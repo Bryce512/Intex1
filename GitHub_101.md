@@ -23,7 +23,7 @@ Follow this guide to using common commands from command line to access GitHub.
 > git checkout branch-name
 
 ## Resetting local changes:
-WARNING: This will reset all changes on your computer to the most recent push on the branch!
+WARNING: This will reset all changes on your computer to the most recent push on the branch! 
 
 Reset Everything
 > git reset --hard
