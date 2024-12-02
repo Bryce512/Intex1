@@ -31,9 +31,38 @@ app.get('/', (req, res) => {
 
 // *** --------------------------------- ADMIN ONLY Routes --------------------------------***
 
+// Serve the login page (login.ejs)
+app.get('/login', (req, res) => {
+  res.render('admin_Views/login');  // Renders login.ejs from admin_Views folder
+});
+
+// Login Route
+app.post('/login', async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  
+  try {
+      // Query the user table to find the record
+      const user = await knex('user')
+          .select('*')
+          .where({ username, password }) // Replace with hashed password comparison in production
+          .first(); // Returns the first matching record
+          
+      if (user) {
+          security = true;
+          res.redirect("/admin");  // Redirect to admin page on success
+      } else {
+          security = false;
+          res.render('admin_Views/login', { error: 'Invalid username or password' });
+      }
+  } catch (error) {
+      console.error('Database error:', error);
+      res.render('admin_Views/login', { error: 'An error occurred. Please try again.' });
+  }
+});
+
 // Admin Home Page
-// Define a route for the About page
-app.get('admin', (req, res) => {
+app.get('/admin', (req, res) => {
   const navItems = [
     { text: 'Home', link: '/' },
     { text: 'About', link: '/about' },
