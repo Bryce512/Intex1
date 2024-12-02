@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve the login page (login.ejs)
 app.get('/', (req, res) => {
-  res.render('home');  // Renders 'login.ejs' file
+  res.render('public_views/external');  // Renders 'login.ejs' file
 });
 
 // *** --------------------------------- ADMIN ONLY Routes --------------------------------***
