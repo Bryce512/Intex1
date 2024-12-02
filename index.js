@@ -68,7 +68,7 @@ app.get('/admin', (req, res) => {
     { text: 'About', link: '/about' },
     { text: 'Support', link: '/support' }
   ];
-  res.render('admin_Views/adminHome', { navItems });
+  res.render("admin_Views/adminHome", { navItems });
 });
 
 
