@@ -18,10 +18,11 @@ const knex = require("knex") ({
 }
 })
 
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
 // Serve static files (CSS, images, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
+
 // Define route for home page
 
 // Serve the login page (login.ejs)
@@ -29,7 +30,7 @@ app.get('/', (req, res) => {
   res.render('home');  // Renders 'login.ejs' file
 });
 
-// *** --------------------------------- ADMIN ONLY Routes --------------------------------***
+// *** --------------------------------- ADMIN Routes --------------------------------***
 
 // Admin Home Page
 // Define a route for the About page

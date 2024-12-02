@@ -1,0 +1,98 @@
+:root {
+  --primary-color: #34b3a8;
+  --primary-light: #B0E8E3;
+  --secondary-color: #EF767A;
+  --secondary-light: #F9C8CA;
+  --dark-grey: #333333;
+  --font-size-large: 2rem;
+  --font-size-small: 1rem;
+}
+
+
+/* Reset some basic styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Override the Materialize default navbar color */
+nav {
+  background-color: var(--dark-grey); /* Custom color */
+}
+
+/* Customize the color of the logo */
+nav .brand-logo {
+  color: #ffffff !important; /* Make logo text white */
+  font-size: 2rem;  /* Adjust font size of logo */
+  font-weight: bold;
+}
+
+/* Move the logo to the left */
+nav .nav-wrapper {
+  padding-left: 20px; /* Adjust padding to move logo left */
+}
+
+/* Customize the navigation links color */
+nav ul li a {
+  color: #ffffff !important; /* Make nav links white */
+  font-weight: bold;
+}
+
+/* Hover effect for nav links */
+nav ul li a:hover {
+  background-color: var(--primary-light);  /* Red background on hover */
+}
+
+/* Change color of the navbar when scrolled */
+.navbar-fixed {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 999;
+}
+
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  padding: 30px;
+  width: 300px;
+}
+
+h1 {
+  color: #2C3E50;
+  margin-bottom: 20px;
+}
+
+p {
+  color: #7F8C8D;
+  margin-bottom: 30px;
+}
+
+.cta-button {
+  background-color: #3498DB;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #2980B9;
+}
