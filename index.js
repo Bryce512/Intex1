@@ -33,13 +33,13 @@ app.get('/', (req, res) => {
 
 // Admin Home Page
 // Define a route for the About page
-app.get('admin', (req, res) => {
+app.get('/admin', (req, res) => {
   const navItems = [
     { text: 'Home', link: '/' },
     { text: 'About', link: '/about' },
     { text: 'Support', link: '/support' }
   ];
-  res.render('admin_Views/adminHome', { navItems });
+  res.render("admin_Views/adminHome", { navItems });
 });
 
 
