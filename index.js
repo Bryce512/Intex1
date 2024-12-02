@@ -29,6 +29,23 @@ app.get('/', (req, res) => {
   res.render('public_views/external');  // Renders 'login.ejs' file
 });
 
+// *** --------------------------------- ADMIN ONLY Routes --------------------------------***
+
+// Admin Home Page
+// Define a route for the About page
+app.get('admin', (req, res) => {
+  const navItems = [
+    { text: 'Home', link: '/' },
+    { text: 'About', link: '/about' },
+    { text: 'Support', link: '/support' }
+  ];
+  res.render('admin_Views/adminHome', { navItems });
+});
+
+
+
+// *** --------------------------------- PUBLIC Routes --------------------------------***
+
 
 // Serve static files (e.g., CSS) if needed
 app.use(express.static('public'));
