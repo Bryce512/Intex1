@@ -24,17 +24,17 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, 'public')));
 // Define route for home page
 
-// Serve the login page (login.ejs)
+// Serve the external page (external.ejs)
 app.get('/', (req, res) => {
-  res.render('public_views/external');  // Renders 'login.ejs' file
+  res.render('public_views/external');  // Renders external.ejs from public_views folder
 });
-
-// *** --------------------------------- ADMIN ONLY Routes --------------------------------***
 
 // Serve the login page (login.ejs)
 app.get('/login', (req, res) => {
   res.render('admin_Views/login');  // Renders login.ejs from admin_Views folder
 });
+
+// *** --------------------------------- ADMIN ONLY Routes --------------------------------***
 
 // Login Route
 app.post('/login', async (req, res) => {
