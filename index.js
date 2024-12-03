@@ -122,6 +122,24 @@ app.post('/update-user/:id', (req, res) => {
     });
 });
 
+// Search Bar grabbing data
+app.get('/search', async (req, res) => {
+  try {
+    const query = req.query.query.toLowerCase(); // Get the search query from the request
+
+    // Search for users whose first_name or last_name matches the query
+    const users = await knex('contact_info')
+      .whereRaw('LOWER(first_name) LIKE ?', [`%${query}%`])
+      .orWhereRaw('LOWER(last_name) LIKE ?', [`%${query}%`]);
+
+    res.json(users); // Return the matching users as JSON
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error retrieving search results" });
+  }
+});
+
+
 // Volunteers Page
 app.get('/volunteers', (req, res) => {
   res.render("admin_Views/volunteers", {
@@ -173,6 +191,37 @@ app.get('/trainings', (req, res) => {
   });
 });
 
+//see if this route works, do we need a different route to display the records
+app.get("/searchUser", (req, res) => {
+  const { searchFirstName, searchLastName } = req.query;
+
+  // Build the query
+  let query = knex.select().from('contact_info');
+
+  if (searchFirstName) {
+    query = query.where(knex.raw('UPPER(first_name)'), '=', searchFirstName.toUpperCase());
+  }
+  
+  if (searchLastName) {
+    query = query.andWhere(knex.raw('UPPER(last_name)'), '=', searchLastName.toUpperCase());
+  }
+
+  // Execute the query
+  // is users the right list 
+  query
+    .then(results => {
+      if (results.length > 0) {
+        res.render("displayUser", { users: results });
+      } else {
+        res.render("displayUser", { users: [], message: "No matches found." });
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ err });
+    });
+});
+
 
 
 // *** --------------------------------- PUBLIC Routes --------------------------------***
@@ -184,3 +233,16 @@ app.use(express.static('public'));
 
 // port number, (parameters) => what you want it to do.
 app.listen(PORT, () => console.log('Server started on port ' + PORT));
+
+// donate route for home page 
+app.get('/donate', (req, res) => {
+  res.redirect('https://turtleshelterproject.org/checkout/donate?donatePageId=5b6a44c588251b72932df5a0');
+});
+
+// Jen's story
+app.get('/jensstory', (req, res) => {
+  res.render('public_views/jensstory', {
+    layout: false });  // Renders external.ejs from public_views folder
+});
+
+
