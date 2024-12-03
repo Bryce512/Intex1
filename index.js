@@ -1,33 +1,40 @@
 let express = require('express');
 let app = express();
 let path = require('path');
+const ejsLayouts = require('express-ejs-layouts');
 const PORT = process.env.PORT || 3000
 // grab html form from file 
 // allows to pull JSON data from form 
+app.set("view engine", "ejs");
+app.set("views", path.resolve(__dirname, "views"));
 app.use(express.urlencoded( {extended: true} )); 
+// Serve static files (CSS, images, etc.)
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(ejsLayouts); // Use layouts middleware
+// Set custom directory for layouts
+app.set('layout', path.join(__dirname, 'views/layouts/adminLayout'));
+
 
 const knex = require("knex") ({
   client : "pg",
   connection : {
-  host : process.env.RDS_HOSTNAME || "awseb-e-jscipcpyz9-stack-awsebrdsdatabase-roat50cnm4ii.c7kgaykw042g.us-east-2.rds.amazonaws.com",
-  user : process.env.RDS_USERNAME || "dev-admins",
-  password : process.env.RDS_PASSWORD || "Password123",
+  host : process.env.RDS_HOSTNAME || "awseb-e-ypkcf5xizp-stack-awsebrdsdatabase-hdqch4trssrm.c7kgaykw042g.us-east-2.rds.amazonaws.com",
+  user : process.env.RDS_USERNAME || "sudosudo",
+  password : process.env.RDS_PASSWORD || "ISAdmins",
   database : process.env.RDS_DB_NAME || "ebdb",
   port : process.env.RDS_PORT || 5432,
-  ssl: process.env.DB_SSL ? { rejectUnauthorized: false } : false
+  ssl:  {rejectUnauthorized: false}
 }
 })
 
-// Serve static files (CSS, images, etc.)
-app.use(express.static(path.join(__dirname, 'public')));
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
+
 
 // Define route for home page
 
 // Serve the external page (external.ejs)
 app.get('/', (req, res) => {
-  res.render('public_views/external');  // Renders external.ejs from public_views folder
+  res.render('public_views/publicHome', {
+    layout: false });  // Renders external.ejs from public_views folder
 });
 
 // Serve the login page (login.ejs)
@@ -63,13 +70,66 @@ app.post('/login', async (req, res) => {
 });
 
 // Admin Home Page
-app.get('/admin', (req, res) => {
-  const navItems = [
-    { text: 'Home', link: '/' },
-    { text: 'About', link: '/about' },
-    { text: 'Support', link: '/support' }
-  ];
-  res.render("admin_Views/adminHome", { navItems });
+app.get('/adminHome', (req, res) => {
+  res.render("admin_Views/adminHome", {
+    title: 'Admin Home',
+    navItems: [],
+    layout: 'layouts/adminLayout'});  // Use the admin layout for this route
+});
+
+// User Maintenance Page
+app.get('/users', async (req, res) => {
+  try {
+    // Fetch users from the 'users' table
+    const users = await knex('contact_info').select(); // Adjust field names as needed
+
+    // Render the users page and pass the users data to the view
+    res.render("admin_Views/users", {
+      title: 'Manage Users',
+      navItems: [],
+      layout: 'layouts/adminLayout', // Use the admin layout for this route
+      users: users // Pass the users data to the view
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error retrieving users");
+  }
+});
+
+// Volunteers Page
+app.get('/volunteers', (req, res) => {
+  res.render("admin_Views/volunteers", {
+    title: 'Manage Volunteers',
+    navItems: [],
+    layout: 'layouts/adminLayout'  // Use the admin layout for this route
+  });
+});
+
+// Events Page
+app.get('/events', (req, res) => {
+  res.render("admin_Views/events", {
+    title: 'Manage Events',
+    navItems: [],  // You can add navigation items here if needed
+    layout: 'layouts/adminLayout'  // Use the admin layout for this route
+  });
+});
+
+// FAQs Page
+app.get('/faqs', (req, res) => {
+  res.render("admin_Views/FAQs", {
+    title: 'Manage FAQs',
+    navItems: [],  // You can add navigation items here if needed
+    layout: 'layouts/adminLayout'  // Use the admin layout for this route
+  });
+});
+
+// Trainings Page
+app.get('/trainings', (req, res) => {
+  res.render("admin_Views/trainings", {
+    title: 'Manage Trainings',
+    navItems: [],  // You can add navigation items here if needed
+    layout: 'layouts/adminLayout'  // Use the admin layout for this route
+  });
 });
 
 //see if this route works, do we need a different route to display the records
@@ -114,3 +174,13 @@ app.use(express.static('public'));
 
 // port number, (parameters) => what you want it to do.
 app.listen(PORT, () => console.log('Server started on port ' + PORT));
+
+// donate route for home page 
+app.get('/donate', (req, res) => {
+  res.redirect('https://turtleshelterproject.org/checkout/donate?donatePageId=5b6a44c588251b72932df5a0');
+});
+
+
+app.get('/jensstory', (req, res) => {
+  res.redirect('https://turtleshelterproject.org/jensstory');
+});

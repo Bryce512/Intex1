@@ -1,0 +1,40 @@
+<!-- Example Table of Users -->
+<h2><%= title %></h2>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% users.forEach(user => { %>
+      <tr class="editable-row" 
+          data-id="<%= user.id %>" 
+          data-name="<%= user.name %>" 
+          data-email="<%= user.email %>">
+        <td><%= user.first_name %></td>
+        <td><%= user.email %></td>
+        <td>
+          <!-- You can remove the Edit button here, as the row itself is clickable -->
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<!-- Modal Template -->
+<%- include('../components/modal', {
+  title: 'Edit User',
+  formAction: '/update-user',
+  body: `
+    <div class="input-field">
+      <input id="user-name" type="text" name="userName" required>
+      <label for="user-name">User Name</label>
+    </div>
+    <div class="input-field">
+      <input id="user-email" type="email" name="userEmail" required>
+      <label for="user-email">Email</label>
+    </div>
+  `
+}) %>
