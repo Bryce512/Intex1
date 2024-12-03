@@ -9,32 +9,56 @@ document.addEventListener('DOMContentLoaded', function() {
     row.addEventListener('click', function() {
       // Get the data from the clicked row
       var id = row.getAttribute('data-id');
-      var name = row.getAttribute('data-name');
-      var email = row.getAttribute('data-email');
+      var entity = row.getAttribute('data-entity');  // user, volunteer, event, etc.
 
-      // Populate the modal form with the selected row's data
-      document.getElementById('entity-name').value = name;
-      document.getElementById('entity-email').value = email;
+      // Dynamically populate modal fields based on the entity type
+      if (entity === 'user') {
+        var firstName = row.getAttribute('data-first-name');
+        var lastName = row.getAttribute('data-last-name');
+        var email = row.getAttribute('data-email');
+
+        // Populate modal with data
+        document.getElementById('entity-first-name').value = firstName;
+        document.getElementById('entity-last-name').value = lastName;
+        document.getElementById('entity-email').value = email;
+      } 
+
+      else if (entity === 'volunteer') {
+        var name = row.getAttribute('data-name');
+        var email = row.getAttribute('data-email');
+
+        // Populate modal with volunteer data
+        document.getElementById('entity-name').value = name;
+        document.getElementById('entity-email').value = email;
+      } 
+
+      else if (entity === 'event') {
+        var eventName = row.getAttribute('data-name');
+        var eventDate = row.getAttribute('data-date');
+        
+        // Populate modal with event data
+        document.getElementById('entity-name').value = eventName;
+        document.getElementById('entity-date').value = eventDate;
+      }
 
       // Set the form action dynamically
-      var formAction = '/update-' + row.closest('table').dataset.entity + '/' + id;
-      document.querySelector('form').setAttribute('action', formAction);
+      var formAction = '/update-' + entity + '/' + id;
+      document.querySelector('#modal1 form').setAttribute('action', formAction);
 
       // Open the modal
       var modal = M.Modal.getInstance(document.getElementById('modal1'));
       modal.open();
     });
   });
-});
 
-
-// Add event listeners for row hover
-document.querySelectorAll('.editable-row').forEach(row => {
-  row.addEventListener('mouseenter', () => {
-    row.classList.add('hover');
-  });
-  row.addEventListener('mouseleave', () => {
-    row.classList.remove('hover');
+  // Add event listeners for row hover
+  document.querySelectorAll('.editable-row').forEach(row => {
+    row.addEventListener('mouseenter', () => {
+      row.classList.add('hover');
+    });
+    row.addEventListener('mouseleave', () => {
+      row.classList.remove('hover');
+    });
   });
 });
 

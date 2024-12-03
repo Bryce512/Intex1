@@ -1,23 +1,65 @@
-<br>
-<!-- Trigger Button to open Modal -->
-<a class="waves-effect waves-light btn modal-trigger" href="#modal1">Edit Event</a>
+<!-- Example Table of Users -->
+<h2><%= title %></h2>
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Primary Contact</th>
+      <th>Phone</th>
+      <th>Email</th>
+      <th>Street Address</th>
+      <th>Location</th>
+      <th>Start Time</th>
+      <th>Est. Duration</th>
+      <th>Requested Type</th>
+      <th>Est. # of Participants</th>
+      <th>Est. # of Adults</th>
+      <th>Est. # of Youth</th>
+      <th>Est. # of Children</th>
+      <th>Est. # Machines</th>
+      <th>Share Jen's Story</th>
+      <th>Requested length</th>
+      <th>Additional Notes</th>
 
-<!-- Include the modal template and pass dynamic data -->
+
+
+    </tr>
+  </thead>
+  <tbody>
+    <% events.forEach(event => { %>
+      <tr class="editable-row" 
+          data-id="<%= event.contact_id %>" 
+          data-date="<%= event.estimated_date %>"
+          data-first-name = "<%= event.first_name %>"
+          data-phone = "<%= event.phone %>"
+          data-entity="event">
+        <td><%= event.estimated_date %></td>
+        <td><%= event.first_name %></td>
+        <td><%= event.phone%></td>
+        <td>
+          <!-- You can remove the Edit button here, as the row itself is clickable -->
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<!-- Modal Template -->
 <%- include('../components/modal', {
-  title: 'Edit Event',
-  formAction: '/update-event',  // The action for the form submission (e.g., update event)
+  title: 'Edit User',
+  formAction: '/update-user',
   body: `
-    <div class="input-field">
-      <input id="event-name" type="text" name="eventName" value="<%= event.name %>" required>
-      <label for="event-name">Event Name</label>
-    </div>
-    <div class="input-field">
-      <input id="event-date" type="date" name="eventDate" value="<%= event.date %>" required>
-      <label for="event-date">Event Date</label>
-    </div>
-    <div class="input-field">
-      <textarea id="event-description" name="eventDescription" class="materialize-textarea" required><%= event.description %></textarea>
-      <label for="event-description">Event Description</label>
-    </div>
+      <div class="input-field">
+        <input id="entity-first-name" type="text" name="firstName" placeholder="First Name">
+        <label for="entity-first-name"></label>
+      </div>
+      <div class="input-field">
+        <input id="entity-last-name" type="text" name="lastName" placeholder="Last Name">
+        <label for="entity-last-name"></label>
+      </div>
+      <div class="input-field">
+        <input id="entity-email" type="email" name="email" placeholder="Email">
+        <label for="entity-email"></label>
+      </div>
   `
 }) %>

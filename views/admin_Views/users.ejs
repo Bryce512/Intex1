@@ -10,10 +10,12 @@
   <tbody>
     <% users.forEach(user => { %>
       <tr class="editable-row" 
-          data-id="<%= user.id %>" 
-          data-name="<%= user.name %>" 
-          data-email="<%= user.email %>">
-        <td><%= user.first_name %></td>
+          data-id="<%= user.contact_id %>" 
+          data-email="<%= user.email %>"
+          data-first-name="<%= user.first_name %>"
+          data-last-name="<%= user.last_name %>"
+          data-entity="user">
+        <td><%= user.first_name + ' ' + user.last_name %></td>
         <td><%= user.email %></td>
         <td>
           <!-- You can remove the Edit button here, as the row itself is clickable -->
@@ -28,13 +30,17 @@
   title: 'Edit User',
   formAction: '/update-user',
   body: `
-    <div class="input-field">
-      <input id="user-name" type="text" name="userName" required>
-      <label for="user-name">User Name</label>
-    </div>
-    <div class="input-field">
-      <input id="user-email" type="email" name="userEmail" required>
-      <label for="user-email">Email</label>
-    </div>
+      <div class="input-field">
+        <input id="entity-first-name" type="text" name="firstName" placeholder="First Name">
+        <label for="entity-first-name"></label>
+      </div>
+      <div class="input-field">
+        <input id="entity-last-name" type="text" name="lastName" placeholder="Last Name">
+        <label for="entity-last-name"></label>
+      </div>
+      <div class="input-field">
+        <input id="entity-email" type="email" name="email" placeholder="Email">
+        <label for="entity-email"></label>
+      </div>
   `
 }) %>
