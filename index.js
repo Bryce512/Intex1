@@ -132,6 +132,37 @@ app.get('/trainings', (req, res) => {
   });
 });
 
+//see if this route works, do we need a different route to display the records
+app.get("/searchUser", (req, res) => {
+  const { searchFirstName, searchLastName } = req.query;
+
+  // Build the query
+  let query = knex.select().from('contact_info');
+
+  if (searchFirstName) {
+    query = query.where(knex.raw('UPPER(first_name)'), '=', searchFirstName.toUpperCase());
+  }
+  
+  if (searchLastName) {
+    query = query.andWhere(knex.raw('UPPER(last_name)'), '=', searchLastName.toUpperCase());
+  }
+
+  // Execute the query
+  // is users the right list 
+  query
+    .then(results => {
+      if (results.length > 0) {
+        res.render("displayUser", { users: results });
+      } else {
+        res.render("displayUser", { users: [], message: "No matches found." });
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ err });
+    });
+});
+
 
 
 // *** --------------------------------- PUBLIC Routes --------------------------------***
@@ -142,4 +173,18 @@ app.use(express.static('public'));
 
 
 // port number, (parameters) => what you want it to do.
+<<<<<<< HEAD
 app.listen(PORT, () => console.log('Server started on port ' + PORT));
+=======
+app.listen(PORT, () => console.log('Server started on port ' + PORT));
+
+// donate route for home page 
+app.get('/donate', (req, res) => {
+  res.redirect('https://turtleshelterproject.org/checkout/donate?donatePageId=5b6a44c588251b72932df5a0');
+});
+
+
+app.get('/jensstory', (req, res) => {
+  res.redirect('https://turtleshelterproject.org/jensstory');
+});
+>>>>>>> 3967fe05d8dab349fbbe7e8ca7441e8c189378bc
