@@ -43,6 +43,37 @@ app.get('/admin', (req, res) => {
   res.render("admin_Views/adminHome", { navItems });
 });
 
+//see if this route works, do we need a different route to display the records
+app.get("/searchUser", (req, res) => {
+  const { searchFirstName, searchLastName } = req.query;
+
+  // Build the query
+  let query = knex.select().from('contact_info');
+
+  if (searchFirstName) {
+    query = query.where(knex.raw('UPPER(first_name)'), '=', searchFirstName.toUpperCase());
+  }
+  
+  if (searchLastName) {
+    query = query.andWhere(knex.raw('UPPER(last_name)'), '=', searchLastName.toUpperCase());
+  }
+
+  // Execute the query
+  // is users the right list 
+  query
+    .then(results => {
+      if (results.length > 0) {
+        res.render("displayUser", { users: results });
+      } else {
+        res.render("displayUser", { users: [], message: "No matches found." });
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ err });
+    });
+});
+
 
 
 // *** --------------------------------- PUBLIC Routes --------------------------------***
