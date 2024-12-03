@@ -198,7 +198,10 @@ app.get('/donate', (req, res) => {
   res.redirect('https://turtleshelterproject.org/checkout/donate?donatePageId=5b6a44c588251b72932df5a0');
 });
 
-
+// Jen's story
 app.get('/jensstory', (req, res) => {
-  res.redirect('https://turtleshelterproject.org/jensstory');
+  res.render('public_views/jensstory', {
+    layout: false });  // Renders external.ejs from public_views folder
 });
+
+

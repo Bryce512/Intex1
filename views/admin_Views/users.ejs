@@ -45,6 +45,7 @@
         const rows = results.map(user => `
           <tr>
             <td>${user.first_name} ${user.last_name}</td>
+            <td>${user.sewing_level}</td>
             <td>${user.email}</td>
           </tr>
         `).join('');
@@ -61,6 +62,41 @@
         resultsContainer.innerHTML = '<p>No matching users found.</p>';
       }
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+    const rows = document.querySelectorAll(".editable-row");
+
+    rows.forEach(row => {
+      row.addEventListener("click", async () => {
+        const userId = row.getAttribute("data-id");
+
+        try {
+          const response = await fetch(`/users/${userId}`); // Fetch user data by ID
+          const user = await response.json();
+
+          if (user) {
+            populateModal(user); // Fill modal with user details
+            const modal = document.querySelector("#modal1");
+            const instance = M.Modal.getInstance(modal); // Assuming you're using Materialize
+            instance.open(); // Open the modal
+          }
+        } catch (error) {
+          console.error("Error fetching user details:", error);
+        }
+      });
+    });
+  });
+
+  function populateModal(user) {
+    document.getElementById("user-name").value = `${user.first_name} ${user.last_name}`;
+    document.getElementById("user-email").value = user.email;
+    document.getElementById("user-sewing_level")
+    document.getElementById("user-username").value = user.username;
+    document.getElementById("user-password").value = user.password;
+
+    // Refresh Materialize inputs (if using Materialize CSS)
+    M.updateTextFields();
+  }
 </script>
 
 <table>
@@ -74,10 +110,11 @@
     <% users.forEach(user => { %>
       <tr class="editable-row" 
           data-id="<%= user.id %>" 
-          data-name="<%= user.name %>" 
+          data-name="<%= user.first_name %> <%= user.last_name %>" 
           data-email="<%= user.email %>">
-        <td><%= user.first_name %></td>
-        <td><%= user.email %></td>
+          <td><%= user.first_name %> <%= user.last_name %></td>
+          <td><%= user.sewing_level%></td>
+          <td><%= user.email %></td>
         <td>
           <!-- You can remove the Edit button here, as the row itself is clickable -->
         </td>
@@ -92,12 +129,20 @@
   formAction: '/update-user',
   body: `
     <div class="input-field">
-      <input id="user-name" type="text" name="userName" required>
-      <label for="user-name">User Name</label>
+      <input id="user-name" type="text" name="userName" readonly>
+      <label for="user-name">Full Name</label>
     </div>
     <div class="input-field">
-      <input id="user-email" type="email" name="userEmail" required>
+      <input id="user-email" type="email" name="userEmail" readonly>
       <label for="user-email">Email</label>
+    </div>
+    <div class="input-field">
+      <input id="user-username" type="text" name="userUsername" readonly>
+      <label for="user-username">Username</label>
+    </div>
+    <div class="input-field">
+      <input id="user-password" type="password" name="userPassword" readonly>
+      <label for="user-password">Password</label>
     </div>
   `
 }) %>

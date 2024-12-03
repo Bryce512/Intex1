@@ -3,9 +3,10 @@
 <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Edit Event</a>
 
 <!-- Include the modal template and pass dynamic data -->
+
 <%- include('../components/modal', {
   title: 'Edit Event',
-  formAction: '/update-event',  // The action for the form submission (e.g., update event)
+  formAction: '/update-event',
   body: `
     <div class="input-field">
       <input id="event-name" type="text" name="eventName" value="<%= event.name %>" required>
@@ -21,3 +22,7 @@
     </div>
   `
 }) %>
+
+
+
+
