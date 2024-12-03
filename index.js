@@ -232,9 +232,7 @@ app.use(express.static('public'));
 
 
 // port number, (parameters) => what you want it to do.
-<<<<<<< HEAD
-app.listen(PORT, () => console.log('Server started on port ' + PORT));
-=======
+
 app.listen(PORT, () => console.log('Server started on port ' + PORT));
 
 // donate route for home page 
@@ -247,4 +245,3 @@ app.get('/jensstory', (req, res) => {
   res.render('public_views/jensstory', {
     layout: false });  // Renders external.ejs from public_views folder
 });
->>>>>>> 3967fe05d8dab349fbbe7e8ca7441e8c189378bc
