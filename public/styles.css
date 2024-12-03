@@ -55,7 +55,7 @@ body {
 
 /* Button Styles */
 .login-btn {
-    background-color: #3498DB;
+    background-color: #000000;
     color: white;
     border: none;
     padding: 12px 20px;
@@ -67,7 +67,7 @@ body {
 }
 
 .login-btn:hover {
-    background-color: #2980B9;
+    background-color: #343434;
 }
 
 /* Error Message Styles */
@@ -90,7 +90,7 @@ body {
 
 /* Typography */
 h1 {
-    color: #2C3E50;
+    color: #000000;
     margin-bottom: 20px;
 }
 
