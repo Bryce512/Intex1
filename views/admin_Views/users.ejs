@@ -1,5 +1,68 @@
 <!-- Example Table of Users -->
 <h2><%= title %></h2>
+<div class="search-container">
+  <div class="search-container">
+    <input 
+      type="text" 
+      class="search-input" 
+      id="searchBox" 
+      placeholder="Search" 
+      oninput="liveSearch(this.value)">
+  </div>
+  
+  <div id="searchResults"></div>
+    
+</div>
+<script>
+  async function liveSearch(query) {
+    if (!query) {
+      document.getElementById('searchResults').innerHTML = '';
+      return;
+    }
+    const response = await fetch(`/search?query=${query}`);
+    const results = await response.json(); // Expect JSON response
+    displayResults(results);
+  }
+
+    async function liveSearch(query) {
+      if (!query) {
+        document.getElementById('searchResults').innerHTML = '';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/search?query=${query}`);
+        const results = await response.json(); // Expect JSON response
+        displayResults(results);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      }
+    }
+
+    function displayResults(results) {
+      const resultsContainer = document.getElementById('searchResults');
+      if (results.length > 0) {
+        const rows = results.map(user => `
+          <tr>
+            <td>${user.first_name} ${user.last_name}</td>
+            <td>${user.email}</td>
+          </tr>
+        `).join('');
+        resultsContainer.innerHTML = `<table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+      } else {
+        resultsContainer.innerHTML = '<p>No matching users found.</p>';
+      }
+    }
+</script>
+
 <table>
   <thead>
     <tr>

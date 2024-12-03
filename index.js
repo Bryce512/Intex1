@@ -96,6 +96,24 @@ app.get('/users', async (req, res) => {
   }
 });
 
+// Search Bar grabbing data
+app.get('/search', async (req, res) => {
+  try {
+    const query = req.query.query.toLowerCase(); // Get the search query from the request
+
+    // Search for users whose first_name or last_name matches the query
+    const users = await knex('contact_info')
+      .whereRaw('LOWER(first_name) LIKE ?', [`%${query}%`])
+      .orWhereRaw('LOWER(last_name) LIKE ?', [`%${query}%`]);
+
+    res.json(users); // Return the matching users as JSON
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error retrieving search results" });
+  }
+});
+
+
 // Volunteers Page
 app.get('/volunteers', (req, res) => {
   res.render("admin_Views/volunteers", {
