@@ -27,7 +27,7 @@ app.set("view engine", "ejs");
 
 // Serve the external page (external.ejs)
 app.get('/', (req, res) => {
-  res.render('public_views/external');  // Renders external.ejs from public_views folder
+  res.render('public_views/publicHome');  // Renders external.ejs from public_views folder
 });
 
 // Serve the login page (login.ejs)
