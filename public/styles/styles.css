@@ -8,15 +8,9 @@
   --font-size-small: 1rem;
 }
 
-
-/* Reset some basic styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.nav-wrapper{
+  background-color: var(--dark-grey);
 }
-
-
 
 body {
   font-family: Arial, sans-serif;
@@ -24,7 +18,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   margin: 0;
 }
 

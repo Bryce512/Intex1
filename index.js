@@ -1,7 +1,7 @@
 let express = require('express');
 let app = express();
 let path = require('path');
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3000
 // grab html form from file 
 // allows to pull JSON data from form 
 app.use(express.urlencoded( {extended: true} )); 
@@ -14,7 +14,7 @@ const knex = require("knex") ({
   password : process.env.RDS_PASSWORD || "Password123",
   database : process.env.RDS_DB_NAME || "ebdb",
   port : process.env.RDS_PORT || 5432,
-  ssl: process.env.DB_SSL ? { rejectUnauthorized: false } : false  // Fixed line
+  ssl: process.env.DB_SSL ? { rejectUnauthorized: false } : false
 }
 })
 
@@ -27,7 +27,7 @@ app.set("view engine", "ejs");
 
 // Serve the login page (login.ejs)
 app.get('/', (req, res) => {
-  res.render('public_views/external');  // Renders 'login.ejs' file
+  res.render('public_views/publicHome');  // Renders 'login.ejs' file
 });
 
 // *** --------------------------------- ADMIN Routes --------------------------------***
