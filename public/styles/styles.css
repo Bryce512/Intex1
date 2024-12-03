@@ -1,72 +1,161 @@
+/* General root styles */
 :root {
   --primary-color: #34b3a8;
   --primary-light: #B0E8E3;
   --secondary-color: #EF767A;
   --secondary-light: #F9C8CA;
+  --black: #000;
+  --white: #fff;
   --dark-grey: #333333;
   --font-size-large: 2rem;
   --font-size-small: 1rem;
 }
 
-.nav-wrapper{
-  background-color: var(--dark-grey);
+/* Navbar fixed to the top */
+.nav-wrapper {
+  position: fixed;
+  background-image: linear-gradient(var(--black), rgba(0, 0, 0, .7));
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 63px; /* Fixed height for navbar */
+  z-index: 1000; /* Ensure it stays on top */
 }
 
+/* Side navigation */
+.custom-sidenav {
+  position: fixed;
+  top: 63px; /* Leave space for the navbar */
+  left: 0;
+  width: 190px; /* Width of the sidebar */
+  height: 100%; /* Full-height sidebar */
+  background-color: var(--dark-grey);
+  padding-top: 20px;
+  z-index: 999; /* Sidebar stays below the navbar */
+  overflow-y: auto;
+}
+
+/* Side navigation links */
+.custom-sidenav a {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 25px;
+  color: var(--white);
+  display: block;
+}
+
+/* Hover effects on side nav links */
+.custom-sidenav a:hover {
+  color: var(--primary-color);
+}
+
+.custom-sidenav a:active {
+  color: var(--primary-light);
+}
+
+.custom-sidenav a.active {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+/* Main content area */
+.admin-content {
+  margin-left: 190px; /* Space for sidebar */
+  padding-left:  20px;  /* General padding for the content */
+}
+
+/* Content body */
+.admin-body {
+  background-color: #f5f5f5;
+  margin-top: 0;  /* Ensure there's no margin above the content */
+}
+
+/* Table row hover effect */
+table tbody tr:hover {
+  background-color: #e0e0e0;  /* Light grey background on hover */
+}
+/* Hover effect for table rows */
+.editable-row:hover {
+  background-color: #f0f0f0;  /* Light grey on hover */
+  cursor: pointer;
+}
+
+/* Highlight the selected row */
+.editable-row.selected {
+  background-color: #b0e8e3;  /* Light teal when selected */
+}
+
+
+/* Optional: Add some padding to the table for better spacing */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+
+
+
+
+
+/* Basic body styles */
 body {
   font-family: Arial, sans-serif;
   background-color: #f5f5f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
+  margin: 0; /* Ensure no extra margin is added to the body */
 }
 
-/* Container Styles */
+/* Additional container styles (if needed) */
 .container {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    padding: 30px;
-    width: 300px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  padding: 30px;
+  width: 300px;
 }
 
 /* Typography */
 h1 {
-    color: #000000;
-    margin-bottom: 20px;
+  color: #000000;
+  margin-bottom: 20px;
 }
 
 p {
-    color: #7F8C8D;
-    margin-bottom: 30px;
+  color: #7F8C8D;
+  /* margin-bottom: 30px; */
 }
 
 /* CTA Button */
 .cta-button {
-    background-color: #3498DB;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background-color: #3498DB;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .cta-button:hover {
-    background-color: #2980B9;
+  background-color: #2980B9;
 }
 
 /* Responsive Design */
 @media (max-width: 480px) {
-    .login-container {
-        margin: 20px;
-        padding: 20px;
-    }
-    
-    .container {
-        width: 90%;
-        margin: 20px auto;
-    }
+  .login-container {
+    margin: 20px;
+    padding: 20px;
+  }
+  
+  .container {
+    width: 90%;
+    margin: 20px auto;
+  }
 }

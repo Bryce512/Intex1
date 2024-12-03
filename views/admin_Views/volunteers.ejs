@@ -1,0 +1,31 @@
+<br>
+<!-- Button to trigger modal -->
+<a class="waves-effect waves-light btn modal-trigger" href="#modal1">Edit Volunteer</a>
+
+<!-- views/admin_Views/volunteers.ejs -->
+<%- include('../components/modal', {
+  title: 'Edit Volunteer',
+  formAction: '/update-volunteer',  // This would be the action for the form submission
+  body: `
+    <div class="input-field">
+      <input id="volunteer-name" type="text" name="volunteerName" required>
+      <label for="volunteer-name">Volunteer Name</label>
+    </div>
+    <div class="input-field">
+      <input id="volunteer-email" type="email" name="volunteerEmail" required>
+      <label for="volunteer-email">Email</label>
+    </div>
+    <div class="input-field">
+      <input id="volunteer-phone" type="tel" name="volunteerPhone" required>
+      <label for="volunteer-phone">Phone Number</label>
+    </div>
+    <div class="input-field">
+      <input id="volunteer-address" type="text" name="volunteerAddress" required>
+      <label for="volunteer-address">Address</label>
+    </div>
+    <div class="input-field">
+      <input id="volunteer-position" type="text" name="volunteerPosition" required>
+      <label for="volunteer-position">Position</label>
+    </div>
+  `
+}) %>

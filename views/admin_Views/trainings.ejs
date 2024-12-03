@@ -1,0 +1,27 @@
+<br>
+<!-- Button to trigger modal -->
+<a class="waves-effect waves-light btn modal-trigger" href="#modal1">Edit Training</a>
+
+<!-- views/admin_Views/trainings.ejs -->
+<%- include('../components/modal', {
+  title: 'Edit Training',
+  formAction: '/update-training',  // This would be the action for the form submission
+  body: `
+    <div class="input-field">
+      <input id="training-title" type="text" name="trainingTitle" required>
+      <label for="training-title">Training Title</label>
+    </div>
+    <div class="input-field">
+      <input id="training-date" type="date" name="trainingDate" required>
+      <label for="training-date">Training Date</label>
+    </div>
+    <div class="input-field">
+      <textarea id="training-description" name="trainingDescription" class="materialize-textarea" required></textarea>
+      <label for="training-description">Training Description</label>
+    </div>
+    <div class="input-field">
+      <input id="training-location" type="text" name="trainingLocation" required>
+      <label for="training-location">Training Location</label>
+    </div>
+  `
+}) %>
