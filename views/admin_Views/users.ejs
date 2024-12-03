@@ -111,11 +111,12 @@
       <tr class="editable-row" 
           data-id="<%= user.contact_id %>" 
           data-email="<%= user.email %>"
-          data-first-name="<%= user.first_name %>"
+          data-first-name="<%= user.first_first_name %> <%= user.last_name %>"
           data-last-name="<%= user.last_name %>"
           data-entity="user">
-        <td><%= user.first_name + ' ' + user.last_name %></td>
-        <td><%= user.email %></td>
+          <td><%= user.first_name + ' ' + user.last_name %> <%= user.last_name %></td>
+          <td><%= user.sewing_level%></td>
+          <td><%= user.email %></td>
         <td>
           <!-- You can remove the Edit button here, as the row itself is clickable -->
         </td>
