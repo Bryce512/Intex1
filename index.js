@@ -2,7 +2,10 @@ let express = require('express');
 let app = express();
 let path = require('path');
 const ejsLayouts = require('express-ejs-layouts');
+const res = require('express/lib/response');
 const PORT = process.env.PORT || 3000
+
+const authorized = false;
 // grab html form from file 
 // allows to pull JSON data from form 
 app.set("view engine", "ejs");
@@ -81,7 +84,7 @@ app.get('/adminHome', (req, res) => {
 app.get('/users', async (req, res) => {
   try {
     // Fetch users from the 'users' table
-    const users = await knex('contact_info').select(); // Adjust field names as needed
+    const users = await knex('contact_info').select().orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
 
     // Render the users page and pass the users data to the view
     res.render("admin_Views/users", {
@@ -96,24 +99,6 @@ app.get('/users', async (req, res) => {
   }
 });
 
-// Search Bar grabbing data
-app.get('/search', async (req, res) => {
-  try {
-    const query = req.query.query.toLowerCase(); // Get the search query from the request
-
-    // Search for users whose first_name or last_name matches the query
-    const users = await knex('contact_info')
-      .whereRaw('LOWER(first_name) LIKE ?', [`%${query}%`])
-      .orWhereRaw('LOWER(last_name) LIKE ?', [`%${query}%`]);
-
-    res.json(users); // Return the matching users as JSON
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error retrieving search results" });
-  }
-});
-
-
 // Volunteers Page
 app.get('/volunteers', (req, res) => {
   res.render("admin_Views/volunteers", {
@@ -123,14 +108,29 @@ app.get('/volunteers', (req, res) => {
   });
 });
 
-// Events Page
-app.get('/events', (req, res) => {
-  res.render("admin_Views/events", {
-    title: 'Manage Events',
-    navItems: [],  // You can add navigation items here if needed
-    layout: 'layouts/adminLayout'  // Use the admin layout for this route
-  });
+// *** ------------------------------ Events Begin ---------------- ***//
+app.get('/events', async (req, res) => {
+  try {
+    // Fetch events from the 'events' table
+    const events = await knex({r:'requested_events'})
+    .join({c: 'contact_info'}, 'c.contact_id', '=', 'r.contact_id')
+    .select().orderBy('estimated_date', 'asc'); // Adjust field names as needed
+
+    // Render the events page and pass the events data to the view
+    res.render("admin_Views/events", {
+      title: 'Manage Events',
+      navItems: [],
+      layout: 'layouts/adminLayout', // Use the admin layout for this route
+      events: events // Pass the events data to the view
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error retrieving events");
+  }
 });
+// *** ------------------------------ End Events ------------- *** //
+
+
 
 // FAQs Page
 app.get('/faqs', (req, res) => {

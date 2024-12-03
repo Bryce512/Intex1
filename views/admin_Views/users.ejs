@@ -109,12 +109,13 @@
   <tbody>
     <% users.forEach(user => { %>
       <tr class="editable-row" 
-          data-id="<%= user.id %>" 
-          data-name="<%= user.first_name %> <%= user.last_name %>" 
-          data-email="<%= user.email %>">
-          <td><%= user.first_name %> <%= user.last_name %></td>
-          <td><%= user.sewing_level%></td>
-          <td><%= user.email %></td>
+          data-id="<%= user.contact_id %>" 
+          data-email="<%= user.email %>"
+          data-first-name="<%= user.first_name %>"
+          data-last-name="<%= user.last_name %>"
+          data-entity="user">
+        <td><%= user.first_name + ' ' + user.last_name %></td>
+        <td><%= user.email %></td>
         <td>
           <!-- You can remove the Edit button here, as the row itself is clickable -->
         </td>
@@ -128,21 +129,17 @@
   title: 'Edit User',
   formAction: '/update-user',
   body: `
-    <div class="input-field">
-      <input id="user-name" type="text" name="userName" readonly>
-      <label for="user-name">Full Name</label>
-    </div>
-    <div class="input-field">
-      <input id="user-email" type="email" name="userEmail" readonly>
-      <label for="user-email">Email</label>
-    </div>
-    <div class="input-field">
-      <input id="user-username" type="text" name="userUsername" readonly>
-      <label for="user-username">Username</label>
-    </div>
-    <div class="input-field">
-      <input id="user-password" type="password" name="userPassword" readonly>
-      <label for="user-password">Password</label>
-    </div>
+      <div class="input-field">
+        <input id="entity-first-name" type="text" name="firstName" placeholder="First Name">
+        <label for="entity-first-name"></label>
+      </div>
+      <div class="input-field">
+        <input id="entity-last-name" type="text" name="lastName" placeholder="Last Name">
+        <label for="entity-last-name"></label>
+      </div>
+      <div class="input-field">
+        <input id="entity-email" type="email" name="email" placeholder="Email">
+        <label for="entity-email"></label>
+      </div>
   `
 }) %>
