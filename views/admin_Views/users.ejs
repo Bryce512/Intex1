@@ -45,7 +45,6 @@
         const rows = results.map(user => `
           <tr>
             <td>${user.first_name} ${user.last_name}</td>
-            <td>${user.sewing_level}</td>
             <td>${user.email}</td>
           </tr>
         `).join('');
@@ -113,7 +112,6 @@
           data-name="<%= user.first_name %> <%= user.last_name %>" 
           data-email="<%= user.email %>">
           <td><%= user.first_name %> <%= user.last_name %></td>
-          <td><%= user.sewing_level%></td>
           <td><%= user.email %></td>
         <td>
           <!-- You can remove the Edit button here, as the row itself is clickable -->
