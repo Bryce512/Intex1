@@ -16,41 +16,6 @@
   box-sizing: border-box;
 }
 
-/* Override the Materialize default navbar color */
-nav {
-  background-color: var(--dark-grey); /* Custom color */
-}
-
-/* Customize the color of the logo */
-nav .brand-logo {
-  color: #ffffff !important; /* Make logo text white */
-  font-size: 2rem;  /* Adjust font size of logo */
-  font-weight: bold;
-}
-
-/* Move the logo to the left */
-nav .nav-wrapper {
-  padding-left: 20px; /* Adjust padding to move logo left */
-}
-
-/* Customize the navigation links color */
-nav ul li a {
-  color: #ffffff !important; /* Make nav links white */
-  font-weight: bold;
-}
-
-/* Hover effect for nav links */
-nav ul li a:hover {
-  background-color: var(--primary-light);  /* Red background on hover */
-}
-
-/* Change color of the navbar when scrolled */
-.navbar-fixed {
-  position: fixed;
-  width: 100%;
-  top: 0;
-  z-index: 999;
-}
 
 
 body {
