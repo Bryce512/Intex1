@@ -1,0 +1,13 @@
+<!-- Modal Structure in modal.ejs -->
+<div id="modal1" class="modal">
+  <div class="modal-content">
+    <h4><%= title %></h4>
+    <form action="<%= formAction %>" method="POST">
+      <%- body %>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="modal-close btn grey">Cancel</button>
+    <button type="submit" class="btn green">Save</button>
+  </div>
+</div>
