@@ -185,6 +185,7 @@ app.get('/volunteers', async (req, res) => {
         'c.first_name',
         'c.last_name',
         'c.email',
+        'c.phone',
         'v.sewing_level',
         's.level_description',
         'v.hours_willing'
@@ -192,10 +193,10 @@ app.get('/volunteers', async (req, res) => {
       .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
       .leftJoin('sewing_level as s', 'v.sewing_level', '=', 's.sewing_level');
 
-    // console.log('Query results:', {
-    //   count: volunteers.length,
-    //   sample: volunteers[0]
-    // });
+    console.log('Query results:', {
+      count: volunteers.length,
+      sample: volunteers[0]
+    });
 
     return res.render('admin_Views/volunteers', {
       title: 'Manage Volunteers',
@@ -217,6 +218,54 @@ app.get('/volunteers', async (req, res) => {
       layout: 'layouts/adminLayout',
       navItems: []
     });
+  }
+});
+
+app.post('/update-volunteer/:id', async (req, res) => {
+  console.log('Update volunteer route hit with ID:', req.params.id);
+  const id = req.params.id;
+  try {
+    // Convert sewing level description to number
+    let sewingLevelNum;
+    switch(req.body.sewingLevel.toLowerCase()) {
+      case 'beginner':
+        sewingLevelNum = 1;
+        break;
+      case 'intermediate':
+        sewingLevelNum = 2;
+        break;
+      case 'advanced':
+        sewingLevelNum = 3;
+        break;
+      default:
+        sewingLevelNum = null;
+    }
+
+    await knex.transaction(async trx => {
+      // Update contact_info table
+      await trx('contact_info')
+        .where('contact_id', id)
+        .update({
+          first_name: req.body.firstName,
+          last_name: req.body.lastName,
+          email: req.body.email,
+          phone: req.body.phone
+        });
+
+      // Update volunteers table with numeric sewing level
+      await trx('volunteers')
+        .where('contact_id', id)
+        .update({
+          sewing_level: sewingLevelNum,
+          hours_willing: req.body.hoursWilling
+        });
+    });
+
+    console.log('Update successful, redirecting to /volunteers');
+    res.redirect('/volunteers');
+  } catch (error) {
+    console.error('Error updating volunteer:', error);
+    res.status(500).send('Error updating volunteer');
   }
 });
 
@@ -243,6 +292,7 @@ app.get('/searchVolunteers', async (req, res) => {
           'c.first_name',
           'c.last_name',
           'c.email',
+          'c.phone',
           'v.sewing_level',
           's.level_description',
           'v.hours_willing'
@@ -265,6 +315,7 @@ app.get('/searchVolunteers', async (req, res) => {
           'c.first_name',
           'c.last_name',
           'c.email',
+          'c.phone',
           'v.sewing_level',
           's.level_description',
           'v.hours_willing'
