@@ -491,14 +491,14 @@ app.post('/scheduleEvent', (req, res) => {
 
   // Start a transaction
   knex.transaction(trx => {
-    // Step 1: Check if the zip code exists in the 'location' table
+    // Step 1: Check if the zip code exists in the 'location' table (for personal info)
     return trx('location')
       .select('loc_id')
       .where('zip', zip)
       .first()
       .then(location => {
         let loc_id;
-
+  
         if (location) {
           // Zip code exists, use the existing loc_id
           loc_id = location.loc_id;
@@ -515,41 +515,67 @@ app.post('/scheduleEvent', (req, res) => {
               loc_id = newLocation[0].loc_id; // Capture the new loc_id
             });
         }
-
-        // Step 2: Insert new contact into contact_info table with the loc_id
-        return trx('contact_info')
-          .insert({
-            first_name: firstName,
-            last_name: lastName,
-            phone: phone,
-            email: email,
-            loc_id: loc_id, // Insert the loc_id
+  
+        // Step 2: Check if the event zip code exists in the 'location' table (for event location)
+        let eventLoc_id;
+        return trx('location')
+          .select('loc_id')
+          .where('zip', eventZip)
+          .first()
+          .then(existingLocation => {
+            if (existingLocation) {
+              // Event zip exists, use the existing loc_id for the event
+              eventLoc_id = existingLocation.loc_id;
+            } else {
+              // Event zip doesn't exist, insert new location for the event
+              return trx('location')
+                .insert({
+                  city: eventCity,
+                  state: eventState,
+                  zip: eventZip,
+                })
+                .returning('loc_id')
+                .then(newEventLocation => {
+                  eventLoc_id = newEventLocation[0].loc_id; // Capture the new loc_id for the event
+                });
+            }
           })
-          .returning('contact_id') // Get the newly inserted contact_id
-          .then(newContact => {
-            const contact_id = newContact[0].contact_id;  // Capture the new contact_id
-
-            // Step 3: Insert the event into requested_events table
-            return trx('requested_events')
+          .then(() => {
+            // Step 3: Insert new contact into contact_info table with the loc_id
+            return trx('contact_info')
               .insert({
-                estimated_date: eventDate,
-                street_address: street,
-                estimated_start_time: startTime,
-                estimated_duration: eventDuration,
-                type_id: eventType,
-                loc_size: locationSize,
-                estimated_num_adults: numAdults,
-                estimated_num_youth: numYouth,
-                estimated_num_children: numChildren,
-                num_machines: numMachines,
-                share_story: shareStory,
-                story_minutes: storyDuration,
-                num_tables: numTables,
-                table_shape: tableShape,
-                additional_notes: additionalNotes,
-                organization: organization,
-                contact_id: contact_id,  // Insert the contact_id from contact_info
-                loc_id: loc_id,  // Insert the loc_id from location table
+                first_name: firstName,
+                last_name: lastName,
+                phone: phone,
+                email: email,
+                loc_id: loc_id, // Insert the loc_id for personal info
+              })
+              .returning('contact_id') // Get the newly inserted contact_id
+              .then(newContact => {
+                const contact_id = newContact[0].contact_id;  // Capture the new contact_id
+  
+                // Step 4: Insert the event into requested_events table
+                return trx('requested_events')
+                  .insert({
+                    estimated_date: eventDate,
+                    street_address: street,
+                    estimated_start_time: startTime,
+                    estimated_duration: eventDuration,
+                    type_id: eventType,
+                    loc_size: locationSize,
+                    estimated_num_adults: numAdults,
+                    estimated_num_youth: numYouth,
+                    estimated_num_children: numChildren,
+                    num_machines: numMachines,
+                    share_story: shareStory,
+                    story_minutes: storyDuration,
+                    num_tables: numTables,
+                    table_shape: tableShape,
+                    additional_notes: additionalNotes,
+                    organization: organization,
+                    contact_id: contact_id,  // Insert the contact_id from contact_info
+                    loc_id: eventLoc_id,  // Insert the loc_id for the event location
+                  });
               });
           });
       })
@@ -561,8 +587,9 @@ app.post('/scheduleEvent', (req, res) => {
         console.error('Error scheduling event:', error);
         res.status(500).send('Internal Server Error');
       });
-  });
+  });  
 });
+
 
 // port number, (parameters) => what you want it to do.
 
