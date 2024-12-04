@@ -469,3 +469,19 @@ app.get('/jensstory', (req, res) => {
   res.render('public_views/jensstory', {
     layout: false });  // Renders external.ejs from public_views folder
 });
+
+// Schedule an Event
+app.get('/event', (req, res) => {
+  // Fetch location sizes and table shapes to populate dropdowns
+  knex('location_size', 'table_shape')
+  .select('size_description', 'shape_description')
+  .then(formInfo => {
+      // Render the add form with the Pokémon types data
+      res.render('public_views/scheduleEvent', { formInfo }, {
+        layout: false });
+  })
+  .catch(error => {
+      console.error('Error fetching Location sizes and table shapes:', error);
+      res.status(500).send('Internal Server Error');
+  });
+});
