@@ -24,12 +24,28 @@ document.addEventListener('DOMContentLoaded', function() {
       } 
 
       else if (entity === 'volunteer') {
-        var name = row.getAttribute('data-name');
+        // Get all data attributes
+        var firstName = row.getAttribute('data-first-name');
+        var lastName = row.getAttribute('data-last-name');
         var email = row.getAttribute('data-email');
+        var phone = row.getAttribute('data-phone');
+        var sewingLevel = row.getAttribute('data-sewing-level');
+        var hoursWilling = row.getAttribute('data-hours-willing');
+        var id = row.getAttribute('data-id');
 
         // Populate modal with volunteer data
-        document.getElementById('entity-name').value = name;
+        document.getElementById('entity-first-name').value = firstName;
+        document.getElementById('entity-last-name').value = lastName;
         document.getElementById('entity-email').value = email;
+        document.getElementById('entity-phone').value = phone;
+        document.getElementById('entity-sewing-level').value = sewingLevel;
+        document.getElementById('entity-hours-willing').value = hoursWilling;
+
+        // Update form action with the correct ID
+        document.querySelector('form').action = `/update-volunteer/${id}`;
+
+        // Refresh Materialize inputs
+        M.updateTextFields();
       } 
 
       else if (entity === 'event') {

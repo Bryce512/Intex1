@@ -148,6 +148,7 @@ app.get('/volunteers', async (req, res) => {
         'c.first_name',
         'c.last_name',
         'c.email',
+        'c.phone',
         'v.sewing_level',
         's.level_description',
         'v.hours_willing'
@@ -155,10 +156,7 @@ app.get('/volunteers', async (req, res) => {
       .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
       .leftJoin('sewing_level as s', 'v.sewing_level', '=', 's.sewing_level');
 
-    console.log('Query results:', {
-      count: volunteers.length,
-      sample: volunteers[0]
-    });
+    console.log('Sample volunteer data:', volunteers[0]);
 
     return res.render('admin_Views/volunteers', {
       title: 'Manage Volunteers',
@@ -180,6 +178,36 @@ app.get('/volunteers', async (req, res) => {
       layout: 'layouts/adminLayout',
       navItems: []
     });
+  }
+});
+
+app.post('/update-volunteer/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    await knex.transaction(async trx => {
+      // Update contact_info table
+      await trx('contact_info')
+        .where('contact_id', id)
+        .update({
+          first_name: req.body.firstName,
+          last_name: req.body.lastName,
+          email: req.body.email,
+          phone: req.body.phone
+        });
+
+      // Update volunteers table
+      await trx('volunteers')
+        .where('contact_id', id)
+        .update({
+          sewing_level: req.body.sewingLevel,
+          hours_willing: req.body.hoursWilling
+        });
+    });
+
+    res.redirect('/volunteers');
+  } catch (error) {
+    console.error('Error updating volunteer:', error);
+    res.status(500).send('Error updating volunteer');
   }
 });
 
@@ -206,6 +234,7 @@ app.get('/searchVolunteers', async (req, res) => {
           'c.first_name',
           'c.last_name',
           'c.email',
+          'c.phone',
           'v.sewing_level',
           's.level_description',
           'v.hours_willing'
@@ -228,6 +257,7 @@ app.get('/searchVolunteers', async (req, res) => {
           'c.first_name',
           'c.last_name',
           'c.email',
+          'c.phone',
           'v.sewing_level',
           's.level_description',
           'v.hours_willing'

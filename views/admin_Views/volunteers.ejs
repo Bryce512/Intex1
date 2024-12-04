@@ -18,6 +18,7 @@
     <tr>
       <th>Name</th>
       <th>Email</th>
+      <th>Phone</th>
       <th>Sewing Level</th>
       <th>Hours Willing</th>
     </tr>
@@ -25,22 +26,68 @@
   <tbody>
     <% if (typeof volunteers !== 'undefined' && volunteers && volunteers.length > 0) { %>
       <% volunteers.forEach(function(volunteer) { %>
-        <tr>
+        <tr class="editable-row"
+          data-id="<%= volunteer.contact_id %>"
+          data-first-name="<%= volunteer.first_name %>"
+          data-last-name="<%= volunteer.last_name %>"
+          data-email="<%= volunteer.email %>"
+          data-phone="<%= volunteer.phone %>"
+          data-sewing-level="<%= volunteer.level_description %>"
+          data-hours-willing="<%= volunteer.hours_willing %>"
+          data-entity="volunteer"
+        >
           <td><%= volunteer.first_name %> <%= volunteer.last_name %></td>
           <td><%= volunteer.email %></td>
+          <td><%= volunteer.phone || 'Not Set' %></td>
           <td><%= volunteer.level_description || 'Not Set' %></td>
           <td><%= volunteer.hours_willing || 'Not Set' %></td>
         </tr>
       <% }); %>
     <% } else { %>
       <tr>
-        <td colspan="4">No volunteers found</td>
+        <td colspan="5">No volunteers found</td>
       </tr>
     <% } %>
   </tbody>
 </table>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const rows = document.querySelectorAll(".editable-row");
+
+  rows.forEach(row => {
+    row.addEventListener("click", () => {
+      // Get data from row attributes
+      const firstName = row.getAttribute('data-first-name');
+      const lastName = row.getAttribute('data-last-name');
+      const email = row.getAttribute('data-email');
+      const phone = row.getAttribute('data-phone');
+      const sewingLevel = row.getAttribute('data-sewing-level');
+      const hoursWilling = row.getAttribute('data-hours-willing');
+      const id = row.getAttribute('data-id');
+
+      // Populate modal with data
+      document.getElementById('entity-first-name').value = firstName;
+      document.getElementById('entity-last-name').value = lastName;
+      document.getElementById('entity-email').value = email;
+      document.getElementById('entity-phone').value = phone;
+      document.getElementById('entity-sewing-level').value = sewingLevel;
+      document.getElementById('entity-hours-willing').value = hoursWilling;
+      
+      // Update form action with the correct ID
+      document.querySelector('form').action = `/update-volunteer/${id}`;
+
+      // Activate labels (for Materialize)
+      M.updateTextFields();
+
+      // Open the modal
+      const modal = document.querySelector("#editModal");
+      const instance = M.Modal.getInstance(modal);
+      instance.open();
+    });
+  });
+});
+
 async function liveSearch(query) {
   if (!query) {
     document.getElementById('searchResults').innerHTML = '';
@@ -63,6 +110,7 @@ function displayResults(results) {
       <tr>
         <td>${volunteer.first_name} ${volunteer.last_name}</td>
         <td>${volunteer.email}</td>
+        <td>${volunteer.phone || 'Not Set'}</td>
         <td>${volunteer.level_description || 'Not Set'}</td>
         <td>${volunteer.hours_willing || 'Not Set'}</td>
       </tr>
@@ -74,6 +122,7 @@ function displayResults(results) {
           <tr>
             <th>Name</th>
             <th>Email</th>
+            <th>Phone</th>
             <th>Sewing Level</th>
             <th>Hours Willing</th>
           </tr>
@@ -85,3 +134,35 @@ function displayResults(results) {
   }
 }
 </script>
+
+<!-- Modal Template -->
+<%- include('../components/modal', {
+  title: 'Edit Volunteer',
+  formAction: '/update-volunteer',
+  body: `
+      <div class="input-field">
+        <input id="entity-first-name" type="text" name="firstName" required>
+        <label for="entity-first-name">First Name</label>
+      </div>
+      <div class="input-field">
+        <input id="entity-last-name" type="text" name="lastName" required>
+        <label for="entity-last-name">Last Name</label>
+      </div>
+      <div class="input-field">
+        <input id="entity-email" type="email" name="email" required>
+        <label for="entity-email">Email</label>
+      </div>
+      <div class="input-field">
+        <input id="entity-phone" type="tel" name="phone">
+        <label for="entity-phone">Phone</label>
+      </div>
+      <div class="input-field">
+        <input id="entity-sewing-level" type="text" name="sewingLevel">
+        <label for="entity-sewing-level">Sewing Level</label>
+      </div>
+      <div class="input-field">
+        <input id="entity-hours-willing" type="number" name="hoursWilling">
+        <label for="entity-hours-willing">Hours Willing</label>
+      </div>
+  `
+}) %>
