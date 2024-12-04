@@ -33,11 +33,12 @@ const knex = require("knex") ({
 
 
 // Define route for home page
-
-// Serve the external page (external.ejs)
 app.get('/', (req, res) => {
   res.render('public_views/publicHome', {
-    layout: false });  // Renders external.ejs from public_views folder
+    title: 'Home',
+    layout: 'layouts/mainLayout',
+    navItems: []
+  });
 });
 
 // *** --------------------------------- LOGIN Routes --------------------------------***
@@ -83,7 +84,7 @@ app.post('/login', async (req, res) => {
 
 app.get('/logout', (req, res) => {
     authorized = false;
-    return res.redirect('/publicHome');  // In case of an error, go back to admin home
+    return res.redirect('/');  // Changed from '/publicHome' to '/'
 });
 
 
@@ -576,7 +577,9 @@ app.post('/scheduleEvent', (req, res) => {
       })
       .then(() => {
         res.render('public_views/publicHome', {
-        layout: false });
+          layout: false,
+          title: 'Home'
+        });
       })
       .catch(error => {
           console.error('Error adding Event:', error);
