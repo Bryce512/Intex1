@@ -454,11 +454,6 @@ app.get("/searchUser", (req, res) => {
 // Serve static files (e.g., CSS) if needed
 app.use(express.static('public'));
 
-
-// port number, (parameters) => what you want it to do.
-
-app.listen(PORT, () => console.log('Server started on port ' + PORT));
-
 // donate route for home page 
 app.get('/donate', (req, res) => {
   res.redirect('https://turtleshelterproject.org/checkout/donate?donatePageId=5b6a44c588251b72932df5a0');
@@ -472,16 +467,25 @@ app.get('/jensstory', (req, res) => {
 
 // Schedule an Event
 app.get('/event', (req, res) => {
-  // Fetch location sizes and table shapes to populate dropdowns
-  knex('location_size', 'table_shape')
-  .select('size_description', 'shape_description')
-  .then(formInfo => {
-      // Render the add form with the Pokémon types data
-      res.render('public_views/scheduleEvent', { formInfo }, {
-        layout: false });
+  // Fetch location sizes and table shapes independently
+  Promise.all([
+    knex('location_size').select('size_description'), // Fetch size descriptions
+    knex('table_shape').select('shape_description')  // Fetch shape descriptions
+  ])
+  .then(([locationSizes, tableShapes]) => {
+    // Render the page without layout
+    res.render('public_views/scheduleEvent', {
+      locationSizes,
+      tableShapes,
+      layout: false  // Explicitly disable layout
+    });
   })
   .catch(error => {
-      console.error('Error fetching Location sizes and table shapes:', error);
-      res.status(500).send('Internal Server Error');
+    console.error('Error fetching Location sizes and table shapes:', error);
+    res.status(500).send('Internal Server Error');
   });
 });
+
+// port number, (parameters) => what you want it to do.
+
+app.listen(PORT, () => console.log('Server started on port ' + PORT));
