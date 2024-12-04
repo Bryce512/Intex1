@@ -109,9 +109,9 @@ app.get('/admins', async (req, res) => {
     try {
         // Fetch admins from the 'admins' table
         const admins = await knex('contact_info as c').select()
-        .leftJoin('admins as a', 'a.contact_id', '=', 'c.contact_id')
-        .leftJoin('team_members as tm', 'tm.contact_id', '=', 'c.contact_id')
-        .leftJoin('sewing_level as sl', 'sl.sewing_level', '=', 'tm.sewing_level')
+        .join('admins as a', 'a.contact_id', '=', 'c.contact_id')
+        .join('team_members as tm', 'tm.contact_id', '=', 'c.contact_id')
+        .join('sewing_level as sl', 'sl.sewing_level', '=', 'tm.sewing_level')
         .orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
         // Render the admins page and pass the admins data to the view
         res.render("admin_Views/admins", {
