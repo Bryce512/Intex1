@@ -139,113 +139,73 @@ app.get('/search', async (req, res) => {
   }
 });
 
-
-// Volunteers Page
+// *** ------------------------------ Volunteers Begin ---------------- ***//
 app.get('/volunteers', async (req, res) => {
   try {
     const volunteers = await knex('contact_info as c')
-      .join('users as u', 'c.contact_id', '=', 'u.contact_id')
       .select(
         'c.contact_id',
         'c.first_name',
         'c.last_name',
         'c.email',
-        'u.sewing_level',
-        'u.hours_willing'
+        'v.sewing_level',
+        's.level_description',
+        'v.hours_willing'
       )
-      .orderBy('c.last_name', 'asc')
-      .orderBy('c.first_name', 'asc');
+      .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
+      .leftJoin('sewing_level as s', 'v.sewing_level', '=', 's.sewing_level');
 
-    res.render("admin_Views/volunteers", {
+    console.log('Query results:', {
+      count: volunteers.length,
+      sample: volunteers[0]
+    });
+
+    return res.render('admin_Views/volunteers', {
       title: 'Manage Volunteers',
-      navItems: [],
+      volunteers: volunteers,
       layout: 'layouts/adminLayout',
-      volunteers: volunteers
+      navItems: [
+        { text: 'Home', link: '/' },
+        { text: 'About', link: '/about' },
+        { text: 'Support', link: '/support' }
+      ]
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error retrieving volunteers");
+
+  } catch (err) {
+    console.error('Detailed error:', err);
+    return res.render('admin_Views/volunteers', {
+      title: 'Manage Volunteers',
+      volunteers: [],
+      error: 'Failed to load volunteers: ' + err.message,
+      layout: 'layouts/adminLayout',
+      navItems: []
+    });
   }
 });
 
-// Update volunteer route
-app.post('/update-volunteer', async (req, res) => {
-  const { contactId, firstName, lastName, email, sewingLevel, hoursWilling } = req.body;
-  
+
+app.get('/searchVolunteers', async (req, res) => {
   try {
-    await knex.transaction(async trx => {
-      // Update contact_info table
-      await trx('contact_info')
-        .where('contact_id', contactId)
-        .update({
-          first_name: firstName,
-          last_name: lastName,
-          email: email
-        });
+    const query = req.query.query;
 
-      // Update users table
-      await trx('users')
-        .where('contact_id', contactId)
-        .update({
-          sewing_level: sewingLevel,
-          hours_willing: hoursWilling
-        });
-    });
-
-    res.redirect('/volunteers');
-  } catch (error) {
-    console.error('Error updating volunteer:', error);
-    res.status(500).send('Error updating volunteer');
-  }
-});
-
-// Search volunteers route
-app.get('/search-volunteers', async (req, res) => {
-  try {
-    const query = req.query.query.toLowerCase();
-    
-    const volunteers = await knex('contact_info as c')
-      .join('users as u', 'c.contact_id', '=', 'u.contact_id')
+    const results = await knex('contact_info as c')
+      .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
       .select(
         'c.contact_id',
         'c.first_name',
         'c.last_name',
         'c.email',
-        'u.sewing_level',
-        'u.hours_willing'
+        'v.sewing_level',
+        'v.hours_willing'
       )
-      .whereRaw('LOWER(c.first_name) LIKE ?', [`%${query}%`])
-      .orWhereRaw('LOWER(c.last_name) LIKE ?', [`%${query}%`])
-      .orderBy('c.last_name', 'asc')
-      .orderBy('c.first_name', 'asc');
+      .where(knex.raw('LOWER(c.first_name)'), 'like', `%${query.toLowerCase()}%`)
+      .orWhere(knex.raw('LOWER(c.last_name)'), 'like', `%${query.toLowerCase()}%`)
+      .orWhere(knex.raw('LOWER(c.email)'), 'like', `%${query.toLowerCase()}%`);
 
-    res.json(volunteers);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error searching volunteers" });
-  }
-});
-
-// Get all volunteers route
-app.get('/get-all-volunteers', async (req, res) => {
-  try {
-    const volunteers = await knex('contact_info as c')
-      .join('users as u', 'c.contact_id', '=', 'u.contact_id')
-      .select(
-        'c.contact_id',
-        'c.first_name',
-        'c.last_name',
-        'c.email',
-        'u.sewing_level',
-        'u.hours_willing'
-      )
-      .orderBy('c.last_name', 'asc')
-      .orderBy('c.first_name', 'asc');
-
-    res.json(volunteers);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error retrieving volunteers" });
+    res.json(results);
+  } catch (err) {
+    console.error('Error searching volunteers:', err);
+    res.status(500).json({ error: 'Error searching volunteers' });
   }
 });
 

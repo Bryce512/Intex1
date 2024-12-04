@@ -1,148 +1,45 @@
-<br>
-<div class="search-container">
-  <input 
-    type="text" 
-    class="search-input" 
-    id="searchBox" 
-    placeholder="Search volunteers..." 
-    oninput="liveSearch(this.value)">
-</div>
+<!-- Example Table of Volunteers -->
+<h2><%= title %></h2>
 
-<div class="table-container">
-  <table class="striped">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Sewing Level</th>
-        <th>Hours Willing</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="volunteersTableBody">
-      <% if (typeof volunteers !== 'undefined' && volunteers.length > 0) { %>
-        <% volunteers.forEach(volunteer => { %>
-          <tr>
-            <td><%= volunteer.first_name %> <%= volunteer.last_name %></td>
-            <td><%= volunteer.email %></td>
-            <td><%= volunteer.sewing_level %></td>
-            <td><%= volunteer.hours_willing %></td>
-            <td>
-              <button 
-                class="waves-effect waves-light btn modal-trigger" 
-                onclick="openEditModal('<%= volunteer.contact_id %>', '<%= volunteer.first_name %>', '<%= volunteer.last_name %>', '<%= volunteer.email %>', '<%= volunteer.sewing_level %>', '<%= volunteer.hours_willing %>')"
-              >
-                Edit
-              </button>
-            </td>
-          </tr>
-        <% }); %>
-      <% } else { %>
-        <tr>
-          <td colspan="5">No volunteers found</td>
-        </tr>
-      <% } %>
-    </tbody>
-  </table>
-</div>
-
-<!-- Edit Modal -->
-<div id="editModal" class="modal">
-  <div class="modal-content">
-    <h4>Edit Volunteer</h4>
-    <form id="editForm" action="/update-volunteer" method="POST">
-      <input type="hidden" id="contactId" name="contactId">
-      <div class="input-field">
-        <input id="firstName" type="text" name="firstName" required>
-        <label for="firstName">First Name</label>
-      </div>
-      <div class="input-field">
-        <input id="lastName" type="text" name="lastName" required>
-        <label for="lastName">Last Name</label>
-      </div>
-      <div class="input-field">
-        <input id="email" type="email" name="email" required>
-        <label for="email">Email</label>
-      </div>
-      <div class="input-field">
-        <input id="sewingLevel" type="number" name="sewingLevel" min="1" max="5" required>
-        <label for="sewingLevel">Sewing Level (1-5)</label>
-      </div>
-      <div class="input-field">
-        <input id="hoursWilling" type="number" name="hoursWilling" required>
-        <label for="hoursWilling">Hours Willing</label>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="waves-effect waves-light btn">Save Changes</button>
-        <button type="button" class="modal-close waves-effect waves-light btn-flat">Cancel</button>
-      </div>
-    </form>
+<!-- Debug info -->
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="error-message">
+    <%= error %>
   </div>
-</div>
+<% } %>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var modals = document.querySelectorAll('.modal');
-  M.Modal.init(modals);
-});
-
-function openEditModal(contactId, firstName, lastName, email, sewingLevel, hoursWilling) {
-  document.getElementById('contactId').value = contactId;
-  document.getElementById('firstName').value = firstName;
-  document.getElementById('lastName').value = lastName;
-  document.getElementById('email').value = email;
-  document.getElementById('sewingLevel').value = sewingLevel;
-  document.getElementById('hoursWilling').value = hoursWilling;
-  
-  var labels = document.querySelectorAll('.input-field label');
-  labels.forEach(label => label.classList.add('active'));
-  
-  var modal = M.Modal.getInstance(document.getElementById('editModal'));
-  modal.open();
-}
-
-async function liveSearch(query) {
-  if (!query) {
-    loadAllVolunteers();
-    return;
-  }
-
-  try {
-    const response = await fetch(`/search-volunteers?query=${query}`);
-    const volunteers = await response.json();
-    updateVolunteersTable(volunteers);
-  } catch (error) {
-    console.error("Error fetching search results:", error);
-  }
-}
-
-function updateVolunteersTable(volunteers) {
-  const tbody = document.getElementById('volunteersTableBody');
-  tbody.innerHTML = volunteers.map(volunteer => `
+<table>
+  <thead>
     <tr>
-      <td>${volunteer.first_name} ${volunteer.last_name}</td>
-      <td>${volunteer.email}</td>
-      <td>${volunteer.sewing_level}</td>
-      <td>${volunteer.hours_willing}</td>
-      <td>
-        <button 
-          class="waves-effect waves-light btn modal-trigger" 
-          onclick="openEditModal('${volunteer.contact_id}', '${volunteer.first_name}', '${volunteer.last_name}', '${volunteer.email}', '${volunteer.sewing_level}', '${volunteer.hours_willing}')"
-        >
-          Edit
-        </button>
-      </td>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Sewing Level</th>
+      <th>Hours Willing per Month</th>
     </tr>
-  `).join('');
-}
-
-async function loadAllVolunteers() {
-  try {
-    const response = await fetch('/get-all-volunteers');
-    const volunteers = await response.json();
-    updateVolunteersTable(volunteers);
-  } catch (error) {
-    console.error("Error loading volunteers:", error);
-  }
-}
-</script>
+  </thead>
+  <tbody>
+    <% if (typeof volunteers !== 'undefined' && volunteers && volunteers.length > 0) { %>
+      <% volunteers.forEach(function(volunteer) { %>
+        <tr>
+          <td><%= volunteer.first_name %> <%= volunteer.last_name %></td>
+          <td><%= volunteer.email %></td>
+          <td><%= volunteer.level_description || 'Not Set' %></td>
+          <td><%= volunteer.hours_willing || 'Not Set' %></td>
+        </tr>
+      <% }); %>
+    <% } else { %>
+      <tr>
+        <td colspan="4">
+          No volunteers found 
+          <% if (typeof volunteers === 'undefined') { %>
+            (Debug: volunteers is undefined)
+          <% } else if (!volunteers) { %>
+            (Debug: volunteers is null)
+          <% } else { %>
+            (Debug: empty array)
+          <% } %>
+        </td>
+      </tr>
+    <% } %>
+  </tbody>
+</table>
