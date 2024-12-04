@@ -351,32 +351,38 @@ app.get('/searchVolunteers', async (req, res) => {
 });
 
 // *** ------------------------------ Events Begin ---------------- ***//
+// Route to fetch and display executed_events
+
+// Set EJS as the template engine
+app.set('view engine', 'ejs');
+
+// Route to fetch and display executed_events
 app.get('/events', async (req, res) => {
   try {
-    // Fetch data from your database
-    const requestedEventsPending = await knex('requested_events')
-      .where('status', 'pending')
-      .orderBy('estimated_date', 'asc');
-    const requestedEventsApproved = await knex('requested_events')
-      .where('status', 'approved')
-      .orderBy('estimated_date', 'asc');
-    const executedEvents = await knex('executed_events')
-      .orderBy('actual_start_date', 'desc');
+    const events = await knex('executed_events').select(
+      'actual_start_date',
+      'actual_start_time',
+      'actual_duration',
+      'actual_num_people',
+      'actual_type',
+      'pockets',
+      'collars',
+      'envelopes',
+      'vests',
+      'items_completed',
+      'actual_end_date'
+    );
 
-    // Render the EJS page and pass the data
-    res.render('admin_Views/events', {
-      title: 'Manage Events',
-      navItems: [],
-      layout: 'layouts/adminLayout',
-      requestedEventsPending: requestedEventsPending,
-      requestedEventsApproved: requestedEventsApproved,
-      executedEvents: executedEvents
-    });
+    res.render('admin_Views/events', { events });
   } catch (error) {
-    console.error("Error retrieving events:", error);
-    res.status(500).send("Error retrieving events");
+    console.error('Error fetching events:', error.message, error.stack);
+    res.status(500).send('An error occurred while fetching events.');
   }
 });
+
+
+
+
 
 
 
