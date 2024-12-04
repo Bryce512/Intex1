@@ -364,7 +364,12 @@ app.get('/events', async (req, res) => {
     if (status === 'finished') {
       // Query the executed_events table for finished events
       events = await knex('executed_events')
-        .select('*')
+        .select('*',
+        'type.type_description' // Add type_description
+      )
+      .leftJoin('type', 'executed_events.type_id', '=', 'type.type_id'); // Join with type table
+
+
     } else {
       // Default query for pending and approved events
       events = await knex('requested_events')
@@ -375,7 +380,8 @@ app.get('/events', async (req, res) => {
           'requested_events.loc_id',
           'requested_events.estimated_start_time',
           'requested_events.estimated_duration',
-          'requested_events.estimated_type',
+          'requested_events.type_id',
+          'type.type_description',
           'requested_events.loc_size',
           'requested_events.estimated_num_adults',
           'requested_events.estimated_num_youth',
@@ -396,11 +402,13 @@ app.get('/events', async (req, res) => {
         )
         .leftJoin('contact_info', 'requested_events.contact_id', '=', 'contact_info.contact_id')
         .leftJoin('location', 'requested_events.loc_id', '=', 'location.loc_id')
+        .leftJoin('type', 'requested_events.type_id', '=', 'type.type_id')
         .where('requested_events.status', status); // Filter by the status
     }
 
     res.render('admin_Views/events', { 
       events,
+      status,
       title: 'Manage Events',
       navItems: [],
     });
@@ -409,12 +417,6 @@ app.get('/events', async (req, res) => {
     res.status(500).send('An error occurred while fetching events.');
   }
 });
-
-
-
-
-
-
 
 
 
