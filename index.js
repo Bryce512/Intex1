@@ -4,7 +4,7 @@ let path = require('path');
 const ejsLayouts = require('express-ejs-layouts');
 const res = require('express/lib/response');
 const PORT = process.env.PORT || 3000;
-let authorized = false;
+let authorized = true;
 
 // grab html form from file 
 // allows to pull JSON data from form 
@@ -109,7 +109,6 @@ app.get('/users', async (req, res) => {
     try {
         // Fetch users from the 'users' table
         const users = await knex('contact_info').select().orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
-
         // Render the users page and pass the users data to the view
         res.render("admin_Views/users", {
           title: 'Manage Users',
@@ -193,10 +192,10 @@ app.get('/volunteers', async (req, res) => {
       .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
       .leftJoin('sewing_level as s', 'v.sewing_level', '=', 's.sewing_level');
 
-    console.log('Query results:', {
-      count: volunteers.length,
-      sample: volunteers[0]
-    });
+    // console.log('Query results:', {
+    //   count: volunteers.length,
+    //   sample: volunteers[0]
+    // });
 
     return res.render('admin_Views/volunteers', {
       title: 'Manage Volunteers',

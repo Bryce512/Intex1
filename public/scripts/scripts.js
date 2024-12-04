@@ -4,22 +4,23 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
   window.location.href = '/logout';
 });
 
-// *** Add button Handler
-document.getElementById('addBtn').addEventListener('click', function() {
-  // run different queries based on page
-  if (entity === 'user') {
+// // *** Add button Handler
+// document.getElementById('addBtn').addEventListener('click', function() {
+//   // run different queries based on page
+//   if (entity === 'user') {
     
-  }
-  else if (entity === 'events') {
+//   }
+//   else if (entity === 'events') {
     
-  }
-  else if (entity === 'volunteers') {
+//   }
+//   else if (entity === 'volunteers') {
     
-  }
-});
+//   }
+// });
 
 // *** Handle Modal clicks and open
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM fully loaded and parsed');
   // Initialize all modals
   var elems = document.querySelectorAll('.modal');
   M.Modal.init(elems);
@@ -28,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var rows = document.querySelectorAll('.editable-row');
   rows.forEach(row => {
     row.addEventListener('click', function() {
+      console.log('Row clicked!');  // Log the event listener trigger
       // Get the data from the clicked row
       var id = row.getAttribute('data-id');
       var entity = row.getAttribute('data-entity');  // user, volunteer, event, etc.
@@ -68,6 +70,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Open the modal
       var modal = M.Modal.getInstance(document.getElementById('modal1'));
+      if (modal) {
+        console.log('Modal found!');
+      } else {
+        console.log('Modal element not found');
+      }
       modal.open();
     });
   });
