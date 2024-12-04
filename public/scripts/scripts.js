@@ -7,13 +7,13 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
 // // *** Add button Handler
 // document.getElementById('addBtn').addEventListener('click', function() {
 //   // run different queries based on page
-//   if (entity === 'user') {
+//   if (entity === 'admin') {
     
 //   }
 //   else if (entity === 'events') {
     
 //   }
-//   else if (entity === 'volunteers') {
+//   else if (entity === 'team_members') {
     
 //   }
 // });
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const openModalBtns = document.querySelectorAll('.editable-row');
     openModalBtns.forEach(row => {
       row.addEventListener('click', function () {
-        const userId = row.getAttribute('data-id');
+        const adminId = row.getAttribute('data-id');
         const firstName = row.getAttribute('data-first-name');
         const lastName = row.getAttribute('data-last-name');
         const email = row.getAttribute('data-email');
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('entity-email').value = email;
 
         // Optionally set the form action
-        const formAction = `/update-user/${userId}`;
+        const formAction = `/update-admin/${adminId}`;
         document.querySelector('form').setAttribute('action', formAction);
 
         openModal(); // Open the modal
@@ -143,14 +143,27 @@ async function liveSearch(query) {
   const rows = document.querySelectorAll('#mainTable .editable-row');
 
   rows.forEach(row => {
-    const firstName = row.getAttribute('data-first-name').toLowerCase(); // Get first name
-    const lastName = row.getAttribute('data-last-name').toLowerCase();   // Get last name
+    const entity = row.getAttribute('data-entity').toLowerCase();
 
-    // Check if the query matches the first or last name
-    if (firstName.includes(queryLower) || lastName.includes(queryLower)) {
-      row.style.display = '';  // Show matching row
-    } else {
-      row.style.display = 'none';  // Hide non-matching row
-    }
-  });
+    if (entity == 'admin' || entity == 'team_member') {
+      const firstName = row.getAttribute('data-first-name').toLowerCase(); // Get first name
+      const lastName = row.getAttribute('data-last-name').toLowerCase();   // Get last name
+
+      // Check if the query matches the first or last name
+      if (firstName.includes(queryLower) || lastName.includes(queryLower)) {
+        row.style.display = '';  // Show matching row
+      } else {
+        row.style.display = 'none';  // Hide non-matching row
+      }
+    } else if (entity == 'events') {
+      const firstName = row.getAttribute('data-first-name').toLowerCase(); // Get first name
+
+      // Check if the query matches the first or last name
+      if (firstName.includes(queryLower) || lastName.includes(queryLower)) {
+        row.style.display = '';  // Show matching row
+      } else {
+        row.style.display = 'none';  // Hide non-matching row
+      }
+    }}
+);
 }

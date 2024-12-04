@@ -73,7 +73,12 @@
   </thead>
   <tbody>
     <% events.forEach(event => { %>
-      <tr>
+      <tr class="editable-row" 
+          data-id="<%= event.contact_id %>" 
+          data-email="<%= event.email %>"
+          data-first-name="<%= event.first_name %>"
+          data-last-name="<%= event.last_name %>"
+          data-entity="event">
         <% if (status === 'finished') { %>
           <!-- Display columns for executed_events -->
           <td><%= event.actual_start_date %></td>

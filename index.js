@@ -103,22 +103,22 @@ app.get('/adminHome', (req, res) => {
 
 });
 
-// User Maintenance Page
-app.get('/users', async (req, res) => {
+// admin Maintenance Page
+app.get('/admins', async (req, res) => {
   if (authorized) {
     try {
-        // Fetch users from the 'users' table
-        const users = await knex('contact_info').select().orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
-        // Render the users page and pass the users data to the view
-        res.render("admin_Views/users", {
-          title: 'Manage Users',
+        // Fetch admins from the 'admins' table
+        const admins = await knex('contact_info').select().orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
+        // Render the admins page and pass the admins data to the view
+        res.render("admin_Views/admins", {
+          title: 'Manage Admins',
           navItems: [],
           layout: 'layouts/adminLayout', // Use the admin layout for this route
-          users: users // Pass the users data to the view
+          admins: admins // Pass the admins data to the view
         });
       } catch (error) {
         console.error(error);
-        res.status(500).send("Error retrieving users");
+        res.status(500).send("Error retrieving admins");
       }
   } else {
     res.redirect('/login');
@@ -126,7 +126,7 @@ app.get('/users', async (req, res) => {
   
 });
 
-app.post('/update-user/:id', (req, res) => {
+app.post('/update-admin/:id', (req, res) => {
 
   if (authorized) {
     const id = req.params.id;
@@ -143,7 +143,7 @@ app.post('/update-user/:id', (req, res) => {
         email: email,
       })
       .then(() => {
-        res.redirect('/users'); // Redirect to the list of Character after saving
+        res.redirect('/admins'); // Redirect to the list of Character after saving
       })
       .catch(error => {
         console.error('Error updating Character:', error);
@@ -155,286 +155,187 @@ app.post('/update-user/:id', (req, res) => {
   
 });
 
-// Search Bar grabbing data
-app.get('/search', async (req, res) => {
-  try {
-    const query = req.query.query.trim().toLowerCase(); // Trim and convert query to lowercase
 
-    if (!query) {
-      return res.json([]); // Return an empty array if the query is empty
-    }
+// *** ------------------------------ team_members Begin ---------------- ***//
+app.get('/team_members', async (req, res) => {
+  if(authorized) {
+    try {
+        const team_members = await knex({c: 'contact_info'})
+          .select(
+            'c.contact_id',
+            'c.first_name',
+            'c.last_name',
+            'c.email',
+            'c.phone',
+            'tm.sewing_level',
+            's.level_description',
+            'tm.hours_willing'
+          )
+          .leftJoin('team_members as tm', 'c.contact_id', '=', 'tm.contact_id')
+          .leftJoin('sewing_level as s', 'tm.sewing_level', '=', 's.sewing_level');
 
-    const searchTerms = query.split(' '); // Split query into individual terms (e.g., ["john", "doe"])
-
-    let users;
-
-    if (searchTerms.length > 1) {
-      // If multiple terms, search for combinations of first and last names
-      users = await knex('contact_info')
-        .whereRaw('LOWER(first_name) LIKE ?', [`%${searchTerms[0]}%`])
-        .andWhereRaw('LOWER(last_name) LIKE ?', [`%${searchTerms[1]}%`])
-        .orWhereRaw('LOWER(first_name) LIKE ?', [`%${searchTerms[1]}%`])
-        .andWhereRaw('LOWER(last_name) LIKE ?', [`%${searchTerms[0]}%`]);
-    } else {
-      // If a single term, search in both first and last names
-      users = await knex('contact_info')
-        .whereRaw('LOWER(first_name) LIKE ?', [`%${query}%`])
-        .orWhereRaw('LOWER(last_name) LIKE ?', [`%${query}%`]);
-    }
-
-    res.json(users); // Return the matching users as JSON
-  } catch (error) {
-    console.error('Error retrieving search results:', error);
-    res.status(500).json({ error: 'Error retrieving search results' });
-  }
-});
-
-
-
-// *** ------------------------------ Volunteers Begin ---------------- ***//
-app.get('/volunteers', async (req, res) => {
-  try {
-    const volunteers = await knex('contact_info as c')
-      .select(
-        'c.contact_id',
-        'c.first_name',
-        'c.last_name',
-        'c.email',
-        'c.phone',
-        'v.sewing_level',
-        's.level_description',
-        'v.hours_willing'
-      )
-      .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
-      .leftJoin('sewing_level as s', 'v.sewing_level', '=', 's.sewing_level');
-
-    console.log('Query results:', {
-      count: volunteers.length,
-      sample: volunteers[0]
-    });
-
-    return res.render('admin_Views/volunteers', {
-      title: 'Manage Volunteers',
-      volunteers: volunteers,
-      layout: 'layouts/adminLayout',
-      navItems: [
-        { text: 'Home', link: '/' },
-        { text: 'About', link: '/about' },
-        { text: 'Support', link: '/support' }
-      ]
-    });
-
-  } catch (err) {
-    console.error('Error:', err);
-    return res.render('admin_Views/volunteers', {
-      title: 'Manage Volunteers',
-      volunteers: [],
-      error: 'Failed to load volunteers: ' + err.message,
-      layout: 'layouts/adminLayout',
-      navItems: []
-    });
-  }
-});
-
-app.post('/update-volunteer/:id', async (req, res) => {
-  console.log('Update volunteer route hit with ID:', req.params.id);
-  const id = req.params.id;
-  try {
-    // Convert sewing level description to number
-    let sewingLevelNum;
-    switch(req.body.sewingLevel.toLowerCase()) {
-      case 'beginner':
-        sewingLevelNum = 1;
-        break;
-      case 'intermediate':
-        sewingLevelNum = 2;
-        break;
-      case 'advanced':
-        sewingLevelNum = 3;
-        break;
-      default:
-        sewingLevelNum = null;
-    }
-
-    await knex.transaction(async trx => {
-      // Update contact_info table
-      await trx('contact_info')
-        .where('contact_id', id)
-        .update({
-          first_name: req.body.firstName,
-          last_name: req.body.lastName,
-          email: req.body.email,
-          phone: req.body.phone
+        return res.render('admin_Views/team_members', {
+          title: 'Manage Team Members',
+          team_members: team_members,
+          layout: 'layouts/adminLayout',
+          navItems: [
+            { text: 'Home', link: '/' },
+            { text: 'About', link: '/about' },
+            { text: 'Support', link: '/support' }
+          ]
         });
 
-      // Update volunteers table with numeric sewing level
-      await trx('volunteers')
-        .where('contact_id', id)
-        .update({
-          sewing_level: sewingLevelNum,
-          hours_willing: req.body.hoursWilling
+      } catch (err) {
+        console.error('Error:', err);
+        return res.render('admin_Views/team_members', {
+          title: 'Manage Team Members',
+          team_members: [],
+          error: 'Failed to load Team Members: ' + err.message,
+          layout: 'layouts/adminLayout',
+          navItems: []
         });
-    });
-
-    console.log('Update successful, redirecting to /volunteers');
-    res.redirect('/volunteers');
-  } catch (error) {
-    console.error('Error updating volunteer:', error);
-    res.status(500).send('Error updating volunteer');
+      }
+  } else {
+    res.redirect('/login');
   }
 });
+  
 
+app.post('/update-team_member/:id', async (req, res) => {
+  if (authorized) {
+      console.log('Update Team Member route hit with ID:', req.params.id);
+    const id = req.params.id;
+    try {
+      // Convert sewing level description to number
+      let sewingLevelNum;
+      switch(req.body.sewingLevel.toLowerCase()) {
+        case 'beginner':
+          sewingLevelNum = 1;
+          break;
+        case 'intermediate':
+          sewingLevelNum = 2;
+          break;
+        case 'advanced':
+          sewingLevelNum = 3;
+          break;
+        default:
+          sewingLevelNum = null;
+      }
 
-app.get('/searchVolunteers', async (req, res) => {
-  try {
-    const query = req.query.query.trim().toLowerCase();
+      await knex.transaction(async trx => {
+        // Update contact_info table
+        await trx('contact_info')
+          .where('contact_id', id)
+          .update({
+            first_name: req.body.firstName,
+            last_name: req.body.lastName,
+            email: req.body.email,
+            phone: req.body.phone
+          });
 
-    if (!query) {
-      return res.json([]);
+        // Update team_members table with numeric sewing level
+        await trx('team_members')
+          .where('contact_id', id)
+          .update({
+            sewing_level: sewingLevelNum,
+            hours_willing: req.body.hoursWilling
+          });
+      });
+
+      console.log('Update successful, redirecting to /team_members');
+      res.redirect('/team_members');
+    } catch (error) {
+      console.error('Error updating Team Member:', error);
+      res.status(500).send('Error updating Team Member');
     }
-
-    const searchTerms = query.split(' '); // Split query into individual terms (e.g., ["pam", "b"])
-
-    let volunteers;
-
-    if (searchTerms.length > 1) {
-      // If multiple terms, search for combinations of first and last names
-      volunteers = await knex('contact_info as c')
-        .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
-        .leftJoin('sewing_level as s', 'v.sewing_level', '=', 's.sewing_level')
-        .select(
-          'c.contact_id',
-          'c.first_name',
-          'c.last_name',
-          'c.email',
-          'c.phone',
-          'v.sewing_level',
-          's.level_description',
-          'v.hours_willing'
-        )
-        .where(function() {
-          this.whereRaw('LOWER(c.first_name) LIKE ?', [`%${searchTerms[0]}%`])
-              .andWhereRaw('LOWER(c.last_name) LIKE ?', [`%${searchTerms[1]}%`])
-              .orWhere(function() {
-                this.whereRaw('LOWER(c.first_name) LIKE ?', [`%${searchTerms[1]}%`])
-                    .andWhereRaw('LOWER(c.last_name) LIKE ?', [`%${searchTerms[0]}%`]);
-              });
-        });
-    } else {
-      // If a single term, search in both first and last names
-      volunteers = await knex('contact_info as c')
-        .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
-        .leftJoin('sewing_level as s', 'v.sewing_level', '=', 's.sewing_level')
-        .select(
-          'c.contact_id',
-          'c.first_name',
-          'c.last_name',
-          'c.email',
-          'c.phone',
-          'v.sewing_level',
-          's.level_description',
-          'v.hours_willing'
-        )
-        .whereRaw('LOWER(c.first_name) LIKE ?', [`%${query}%`])
-        .orWhereRaw('LOWER(c.last_name) LIKE ?', [`%${query}%`]);
-    }
-
-    console.log('Search query:', query);
-    console.log('Search terms:', searchTerms);
-    console.log('Results:', volunteers);
-
-    res.json(volunteers);
-  } catch (error) {
-    console.error('Error retrieving search results:', error);
-    res.status(500).json({ error: 'Error retrieving search results' });
+  } else {
+    res.redirect('/login');
   }
 });
 
 // *** ------------------------------ Events Begin ---------------- ***//
 // Route to fetch and display executed_events
 
-// Set EJS as the template engine
-// Route to fetch and display executed_events
+if (authorized) {
+    
+}else {
+  res.redirect('/login');
+}
 app.get('/events', async (req, res) => {
   const status = req.query.status || 'pending'; // Default to 'pending' if no status is provided
-  
-  try {
-    let events;
+  if (authorized) {
+      try {
+      let events;
 
-    if (status === 'finished') {
-      // Query the executed_events table for finished events
-      events = await knex('executed_events')
-        .select('*',
-        'type.type_description' // Add type_description
-      )
-      .leftJoin('type', 'executed_events.type_id', '=', 'type.type_id'); // Join with type table
-
-
-    } else {
-      // Default query for pending and approved events
-      events = await knex('requested_events')
-        .select(
-          'requested_events.estimated_date',
-          'requested_events.contact_id',
-          'requested_events.street_address',
-          'requested_events.loc_id',
-          'requested_events.estimated_start_time',
-          'requested_events.estimated_duration',
-          'requested_events.type_id',
-          'type.type_description',
-          'requested_events.loc_size',
-          'requested_events.estimated_num_adults',
-          'requested_events.estimated_num_youth',
-          'requested_events.estimated_num_children',
-          'requested_events.num_machines',
-          'requested_events.share_story',
-          'requested_events.story_minutes',
-          'requested_events.num_tables',
-          'requested_events.table_shape',
-          'requested_events.additional_notes',
-          'requested_events.status',
-          'contact_info.first_name',
-          'contact_info.last_name',
-          'contact_info.phone',
-          'location.city',
-          'location.state',
-          'location.zip'
+      if (status === 'finished') {
+        // Query the executed_events table for finished events
+        events = await knex('executed_events')
+          .select('*',
+          'type.type_description' // Add type_description
         )
-        .leftJoin('contact_info', 'requested_events.contact_id', '=', 'contact_info.contact_id')
-        .leftJoin('location', 'requested_events.loc_id', '=', 'location.loc_id')
-        .leftJoin('type', 'requested_events.type_id', '=', 'type.type_id')
-        .where('requested_events.status', status); // Filter by the status
-    }
+        .leftJoin('type', 'executed_events.type_id', '=', 'type.type_id'); // Join with type table
 
-    res.render('admin_Views/events', { 
-      events,
-      status,
-      title: 'Manage Events',
-      navItems: [],
-    });
-  } catch (error) {
-    console.error('Error fetching events:', error.message, error.stack);
-    res.status(500).send('An error occurred while fetching events.');
+
+      } else {
+        // Default query for pending and approved events
+        events = await knex('requested_events')
+          .select(
+            'requested_events.estimated_date',
+            'requested_events.contact_id',
+            'requested_events.street_address',
+            'requested_events.loc_id',
+            'requested_events.estimated_start_time',
+            'requested_events.estimated_duration',
+            'requested_events.type_id',
+            'type.type_description',
+            'requested_events.loc_size',
+            'requested_events.estimated_num_adults',
+            'requested_events.estimated_num_youth',
+            'requested_events.estimated_num_children',
+            'requested_events.num_machines',
+            'requested_events.share_story',
+            'requested_events.story_minutes',
+            'requested_events.num_tables',
+            'requested_events.table_shape',
+            'requested_events.additional_notes',
+            'requested_events.status',
+            'contact_info.first_name',
+            'contact_info.last_name',
+            'contact_info.phone',
+            'location.city',
+            'location.state',
+            'location.zip'
+          )
+          .leftJoin('contact_info', 'requested_events.contact_id', '=', 'contact_info.contact_id')
+          .leftJoin('location', 'requested_events.loc_id', '=', 'location.loc_id')
+          .leftJoin('type', 'requested_events.type_id', '=', 'type.type_id')
+          .where('requested_events.status', status); // Filter by the status
+      }
+
+      res.render('admin_Views/events', { 
+        events,
+        status,
+        title: 'Manage Events',
+        navItems: [],
+      });
+    } catch (error) {
+      console.error('Error fetching events:', error.message, error.stack);
+      res.status(500).send('An error occurred while fetching events.');
+    }
+  }else {
+    res.redirect('/login');
   }
 });
-
-
-
 // *** ------------------------------ End Events ------------- *** //
 
 // *** ------------------------------ FAQ Routes ------------- *** //
-
 // FAQs Page
 app.get('/faqs', (req, res) => {
-  if (authorized) {
     res.render("admin_Views/FAQs", {
         title: 'Manage FAQs',
         navItems: [],  // You can add navigation items here if needed
         layout: 'layouts/adminLayout'  // Use the admin layout for this route
       });
-  } else {
-    res.redirect('/login');
-  }
 });
 
 // Trainings Page
@@ -450,46 +351,7 @@ app.get('/trainings', (req, res) => {
   }
 });
 
-//see if this route works, do we need a different route to display the records
-app.get("/searchUser", (req, res) => {
-  if (authorized) {
-    const { searchFirstName, searchLastName } = req.query;
-
-      // Build the query
-      let query = knex.select().from('contact_info');
-
-      if (searchFirstName) {
-        query = query.where(knex.raw('UPPER(first_name)'), '=', searchFirstName.toUpperCase());
-      }
-      
-      if (searchLastName) {
-        query = query.andWhere(knex.raw('UPPER(last_name)'), '=', searchLastName.toUpperCase());
-      }
-
-      // Execute the query
-      // is users the right list 
-      query
-        .then(results => {
-          if (results.length > 0) {
-            res.render("displayUser", { users: results });
-          } else {
-            res.render("displayUser", { users: [], message: "No matches found." });
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          res.status(500).json({ err });
-        });
-  } else {
-    res.redirect('/login');
-  }
-});
-
-
-
 // *** --------------------------------- PUBLIC Routes --------------------------------***
-
-
 // Serve static files (e.g., CSS) if needed
 app.use(express.static('public'));
 

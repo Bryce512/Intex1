@@ -1,4 +1,4 @@
-<!-- Example Table of Users -->
+<!-- Example Table of admins -->
 <div class="search-container">
   <div class="search-container">
     <input 
@@ -19,18 +19,15 @@
     </tr>
   </thead>
   <tbody>
-    <% users.forEach(user => { %>
+    <% admins.forEach(admin => { %>
       <tr class="editable-row" 
-          data-id="<%= user.contact_id %>" 
-          data-email="<%= user.email %>"
-          data-first-name="<%= user.first_name %>"
-          data-last-name="<%= user.last_name %>"
-          data-entity="user">
-        <td><%= user.first_name + ' ' + user.last_name %></td>
-        <td><%= user.email %></td>
-        <td>
-          <!-- You can remove the Edit button here, as the row itself is clickable -->
-        </td>
+          data-id="<%= admin.contact_id %>" 
+          data-email="<%= admin.email %>"
+          data-first-name="<%= admin.first_name %>"
+          data-last-name="<%= admin.last_name %>"
+          data-entity="admin">
+        <td><%= admin.first_name + ' ' + admin.last_name %></td>
+        <td><%= admin.email %></td>
       </tr>
     <% }) %>
   </tbody>
@@ -38,8 +35,8 @@
 
 <!-- Modal Template -->
 <%- include('../components/modal', {
-  title: 'Edit User',
-  formAction: '/update-user',
+  title: 'Edit Admin',
+  formAction: '/update-admin',
   body: `
       <div class="input-field">
         <input id="entity-first-name" type="text" name="firstName" placeholder="First Name">

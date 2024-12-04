@@ -10,10 +10,10 @@
 //       console.log('Editable row clicked:', row);
 //       // Get the data from the clicked row
 //       var id = row.getAttribute('data-id');
-//       var entity = row.getAttribute('data-entity');  // user, volunteer, event, etc.
+//       var entity = row.getAttribute('data-entity');  // admin, team_member, event, etc.
 
 //       // Dynamically populate modal fields based on the entity type
-//       if (entity === 'user') {
+//       if (entity === 'admin') {
 //         var firstName = row.getAttribute('data-first-name');
 //         var lastName = row.getAttribute('data-last-name');
 //         var email = row.getAttribute('data-email');
@@ -24,7 +24,7 @@
 //         document.getElementById('entity-email').value = email;
 //       } 
 
-//       else if (entity === 'volunteer') {
+//       else if (entity === 'team_member') {
 //         // Get all data attributes
 //         var firstName = row.getAttribute('data-first-name');
 //         var lastName = row.getAttribute('data-last-name');
@@ -34,7 +34,7 @@
 //         var hoursWilling = row.getAttribute('data-hours-willing');
 //         var id = row.getAttribute('data-id');
 
-//         // Populate modal with volunteer data
+//         // Populate modal with team_member data
 //         document.getElementById('entity-first-name').value = firstName;
 //         document.getElementById('entity-last-name').value = lastName;
 //         document.getElementById('entity-email').value = email;
@@ -43,7 +43,7 @@
 //         document.getElementById('entity-hours-willing').value = hoursWilling;
 
 //         // Update form action with the correct ID
-//         document.querySelector('form').action = `/update-volunteer/${id}`;
+//         document.querySelector('form').action = `/update-team_member/${id}`;
 
 //         // Refresh Materialize inputs
 //         M.updateTextFields();

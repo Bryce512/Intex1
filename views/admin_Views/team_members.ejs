@@ -1,4 +1,4 @@
-<!-- Example Table of Volunteers -->
+<!-- Example Table of team_members -->
 <!-- Single search bar -->
 <div class="search-container">
   <input 
@@ -21,28 +21,28 @@
     </tr>
   </thead>
   <tbody>
-    <% if (typeof volunteers !== 'undefined' && volunteers && volunteers.length > 0) { %>
-      <% volunteers.forEach(function(volunteer) { %>
+    <% if (typeof team_members !== 'undefined' && team_members && team_members.length > 0) { %>
+      <% team_members.forEach(team_member => {%>
         <tr class="editable-row"
-          data-id="<%= volunteer.contact_id %>"
-          data-first-name="<%= volunteer.first_name %>"
-          data-last-name="<%= volunteer.last_name %>"
-          data-email="<%= volunteer.email %>"
-          data-phone="<%= volunteer.phone %>"
-          data-sewing-level="<%= volunteer.sewing_level %>"
-          data-hours-willing="<%= volunteer.hours_willing %>"
-          data-entity="volunteer"
+          data-id="<%= team_member.contact_id %>"
+          data-first-name="<%= team_member.first_name %>"
+          data-last-name="<%= team_member.last_name %>"
+          data-email="<%= team_member.email %>"
+          data-phone="<%= team_member.phone %>"
+          data-sewing-level="<%= team_member.sewing_level %>"
+          data-hours-willing="<%= team_member.hours_willing %>"
+          data-entity="team_member"
         >
-          <td><%= volunteer.first_name %> <%= volunteer.last_name %></td>
-          <td><%= volunteer.email %></td>
-          <td><%= volunteer.phone || 'Not Set' %></td>
-          <td><%= volunteer.level_description || 'Not Set' %></td>
-          <td><%= volunteer.hours_willing || 'Not Set' %></td>
+          <td><%= team_member.first_name %> <%= team_member.last_name %></td>
+          <td><%= team_member.email %></td>
+          <td><%= team_member.phone || 'Not Set' %></td>
+          <td><%= team_member.level_description || 'Not Set' %></td>
+          <td><%= team_member.hours_willing || 'Not Set' %></td>
         </tr>
       <% }); %>
     <% } else { %>
       <tr>
-        <td colspan="5">No volunteers found</td>
+        <td colspan="5">No Team Members found</td>
       </tr>
     <% } %>
   </tbody>
@@ -51,8 +51,8 @@
 
 <!-- Modal Template -->
 <%- include('../components/modal', {
-  title: 'Edit Volunteer',
-  formAction: '/update-volunteer',
+  title: 'Edit Team Members',
+  formAction: '/update-team_member',
   body: `
   <div class="input-field">
     <input id="entity-first-name" type="text" name="firstName" placeholder="First Name" required>
