@@ -354,31 +354,62 @@ app.get('/searchVolunteers', async (req, res) => {
 // Route to fetch and display executed_events
 
 // Set EJS as the template engine
-app.set('view engine', 'ejs');
-
 // Route to fetch and display executed_events
 app.get('/events', async (req, res) => {
+  const status = req.query.status || 'pending'; // Default to 'pending' if no status is provided
+  
   try {
-    const events = await knex('executed_events').select(
-      'actual_start_date',
-      'actual_start_time',
-      'actual_duration',
-      'actual_num_people',
-      'actual_type',
-      'pockets',
-      'collars',
-      'envelopes',
-      'vests',
-      'items_completed',
-      'actual_end_date'
-    );
+    let events;
 
-    res.render('admin_Views/events', { events });
+    if (status === 'finished') {
+      // Query the executed_events table for finished events
+      events = await knex('executed_events')
+        .select('*')
+    } else {
+      // Default query for pending and approved events
+      events = await knex('requested_events')
+        .select(
+          'requested_events.estimated_date',
+          'requested_events.contact_id',
+          'requested_events.street_address',
+          'requested_events.loc_id',
+          'requested_events.estimated_start_time',
+          'requested_events.estimated_duration',
+          'requested_events.estimated_type',
+          'requested_events.loc_size',
+          'requested_events.estimated_num_adults',
+          'requested_events.estimated_num_youth',
+          'requested_events.estimated_num_children',
+          'requested_events.num_machines',
+          'requested_events.share_story',
+          'requested_events.story_minutes',
+          'requested_events.num_tables',
+          'requested_events.table_shape',
+          'requested_events.additional_notes',
+          'requested_events.status',
+          'contact_info.first_name',
+          'contact_info.last_name',
+          'contact_info.phone',
+          'location.city',
+          'location.state',
+          'location.zip'
+        )
+        .leftJoin('contact_info', 'requested_events.contact_id', '=', 'contact_info.contact_id')
+        .leftJoin('location', 'requested_events.loc_id', '=', 'location.loc_id')
+        .where('requested_events.status', status); // Filter by the status
+    }
+
+    res.render('admin_Views/events', { 
+      events,
+      title: 'Manage Events',
+      navItems: [],
+    });
   } catch (error) {
     console.error('Error fetching events:', error.message, error.stack);
     res.status(500).send('An error occurred while fetching events.');
   }
 });
+
 
 
 
@@ -483,6 +514,7 @@ app.get('/event', (req, res) => {
     res.render('public_views/scheduleEvent', {
       locationSizes,
       tableShapes,
+      title: 'Manage Events',
       layout: false  // Explicitly disable layout
     });
   })
