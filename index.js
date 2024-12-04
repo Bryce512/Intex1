@@ -182,8 +182,25 @@ app.get('/volunteers', async (req, res) => {
 });
 
 app.post('/update-volunteer/:id', async (req, res) => {
+  console.log('Update volunteer route hit with ID:', req.params.id);
   const id = req.params.id;
   try {
+    // Convert sewing level description to number
+    let sewingLevelNum;
+    switch(req.body.sewingLevel.toLowerCase()) {
+      case 'beginner':
+        sewingLevelNum = 1;
+        break;
+      case 'intermediate':
+        sewingLevelNum = 2;
+        break;
+      case 'advanced':
+        sewingLevelNum = 3;
+        break;
+      default:
+        sewingLevelNum = null;
+    }
+
     await knex.transaction(async trx => {
       // Update contact_info table
       await trx('contact_info')
@@ -195,15 +212,16 @@ app.post('/update-volunteer/:id', async (req, res) => {
           phone: req.body.phone
         });
 
-      // Update volunteers table
+      // Update volunteers table with numeric sewing level
       await trx('volunteers')
         .where('contact_id', id)
         .update({
-          sewing_level: req.body.sewingLevel,
+          sewing_level: sewingLevelNum,
           hours_willing: req.body.hoursWilling
         });
     });
 
+    console.log('Update successful, redirecting to /volunteers');
     res.redirect('/volunteers');
   } catch (error) {
     console.error('Error updating volunteer:', error);
