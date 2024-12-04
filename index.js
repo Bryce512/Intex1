@@ -396,6 +396,13 @@ app.get('/about-homelessness-and-the-cold', (req, res) => {
     layout: false });  // Renders external.ejs from public_views folder
 });
 
+
+// homelessness and cold  
+app.get('/our-tech', (req, res) => {
+  res.render('public_views/our-tech', {
+    layout: false });  // Renders external.ejs from public_views folder
+});
+
 // Schedule an Event
 app.get('/event', (req, res) => {
   // Fetch location sizes and table shapes independently
