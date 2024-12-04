@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>title</title>
+  <title>Executed Events</title>
   <style>
     table {
       width: 100%;
@@ -22,38 +22,94 @@
     }
   </style>
 </head>
-<body>
-  <h1>Executed Events</h1>
+  
+  <!-- Buttons to filter by status -->
+  <button onclick="window.location.href='/events?status=pending'">Pending</button>
+  <button onclick="window.location.href='/events?status=approved'">Approved</button>
+  <button onclick="window.location.href='/events?status=finished'">Finished</button>
+
   <table>
     <thead>
       <tr>
-        <th>Actual Start Date</th>
-        <th>Actual Start Time</th>
-        <th>Actual Duration</th>
-        <th>Actual Number of People</th>
-        <th>Actual Type</th>
-        <th>Pockets</th>
-        <th>Collars</th>
-        <th>Envelopes</th>
-        <th>Vests</th>
-        <th>Items Completed</th>
-        <th>Actual End Date</th>
+        <!-- Common columns -->
+        <th>Contact Name</th>
+        <th>Phone</th>
+        <th>Street Address</th>
+        <th>Location</th>
+        
+        <% if (status === 'finished') { %>
+          <!-- Columns for executed_events -->
+          <th>Actual Start Date</th>
+          <th>Actual Start Time</th>
+          <th>Actual Duration</th>
+          <th>Actual Number of People</th>
+          <th>Actual Type</th>
+          <th>Pockets</th>
+          <th>Collars</th>
+          <th>Envelopes</th>
+          <th>Vests</th>
+          <th>Items Completed</th>
+          <th>Actual End Date</th>
+        <% } else { %>
+          <!-- Columns for requested_events (Pending/Approved) -->
+          <th>Estimated Date</th>
+          <th>Estimated Start Time</th>
+          <th>Estimated Duration</th>
+          <th>Estimated Type</th>
+          <th>Location Size</th>
+          <th>Estimated Number of Adults</th>
+          <th>Estimated Number of Youth</th>
+          <th>Estimated Number of Children</th>
+          <th>Number of Machines</th>
+          <th>Share Story</th>
+          <th>Story Minutes</th>
+          <th>Number of Tables</th>
+          <th>Table Shape</th>
+          <th>Additional Notes</th>
+          <th>Status</th> <!-- This column only for requested_events -->
+        <% } %>
       </tr>
     </thead>
     <tbody>
       <% events.forEach(event => { %>
         <tr>
-          <td><%= event.actual_start_date %></td>
-          <td><%= event.actual_start_time %></td>
-          <td><%= event.actual_duration %></td>
-          <td><%= event.actual_num_people %></td>
-          <td><%= event.actual_type %></td>
-          <td><%= event.pockets %></td>
-          <td><%= event.collars %></td>
-          <td><%= event.envelopes %></td>
-          <td><%= event.vests %></td>
-          <td><%= event.items_completed %></td>
-          <td><%= event.actual_end_date %></td>
+          <!-- Common data -->
+          <td><%= event.first_name %> <%= event.last_name %></td>
+          <td><%= event.phone %></td>
+          <td><%= event.street_address %></td>
+          <td><%= event.city %>, <%= event.state %> <%= event.zip %></td>
+
+          <% if (status === 'finished') { %>
+            <!-- Data for executed_events -->
+            <td><%= event.actual_start_date %></td>
+            <td><%= event.actual_start_time %></td>
+            <td><%= event.actual_duration %></td>
+            <td><%= event.actual_num_people %></td>
+            <td><%= event.actual_type %></td>
+            <td><%= event.pockets %></td>
+            <td><%= event.collars %></td>
+            <td><%= event.envelopes %></td>
+            <td><%= event.vests %></td>
+            <td><%= event.items_completed %></td>
+            <td><%= event.actual_end_date %></td>
+          <% } else { %>
+            <!-- Data for requested_events -->
+            <td><%= event.estimated_date %></td>
+            <td><%= event.estimated_start_time %></td>
+            <td><%= event.estimated_duration %></td>
+            <td><%= event.estimated_type %></td>
+            <td><%= event.loc_size %></td>
+            <td><%= event.estimated_num_adults %></td>
+            <td><%= event.estimated_num_youth %></td>
+            <td><%= event.estimated_num_children %></td>
+            <td><%= event.num_machines %></td>
+            <td><%= event.share_story %></td>
+            <td><%= event.story_minutes %></td>
+            <td><%= event.num_tables %></td>
+            <td><%= event.table_shape %></td>
+            <td><%= event.additional_notes %></td>
+            <td><%= event.status %></td> <!-- Show status only for requested_events -->
+          <% } %>
         </tr>
       <% }) %>
     </tbody>
@@ -63,22 +119,28 @@
 
 
 
+
 <!-- Modal Template -->
-<%- include('../components/modal', {
-  title: 'Edit User',
-  formAction: '/update-user',
+<%- include('../components/modal', { 
+  title: 'Edit Event', 
+  formAction: '/update-event', 
   body: `
-      <div class="input-field">
-        <input id="entity-first-name" type="text" name="firstName" placeholder="First Name">
-        <label for="entity-first-name"></label>
-      </div>
-      <div class="input-field">
-        <input id="entity-last-name" type="text" name="lastName" placeholder="Last Name">
-        <label for="entity-last-name"></label>
-      </div>
-      <div class="input-field">
-        <input id="entity-email" type="email" name="email" placeholder="Email">
-        <label for="entity-email"></label>
-      </div>
+    <div class="input-field">
+      <input id="entity-first-name" type="text" name="firstName" placeholder="First Name">
+      <label for="entity-first-name"></label>
+    </div>
+    <div class="input-field">
+      <input id="entity-last-name" type="text" name="lastName" placeholder="Last Name">
+      <label for="entity-last-name"></label>
+    </div>
+    <div class="input-field">
+      <input id="entity-email" type="email" name="email" placeholder="Email">
+      <label for="entity-email"></label>
+    </div>
   `
 }) %>
+
+
+
+
+
