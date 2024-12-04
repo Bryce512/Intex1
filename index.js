@@ -267,50 +267,53 @@ app.get('/events', async (req, res) => {
       try {
       let events;
 
-      if (status === 'finished') {
-        // Query the executed_events table for finished events
-        events = await knex('executed_events')
-          .select('*',
-          'type.type_description' // Add type_description
+    if (status === 'finished') {
+      // Query the executed_events table for finished events
+      events = await knex('executed_events')
+        .select('*',
+        'type.type_description', // Add type_description
+        'requested_events.organization'
+      )
+      .leftJoin('type', 'executed_events.type_id', '=', 'type.type_id') // Join with type table
+      .leftJoin('requested_events', 'executed_events.event_id', '=', 'requested_events.event_id');
+
+
+    } else {
+      // Default query for pending and approved events
+      events = await knex('requested_events')
+        .select(
+          'requested_events.estimated_date',
+          'requested_events.contact_id',
+          'requested_events.street_address',
+          'requested_events.loc_id',
+          'requested_events.estimated_start_time',
+          'requested_events.estimated_duration',
+          'requested_events.type_id',
+          'type.type_description',
+          'requested_events.loc_size',
+          'requested_events.estimated_num_adults',
+          'requested_events.estimated_num_youth',
+          'requested_events.estimated_num_children',
+          'requested_events.num_machines',
+          'requested_events.share_story',
+          'requested_events.story_minutes',
+          'requested_events.num_tables',
+          'requested_events.table_shape',
+          'requested_events.additional_notes',
+          'requested_events.status',
+          'requested_events.organization',
+          'contact_info.first_name',
+          'contact_info.last_name',
+          'contact_info.phone',
+          'location.city',
+          'location.state',
+          'location.zip',
         )
-        .leftJoin('type', 'executed_events.type_id', '=', 'type.type_id'); // Join with type table
-
-
-      } else {
-        // Default query for pending and approved events
-        events = await knex('requested_events')
-          .select(
-            'requested_events.estimated_date',
-            'requested_events.contact_id',
-            'requested_events.street_address',
-            'requested_events.loc_id',
-            'requested_events.estimated_start_time',
-            'requested_events.estimated_duration',
-            'requested_events.type_id',
-            'type.type_description',
-            'requested_events.loc_size',
-            'requested_events.estimated_num_adults',
-            'requested_events.estimated_num_youth',
-            'requested_events.estimated_num_children',
-            'requested_events.num_machines',
-            'requested_events.share_story',
-            'requested_events.story_minutes',
-            'requested_events.num_tables',
-            'requested_events.table_shape',
-            'requested_events.additional_notes',
-            'requested_events.status',
-            'contact_info.first_name',
-            'contact_info.last_name',
-            'contact_info.phone',
-            'location.city',
-            'location.state',
-            'location.zip'
-          )
-          .leftJoin('contact_info', 'requested_events.contact_id', '=', 'contact_info.contact_id')
-          .leftJoin('location', 'requested_events.loc_id', '=', 'location.loc_id')
-          .leftJoin('type', 'requested_events.type_id', '=', 'type.type_id')
-          .where('requested_events.status', status); // Filter by the status
-      }
+        .leftJoin('contact_info', 'requested_events.contact_id', '=', 'contact_info.contact_id')
+        .leftJoin('location', 'requested_events.loc_id', '=', 'location.loc_id')
+        .leftJoin('type', 'requested_events.type_id', '=', 'type.type_id')
+        .where('requested_events.status', status); // Filter by the status
+    }
 
       res.render('admin_Views/events', { 
         events,
@@ -363,6 +366,12 @@ app.get('/donate', (req, res) => {
 // Jen's story
 app.get('/jensstory', (req, res) => {
   res.render('public_views/jensstory', {
+    layout: false });  // Renders external.ejs from public_views folder
+});
+
+// Thanks to sponsors 
+app.get('/thank-you-to-our-sponsors', (req, res) => {
+  res.render('public_views/thank-you-to-our-sponsors', {
     layout: false });  // Renders external.ejs from public_views folder
 });
 
