@@ -172,7 +172,7 @@ app.get('/volunteers', async (req, res) => {
     });
 
   } catch (err) {
-    console.error('Detailed error:', err);
+    console.error('Error:', err);
     return res.render('admin_Views/volunteers', {
       title: 'Manage Volunteers',
       volunteers: [],
@@ -186,26 +186,64 @@ app.get('/volunteers', async (req, res) => {
 
 app.get('/searchVolunteers', async (req, res) => {
   try {
-    const query = req.query.query;
+    const query = req.query.query.trim().toLowerCase();
 
-    const results = await knex('contact_info as c')
-      .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
-      .select(
-        'c.contact_id',
-        'c.first_name',
-        'c.last_name',
-        'c.email',
-        'v.sewing_level',
-        'v.hours_willing'
-      )
-      .where(knex.raw('LOWER(c.first_name)'), 'like', `%${query.toLowerCase()}%`)
-      .orWhere(knex.raw('LOWER(c.last_name)'), 'like', `%${query.toLowerCase()}%`)
-      .orWhere(knex.raw('LOWER(c.email)'), 'like', `%${query.toLowerCase()}%`);
+    if (!query) {
+      return res.json([]);
+    }
 
-    res.json(results);
-  } catch (err) {
-    console.error('Error searching volunteers:', err);
-    res.status(500).json({ error: 'Error searching volunteers' });
+    const searchTerms = query.split(' '); // Split query into individual terms (e.g., ["pam", "b"])
+
+    let volunteers;
+
+    if (searchTerms.length > 1) {
+      // If multiple terms, search for combinations of first and last names
+      volunteers = await knex('contact_info as c')
+        .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
+        .leftJoin('sewing_level as s', 'v.sewing_level', '=', 's.sewing_level')
+        .select(
+          'c.contact_id',
+          'c.first_name',
+          'c.last_name',
+          'c.email',
+          'v.sewing_level',
+          's.level_description',
+          'v.hours_willing'
+        )
+        .where(function() {
+          this.whereRaw('LOWER(c.first_name) LIKE ?', [`%${searchTerms[0]}%`])
+              .andWhereRaw('LOWER(c.last_name) LIKE ?', [`%${searchTerms[1]}%`])
+              .orWhere(function() {
+                this.whereRaw('LOWER(c.first_name) LIKE ?', [`%${searchTerms[1]}%`])
+                    .andWhereRaw('LOWER(c.last_name) LIKE ?', [`%${searchTerms[0]}%`]);
+              });
+        });
+    } else {
+      // If a single term, search in both first and last names
+      volunteers = await knex('contact_info as c')
+        .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
+        .leftJoin('sewing_level as s', 'v.sewing_level', '=', 's.sewing_level')
+        .select(
+          'c.contact_id',
+          'c.first_name',
+          'c.last_name',
+          'c.email',
+          'v.sewing_level',
+          's.level_description',
+          'v.hours_willing'
+        )
+        .whereRaw('LOWER(c.first_name) LIKE ?', [`%${query}%`])
+        .orWhereRaw('LOWER(c.last_name) LIKE ?', [`%${query}%`]);
+    }
+
+    console.log('Search query:', query);
+    console.log('Search terms:', searchTerms);
+    console.log('Results:', volunteers);
+
+    res.json(volunteers);
+  } catch (error) {
+    console.error('Error retrieving search results:', error);
+    res.status(500).json({ error: 'Error retrieving search results' });
   }
 });
 
