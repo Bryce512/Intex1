@@ -125,19 +125,37 @@ app.post('/update-user/:id', (req, res) => {
 // Search Bar grabbing data
 app.get('/search', async (req, res) => {
   try {
-    const query = req.query.query.toLowerCase(); // Get the search query from the request
+    const query = req.query.query.trim().toLowerCase(); // Trim and convert query to lowercase
 
-    // Search for users whose first_name or last_name matches the query
-    const users = await knex('contact_info')
-      .whereRaw('LOWER(first_name) LIKE ?', [`%${query}%`])
-      .orWhereRaw('LOWER(last_name) LIKE ?', [`%${query}%`]);
+    if (!query) {
+      return res.json([]); // Return an empty array if the query is empty
+    }
+
+    const searchTerms = query.split(' '); // Split query into individual terms (e.g., ["john", "doe"])
+
+    let users;
+
+    if (searchTerms.length > 1) {
+      // If multiple terms, search for combinations of first and last names
+      users = await knex('contact_info')
+        .whereRaw('LOWER(first_name) LIKE ?', [`%${searchTerms[0]}%`])
+        .andWhereRaw('LOWER(last_name) LIKE ?', [`%${searchTerms[1]}%`])
+        .orWhereRaw('LOWER(first_name) LIKE ?', [`%${searchTerms[1]}%`])
+        .andWhereRaw('LOWER(last_name) LIKE ?', [`%${searchTerms[0]}%`]);
+    } else {
+      // If a single term, search in both first and last names
+      users = await knex('contact_info')
+        .whereRaw('LOWER(first_name) LIKE ?', [`%${query}%`])
+        .orWhereRaw('LOWER(last_name) LIKE ?', [`%${query}%`]);
+    }
 
     res.json(users); // Return the matching users as JSON
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error retrieving search results" });
+    console.error('Error retrieving search results:', error);
+    res.status(500).json({ error: 'Error retrieving search results' });
   }
 });
+
 
 
 // Volunteers Page
@@ -152,23 +170,34 @@ app.get('/volunteers', (req, res) => {
 // *** ------------------------------ Events Begin ---------------- ***//
 app.get('/events', async (req, res) => {
   try {
-    // Fetch events from the 'events' table
-    const events = await knex({r:'requested_events'})
-    .join({c: 'contact_info'}, 'c.contact_id', '=', 'r.contact_id')
-    .select().orderBy('estimated_date', 'asc'); // Adjust field names as needed
+    // Fetch data from your database
+    const requestedEventsPending = await knex('requested_events')
+      .where('status', 'pending')
+      .orderBy('estimated_date', 'asc');
+    const requestedEventsApproved = await knex('requested_events')
+      .where('status', 'approved')
+      .orderBy('estimated_date', 'asc');
+    const executedEvents = await knex('executed_events')
+      .orderBy('actual_start_date', 'desc');
 
-    // Render the events page and pass the events data to the view
-    res.render("admin_Views/events", {
+    // Render the EJS page and pass the data
+    res.render('admin_Views/events', {
       title: 'Manage Events',
       navItems: [],
-      layout: 'layouts/adminLayout', // Use the admin layout for this route
-      events: events // Pass the events data to the view
+      layout: 'layouts/adminLayout',
+      requestedEventsPending: requestedEventsPending,
+      requestedEventsApproved: requestedEventsApproved,
+      executedEvents: executedEvents
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error retrieving events:", error);
     res.status(500).send("Error retrieving events");
   }
 });
+
+
+
+
 // *** ------------------------------ End Events ------------- *** //
 
 
