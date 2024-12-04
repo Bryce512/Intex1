@@ -100,20 +100,18 @@
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
-    <%- include('../components/navBar', { navItems: navItems }) %>
-
     <div class="login-wrapper">
             <div class="login-container">
             <h1>Admin Login</h1>
             <form action="/login" method="POST">
                 <div class="form-group">
-                    <label for="adminname">adminname:</label>
+                    <label for="username">username:</label>
                     <input 
                         type="text" 
-                        id="adminname" 
-                        name="adminname" 
+                        id="username" 
+                        name="username" 
                         required 
-                        placeholder="Enter adminname"
+                        placeholder="Enter username"
                     >
                 </div>
                 

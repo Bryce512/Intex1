@@ -11,9 +11,23 @@
   --font-size-small: 1rem;
 }
 
+/* Remove background and make navbar transparent */
+nav {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Optional: If you want to make sure text and other styles are not affected */
+nav a {
+  color: white !important;  /* Change to desired color */
+}
+
+nav .collection {
+  border: none !important;
+}
 /* *** NAVBAR STYLES */
 /* Navbar fixed to the top */
-.nav-wrapper {
+.myNav-wrapper {
   position: fixed;
   background-image: linear-gradient(var(--black), rgba(0, 0, 0, .7));
   top: 0;
@@ -179,9 +193,7 @@
   }
 }
 
-
-
-/* *** ADMIN LAYOUT */
+/* *** ------------------------------ ADMIN LAYOUT */
 /* Main content area */
 .admin-content {
   margin-left: 190px; /* Space for sidebar */
@@ -196,7 +208,7 @@
   position: relative; /* Ensure it's positioned relatively to contain modal */
 }
 
-/* *** ADMIN TABLE STYLES */
+/* *** ------------------------------ ADMIN TABLE STYLES */
 
 /* Table row hover effect */
 table tbody tr:hover {
@@ -224,7 +236,7 @@ th, td {
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
-                /* *** END TABLE STYLES */
+/* *** ------------------------------  END TABLE STYLES */
 
 
 

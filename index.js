@@ -30,8 +30,6 @@ const knex = require("knex") ({
 }
 })
 
-
-
 // Define route for home page
 app.get('/', (req, res) => {
   res.render('public_views/publicHome', {
@@ -72,6 +70,7 @@ app.post('/login', async (req, res) => {
           authorized = false;
           res.render('admin_Views/login', { 
             error: 'Invalid username or password',
+            navItems:[],
             layout: false });
       }
   } catch (error) {
