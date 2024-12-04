@@ -376,6 +376,12 @@ app.get('/thank-you-to-our-sponsors', (req, res) => {
     layout: false });  // Renders external.ejs from public_views folder
 });
 
+// homelessness and cold  
+app.get('/about-homelessness-and-the-cold', (req, res) => {
+  res.render('public_views/about-homelessness-and-the-cold', {
+    layout: false });  // Renders external.ejs from public_views folder
+});
+
 // Schedule an Event
 app.get('/event', (req, res) => {
   // Fetch location sizes and table shapes independently
