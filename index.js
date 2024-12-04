@@ -108,7 +108,11 @@ app.get('/admins', async (req, res) => {
   if (authorized) {
     try {
         // Fetch admins from the 'admins' table
-        const admins = await knex('contact_info').select().orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
+        const admins = await knex('contact_info as c').select()
+        .leftJoin('admins as a', 'a.contact_id', '=', 'c.contact_id')
+        .leftJoin('team_members as tm', 'tm.contact_id', '=', 'c.contact_id')
+        .leftJoin('sewing_level as sl', 'sl.sewing_level', '=', 'tm.sewing_level')
+        .orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
         // Render the admins page and pass the admins data to the view
         res.render("admin_Views/admins", {
           title: 'Manage Admins',
@@ -429,14 +433,14 @@ app.get('/event', (req, res) => {
 
 // Add someone's Event Schedule Request to the Database
 app.post('/scheduleEvent', (req, res) => {
-  // Extract form values from req.body
+  // Extract form values
   const firstName = req.body.firstName || ''; 
   const lastName = req.body.lastName || '';
   const email = req.body.email || '';
   const phone = req.body.phone || ''; 
   const city = req.body.city || ''; 
   const state = req.body.state || ''; 
-  const zip = parseInt(req.body.zip, 10) || 0; // Convert to integer
+  const zip = parseInt(req.body.zip, 10) || 0; 
   const organization = req.body.organization || ''; 
   const street = req.body.street || '';
   const eventCity = req.body.eventCity || '';
@@ -459,51 +463,77 @@ app.post('/scheduleEvent', (req, res) => {
 
   // Start a transaction
   knex.transaction(trx => {
-    // Step 1: Check if the zip code exists in the 'location' table
-    return trx('location')
-      .select('loc_id')
-      .where('zip', eventZip)
-      .first()  // This returns the first match or undefined if not found
-      .then(location => {
-        let loc_id;
+    // Step 1: Check if the email exists in the 'contact_info' table
+    return trx('contact_info')
+      .select('contact_id')
+      .where('email', email)
+      .first()
+      .then(contact => {
+        let contact_id;
 
-        if (location) {
-          // Zip code exists, use the existing loc_id
-          loc_id = location.loc_id;
+        if (contact) {
+          // Email exists, use the existing contact_id
+          contact_id = contact.contact_id;
         } else {
-          // Zip code doesn't exist, insert it into the location table
-          return trx('location')
+          // Email doesn't exist, insert new contact into contact_info
+          return trx('contact_info')
             .insert({
-              city: eventCity,
-              state: eventState,
-              zip: eventZip,
+              first_name: firstName,
+              last_name: lastName,
+              phone: phone,
+              email: email
             })
-            .returning('loc_id') // Get the newly inserted loc_id
-            .then(newLocation => {
-              loc_id = newLocation[0].loc_id;  // Capture the new loc_id
+            .returning('contact_id') // Get the newly inserted contact_id
+            .then(newContact => {
+              contact_id = newContact[0].contact_id;  // Capture the new contact_id
             });
         }
 
-        // Step 2: Now that we have the loc_id, insert the event into requested_events
-        return trx('requested_events')
-          .insert({
-            estimated_date: eventDate,
-            street_address: street,
-            estimated_start_time: startTime,
-            estimated_duration: eventDuration,
-            type_id: eventType,
-            loc_size: locationSize,
-            estimated_num_adults: numAdults,
-            estimated_num_youth: numYouth,
-            estimated_num_children: numChildren,
-            num_machines: numMachines,
-            share_story: shareStory,
-            story_minutes: storyDuration,
-            num_tables: numTables,
-            table_shape: tableShape,
-            additional_notes: additionalNotes,
-            organization: organization,
-            loc_id: loc_id, // Insert the loc_id from the location table
+        // Step 2: Check if the zip code exists in the 'location' table
+        return trx('location')
+          .select('loc_id')
+          .where('zip', eventZip)
+          .first()  
+          .then(location => {
+            let loc_id;
+
+            if (location) {
+              loc_id = location.loc_id;
+            } else {
+              return trx('location')
+                .insert({
+                  city: eventCity,
+                  state: eventState,
+                  zip: eventZip,
+                })
+                .returning('loc_id')
+                .then(newLocation => {
+                  loc_id = newLocation[0].loc_id; 
+                });
+            }
+
+            // Step 3: Insert the event into requested_events table
+            return trx('requested_events')
+              .insert({
+                estimated_date: eventDate,
+                street_address: street,
+                estimated_start_time: startTime,
+                estimated_duration: eventDuration,
+                type_id: eventType,
+                loc_size: locationSize,
+                estimated_num_adults: numAdults,
+                estimated_num_youth: numYouth,
+                estimated_num_children: numChildren,
+                num_machines: numMachines,
+                share_story: shareStory,
+                story_minutes: storyDuration,
+                num_tables: numTables,
+                table_shape: tableShape,
+                additional_notes: additionalNotes,
+                organization: organization,
+                contact_id: contact_id,  // Insert the contact_id from contact_info
+                loc_id: loc_id,
+              });
           });
       })
       .then(() => {
@@ -516,6 +546,7 @@ app.post('/scheduleEvent', (req, res) => {
       });
   });
 });
+
 
 
 // port number, (parameters) => what you want it to do.

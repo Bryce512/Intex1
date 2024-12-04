@@ -25,6 +25,8 @@
           data-email="<%= admin.email %>"
           data-first-name="<%= admin.first_name %>"
           data-last-name="<%= admin.last_name %>"
+          data-password="<%= admin.password %>"
+          data-username="<%= admin.username %>"
           data-entity="admin">
         <td><%= admin.first_name + ' ' + admin.last_name %></td>
         <td><%= admin.email %></td>
@@ -49,6 +51,14 @@
       <div class="input-field">
         <input id="entity-email" type="email" name="email" placeholder="Email">
         <label for="entity-email"></label>
+      </div>
+      <div class="input-field">
+        <input id="entity-username" type="text" name="username" placeholder="Username">
+        <label for="entity-username"></label>
+      </div>
+      <div class="input-field">
+        <input id="entity-password" type="text" name="password" placeholder="Password">
+        <label for="entity-password"></label>
       </div>
   `
 }) %>
