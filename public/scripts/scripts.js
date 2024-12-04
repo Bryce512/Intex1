@@ -18,7 +18,7 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
 //   }
 // });
 
-// *** Handle Modal clicks and open
+
 // *** Handle Modal clicks and open
 document.addEventListener('DOMContentLoaded', function() {
   // Ensure that the modal and overlay exist before adding the listeners
@@ -60,21 +60,62 @@ document.addEventListener('DOMContentLoaded', function() {
     const openModalBtns = document.querySelectorAll('.editable-row');
     openModalBtns.forEach(row => {
       row.addEventListener('click', function () {
-        const adminId = row.getAttribute('data-id');
-        const firstName = row.getAttribute('data-first-name');
-        const lastName = row.getAttribute('data-last-name');
-        const email = row.getAttribute('data-email');
+        const Id = row.getAttribute('data-id');
+        const entity = row.getAttribute('data-entity');
+        
+        if (entity == "admin"){
+          // pull data from row
+          const firstName = row.getAttribute('data-first-name');
+          const lastName = row.getAttribute('data-last-name');
+          const email = row.getAttribute('data-email');
+          const password = row.getAttribute('data-password');
+          const username = row.getAttribute('data-username');
 
-        // Populate modal with data
-        document.getElementById('entity-first-name').value = firstName;
-        document.getElementById('entity-last-name').value = lastName;
-        document.getElementById('entity-email').value = email;
+          // Populate modal with data
+          document.getElementById('entity-first-name').value = firstName;
+          document.getElementById('entity-last-name').value = lastName;
+          document.getElementById('entity-email').value = email;
+          document.getElementById('entity-password').value = password;
+          document.getElementById('entity-username').value = username;
 
-        // Optionally set the form action
-        const formAction = `/update-admin/${adminId}`;
-        document.querySelector('form').setAttribute('action', formAction);
 
-        openModal(); // Open the modal
+          // Optionally set the form action
+          const formAction = `/update-${entity}/${Id}`;
+          document.querySelector('form').setAttribute('action', formAction);
+
+          openModal(); // Open the modal
+        } else if (entity == "team_member"){
+            // pull data from row
+            const firstName = row.getAttribute('data-first-name');
+            const lastName = row.getAttribute('data-last-name');
+            const email = row.getAttribute('data-email');
+
+            // Populate modal with data
+            document.getElementById('entity-first-name').value = firstName;
+            document.getElementById('entity-last-name').value = lastName;
+            document.getElementById('entity-email').value = email;
+
+          // Optionally set the form action
+          const formAction = `/update-${entity}/${Id}`;
+          document.querySelector('form').setAttribute('action', formAction);
+          openModal(); // Open the modal
+        } else if (entity == "event") {
+            // pull data from row
+            const firstName = row.getAttribute('data-first-name');
+            const lastName = row.getAttribute('data-last-name');
+            const email = row.getAttribute('data-email');
+
+            // Populate modal with data
+            document.getElementById('entity-first-name').value = firstName;
+            document.getElementById('entity-last-name').value = lastName;
+            document.getElementById('entity-email').value = email;
+
+          // Optionally set the form action
+          const formAction = `/update-${entity}/${Id}`;
+          document.querySelector('form').setAttribute('action', formAction);
+          openModal(); // Open the modal
+        }
+        
       });
     });
   };
