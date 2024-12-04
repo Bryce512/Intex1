@@ -177,17 +177,111 @@ app.get('/search', async (req, res) => {
   }
 });
 
+// *** ------------------------------ Volunteers Begin ---------------- ***//
+app.get('/volunteers', async (req, res) => {
+  try {
+    const volunteers = await knex('contact_info as c')
+      .select(
+        'c.contact_id',
+        'c.first_name',
+        'c.last_name',
+        'c.email',
+        'v.sewing_level',
+        's.level_description',
+        'v.hours_willing'
+      )
+      .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
+      .leftJoin('sewing_level as s', 'v.sewing_level', '=', 's.sewing_level');
 
-// Volunteers Page
-app.get('/volunteers', (req, res) => {
-  if (authorized) {
-    res.render("admin_Views/volunteers", {
-        title: 'Manage Volunteers',
-        navItems: [],
-        layout: 'layouts/adminLayout'  // Use the admin layout for this route
-      });
-  } else {
-    res.redirect('/login');
+    console.log('Query results:', {
+      count: volunteers.length,
+      sample: volunteers[0]
+    });
+
+    return res.render('admin_Views/volunteers', {
+      title: 'Manage Volunteers',
+      volunteers: volunteers,
+      layout: 'layouts/adminLayout',
+      navItems: [
+        { text: 'Home', link: '/' },
+        { text: 'About', link: '/about' },
+        { text: 'Support', link: '/support' }
+      ]
+    });
+
+  } catch (err) {
+    console.error('Error:', err);
+    return res.render('admin_Views/volunteers', {
+      title: 'Manage Volunteers',
+      volunteers: [],
+      error: 'Failed to load volunteers: ' + err.message,
+      layout: 'layouts/adminLayout',
+      navItems: []
+    });
+  }
+});
+
+
+app.get('/searchVolunteers', async (req, res) => {
+  try {
+    const query = req.query.query.trim().toLowerCase();
+
+    if (!query) {
+      return res.json([]);
+    }
+
+    const searchTerms = query.split(' '); // Split query into individual terms (e.g., ["pam", "b"])
+
+    let volunteers;
+
+    if (searchTerms.length > 1) {
+      // If multiple terms, search for combinations of first and last names
+      volunteers = await knex('contact_info as c')
+        .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
+        .leftJoin('sewing_level as s', 'v.sewing_level', '=', 's.sewing_level')
+        .select(
+          'c.contact_id',
+          'c.first_name',
+          'c.last_name',
+          'c.email',
+          'v.sewing_level',
+          's.level_description',
+          'v.hours_willing'
+        )
+        .where(function() {
+          this.whereRaw('LOWER(c.first_name) LIKE ?', [`%${searchTerms[0]}%`])
+              .andWhereRaw('LOWER(c.last_name) LIKE ?', [`%${searchTerms[1]}%`])
+              .orWhere(function() {
+                this.whereRaw('LOWER(c.first_name) LIKE ?', [`%${searchTerms[1]}%`])
+                    .andWhereRaw('LOWER(c.last_name) LIKE ?', [`%${searchTerms[0]}%`]);
+              });
+        });
+    } else {
+      // If a single term, search in both first and last names
+      volunteers = await knex('contact_info as c')
+        .leftJoin('volunteers as v', 'c.contact_id', '=', 'v.contact_id')
+        .leftJoin('sewing_level as s', 'v.sewing_level', '=', 's.sewing_level')
+        .select(
+          'c.contact_id',
+          'c.first_name',
+          'c.last_name',
+          'c.email',
+          'v.sewing_level',
+          's.level_description',
+          'v.hours_willing'
+        )
+        .whereRaw('LOWER(c.first_name) LIKE ?', [`%${query}%`])
+        .orWhereRaw('LOWER(c.last_name) LIKE ?', [`%${query}%`]);
+    }
+
+    console.log('Search query:', query);
+    console.log('Search terms:', searchTerms);
+    console.log('Results:', volunteers);
+
+    res.json(volunteers);
+  } catch (error) {
+    console.error('Error retrieving search results:', error);
+    res.status(500).json({ error: 'Error retrieving search results' });
   }
 });
 
@@ -290,6 +384,7 @@ app.use(express.static('public'));
 
 
 // port number, (parameters) => what you want it to do.
+
 app.listen(PORT, () => console.log('Server started on port ' + PORT));
 
 // donate route for home page 
@@ -302,5 +397,3 @@ app.get('/jensstory', (req, res) => {
   res.render('public_views/jensstory', {
     layout: false });  // Renders external.ejs from public_views folder
 });
-
-
