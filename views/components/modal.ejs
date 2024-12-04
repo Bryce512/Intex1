@@ -1,5 +1,5 @@
 <!-- Modal Structure in modal.ejs -->
-<div id="modal1" class="modal">
+<div id="modal1" class="modal hidden">
   <div class="modal-content">
     <h4><%= title %></h4>
     <form action="<%= formAction %>" method="POST">
@@ -11,3 +11,5 @@
     </form>
   </div>
 </div>
+
+<div class="overlay hidden"></div>

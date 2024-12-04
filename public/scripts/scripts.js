@@ -20,90 +20,71 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
 
 // *** Handle Modal clicks and open
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM fully loaded and parsed');
-  // Initialize all modals
-  var elems = document.querySelectorAll('.modal');
-  M.Modal.init(elems);
+  // Ensure that the close button exists before adding the listener
+  const closeModalBtn = document.querySelector('.modal-close');
+  const overlay = document.getElementById('overlay');
+  const modal = document.getElementById('modal1');
 
-  // Handle row click event
-  var rows = document.querySelectorAll('.editable-row');
-  rows.forEach(row => {
-    row.addEventListener('click', function() {
-      console.log('Row clicked!');  // Log the event listener trigger
-      // Get the data from the clicked row
-      var id = row.getAttribute('data-id');
-      var entity = row.getAttribute('data-entity');  // user, volunteer, event, etc.
+  // Function to close the modal
+  const closeModal = function () {
+    modal.classList.remove('visible');
+    overlay.classList.remove('visible');
+  };
 
-      // Dynamically populate modal fields based on the entity type
-      if (entity === 'user') {
-        var firstName = row.getAttribute('data-first-name');
-        var lastName = row.getAttribute('data-last-name');
-        var email = row.getAttribute('data-email');
+  // Close the modal when the cancel button is clicked
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+  }
 
-        // Populate modal with data
-        document.getElementById('entity-first-name').value = firstName;
-        document.getElementById('entity-last-name').value = lastName;
-        document.getElementById('entity-email').value = email;
-      } 
+  // Close modal when clicking the overlay
+  if (overlay) {
+    overlay.addEventListener('click', closeModal);
+  }
 
-      else if (entity === 'volunteer') {
-        // Get all data attributes
-        var firstName = row.getAttribute('data-first-name');
-        var lastName = row.getAttribute('data-last-name');
-        var email = row.getAttribute('data-email');
-        var phone = row.getAttribute('data-phone');
-        var sewingLevel = row.getAttribute('data-sewing-level');
-        var hoursWilling = row.getAttribute('data-hours-willing');
-        var id = row.getAttribute('data-id');
+  // Close modal when pressing the Escape key
+  document.addEventListener('keydown', function (e) {
+    if (e.key === "Escape" && modal.classList.contains('visible')) {
+      closeModal();
+    }
+  })
+});
 
-        // Populate modal with volunteer data
-        document.getElementById('entity-first-name').value = firstName;
-        document.getElementById('entity-last-name').value = lastName;
-        document.getElementById('entity-email').value = email;
-        document.getElementById('entity-phone').value = phone;
-        document.getElementById('entity-sewing-level').value = sewingLevel;
-        document.getElementById('entity-hours-willing').value = hoursWilling;
+const openModalBtns = document.querySelectorAll('.editable-row'); // Update this selector to match your rows
 
-        // Update form action with the correct ID
-        document.querySelector('form').action = `/update-volunteer/${id}`;
+// Open modal when a row is clicked
+openModalBtns.forEach(row => {
+  row.addEventListener('click', function () {
+    const userId = row.getAttribute('data-id');
+    const firstName = row.getAttribute('data-first-name');
+    const lastName = row.getAttribute('data-last-name');
+    const email = row.getAttribute('data-email');
 
-        // Refresh Materialize inputs
-        M.updateTextFields();
-      } 
+    // Populate modal with data
+    document.getElementById('entity-first-name').value = firstName;
+    document.getElementById('entity-last-name').value = lastName;
+    document.getElementById('entity-email').value = email;
 
-      else if (entity === 'event') {
-        var eventName = row.getAttribute('data-name');
-        var eventDate = row.getAttribute('data-date');
-        
-        // Populate modal with event data
-        document.getElementById('entity-name').value = eventName;
-        document.getElementById('entity-date').value = eventDate;
-      }
+    // Optionally set the form action
+    const formAction = `/update-user/${userId}`;
+    document.querySelector('form').setAttribute('action', formAction);
 
-      // Set the form action dynamically
-      var formAction = '/update-' + entity + '/' + id;
-      document.querySelector('#modal1 form').setAttribute('action', formAction);
-
-      // Open the modal
-      var modal = M.Modal.getInstance(document.getElementById('modal1'));
-      if (modal) {
-        console.log('Modal found!');
-      } else {
-        console.log('Modal element not found');
-      }
-      modal.open();
-    });
+    openModal(); // Open the modal
   });
+});
 
-  // *** Handle change row colors on hover
-  // Add event listeners for row hover
-  document.querySelectorAll('.editable-row').forEach(row => {
-    row.addEventListener('mouseenter', () => {
-      row.classList.add('hover');
-    });
-    row.addEventListener('mouseleave', () => {
-      row.classList.remove('hover');
-    });
+
+
+// *** Handle change row colors on hover
+// Add event listeners for row hover
+
+
+document.querySelectorAll('.editable-row').forEach(row => {
+  row.addEventListener('mouseenter', () => {
+    row.classList.add('hover');
+  });
+  row.addEventListener('mouseleave', () => {
+    row.classList.remove('hover');
   });
 });
 
