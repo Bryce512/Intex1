@@ -380,13 +380,15 @@ app.get('/event', (req, res) => {
   // Fetch location sizes and table shapes independently
   Promise.all([
     knex('location_size').select('loc_size','size_description'), // Fetch size descriptions
-    knex('table_shape').select('table_shape','shape_description')  // Fetch shape descriptions
+    knex('table_shape').select('table_shape','shape_description'),  // Fetch shape descriptions
+    knex('type').select('type_id','type_description')  // Fetch type descriptions
   ])
-  .then(([locationSizes, tableShapes]) => {
+  .then(([locationSizes, tableShapes, types]) => {
     // Render the page without layout
     res.render('public_views/scheduleEvent', {
       locationSizes,
       tableShapes,
+      types,
       title: 'Manage Events',
       layout: false  // Explicitly disable layout
     });
@@ -427,14 +429,14 @@ app.post('/scheduleEvent', (req, res) => {
   const tableShape = req.body.tableShape || '';
   const additionalNotes = req.body.additionalNotes || '';
 
-  // Insert the new Pokémon into the database
+  // Insert the new Event into the database
   knex('requested_events')
       .insert({
           estimated_date: eventDate,
           street_address: street,
           estimated_start_time: startTime,
           estimated_duration: eventDuration,
-          estimated_type: eventType,
+          type_id: eventType,
           loc_size: locationSize,
           estimated_num_adults: numAdults,
           estimated_num_youth: numYouth,
@@ -448,8 +450,7 @@ app.post('/scheduleEvent', (req, res) => {
           organization: organization,
       })
       .then(() => {
-        res.render('public_views/publicHome', {
-        layout: false });
+        res.redirect('/event?success=true');
       })
       .catch(error => {
           console.error('Error adding Event:', error);
