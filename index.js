@@ -178,15 +178,15 @@ app.get('/team_members', async (req, res) => {
           .leftJoin('team_members as tm', 'c.contact_id', '=', 'tm.contact_id')
           .leftJoin('sewing_level as s', 'tm.sewing_level', '=', 's.sewing_level');
 
+        const sewingLevels = await knex('sewing_level')
+        .select('sewing_level', 'level_description');
+        
         return res.render('admin_Views/team_members', {
+          sewingLevels,
           title: 'Manage Team Members',
           team_members: team_members,
           layout: 'layouts/adminLayout',
-          navItems: [
-            { text: 'Home', link: '/' },
-            { text: 'About', link: '/about' },
-            { text: 'Support', link: '/support' }
-          ]
+          navItems: []
         });
 
       } catch (err) {

@@ -84,16 +84,23 @@ document.addEventListener('DOMContentLoaded', function() {
           document.querySelector('form').setAttribute('action', formAction);
 
           openModal(); // Open the modal
+
         } else if (entity == "team_member"){
             // pull data from row
             const firstName = row.getAttribute('data-first-name');
             const lastName = row.getAttribute('data-last-name');
             const email = row.getAttribute('data-email');
+            const phone = row.getAttribute('data-phone');
+            const sewing_level = row.getAttribute('data-sewing-level');
+            const hours_willing = row.getAttribute('data-hours-willing');
 
             // Populate modal with data
             document.getElementById('entity-first-name').value = firstName;
             document.getElementById('entity-last-name').value = lastName;
             document.getElementById('entity-email').value = email;
+            document.getElementById('entity-phone').value = phone;
+            document.getElementById('entity-sewing-level').value = sewing_level;
+            document.getElementById('entity-hours-willing').value = hours_willing;
 
           // Optionally set the form action
           const formAction = `/update-${entity}/${Id}`;

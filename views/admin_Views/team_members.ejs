@@ -29,7 +29,7 @@
           data-last-name="<%= team_member.last_name %>"
           data-email="<%= team_member.email %>"
           data-phone="<%= team_member.phone %>"
-          data-sewing-level="<%= team_member.sewing_level %>"
+          data-sewing-level="<%= team_member.level_description %>"
           data-hours-willing="<%= team_member.hours_willing %>"
           data-entity = "team_member"
         >
@@ -71,8 +71,13 @@
     <label for="entity-phone"></label>
   </div>
   <div class="input-field">
-    <input id="entity-sewing-level" type="text" name="sewingLevel" placeholder="Sewing Level">
-    <label for="entity-sewing-level"></label>
+    <label for="entity-sewing-level">Sewing Level</label>
+    <select id="entity-sewing-level" name="sewingLevel" required>
+      <option value="" disabled selected>Select Sewing Level</option>
+      <% sewingLevels.forEach(level => { %>
+        <option value="<%= level.sewing_level %>"><%= level.level_description %></option>
+      <% }); %>
+    </select>
   </div>
   <div class="input-field">
     <input id="entity-hours-willing" type="number" name="hoursWilling" placeholder="Hours Willing per Month">
