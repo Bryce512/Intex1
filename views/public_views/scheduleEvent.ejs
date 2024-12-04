@@ -184,8 +184,8 @@ input[type="checkbox"] {
     </div>
     <div class="form-group-inline">
         <div>
-            <label for="eventState">State</label>
-            <select id="eventState" name="eventState" required>
+            <label for="state">State</label>
+            <select id="state" name="state" required>
               <option value="" disabled selected>Select State</option>
               <option value="AL">AL</option>
               <option value="AK">AK</option>
@@ -249,8 +249,8 @@ input[type="checkbox"] {
     <div class="section-header">Event Information</div>
 
     <div>
-        <label for="street">Organization</label>
-        <input type="text" id="street" name="street" required>
+        <label for="organization">Organization</label>
+        <input type="text" id="organization" name="organization" required>
       </div>
     <div>
       <label for="street">Street Address</label>
@@ -262,8 +262,8 @@ input[type="checkbox"] {
     </div>
     <div class="form-group-inline">
         <div>
-            <label for="state">State</label>
-            <select id="state" name="state" required>
+            <label for="eventState">State</label>
+            <select id="eventState" name="eventState" required>
               <option value="" disabled selected>Select State</option>
               <option value="AL">AL</option>
               <option value="AK">AK</option>
@@ -327,7 +327,7 @@ input[type="checkbox"] {
         <select id="locationSize" name="locationSize" required>
           <option value="" disabled selected>Select Size</option> <!-- Default option -->
           <% locationSizes.forEach(size => { %>
-            <option value="<%= size.size_description %>"><%= size.size_description %></option>
+            <option value="<%= size.loc_size %>"><%= size.size_description %></option>
           <% }) %>
         </select>
     </div>
@@ -370,15 +370,15 @@ input[type="checkbox"] {
         <label>Type of Event</label>
         <div class="radio-group">
           <label>
-            <input type="radio" id="sewing" name="eventType" value="sewing">
+            <input type="radio" id="sewing" name="eventType" value="Sewing">
             Sewing
           </label>
           <label>
-            <input type="radio" id="nonSewing" name="eventType" value="non-sewing">
+            <input type="radio" id="nonSewing" name="eventType" value="Non-Sewing">
             Non-Sewing
           </label>
           <label>
-            <input type="radio" id="both" name="eventType" value="both">
+            <input type="radio" id="both" name="eventType" value="Both">
             Both
           </label>
         </div>
@@ -408,7 +408,7 @@ input[type="checkbox"] {
         <select id="tableShape" name="tableShape" required>
           <option value="" disabled selected>Select Shape</option> <!-- Default option -->
           <% tableShapes.forEach(shape => { %>
-            <option value="<%= shape.shape_description %>"><%= shape.shape_description %></option>
+            <option value="<%= shape.table_shape %>"><%= shape.shape_description %></option>
           <% }) %>
         </select>
       </div>
