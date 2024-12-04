@@ -20,7 +20,7 @@
   left: 0;
   width: 100%;
   height: 63px; /* Fixed height for navbar */
-  z-index: 1000; /* Ensure it stays on top */
+  z-index: 10; /* Ensure it stays on top */
 }
 
 .logoutButton {
@@ -70,7 +70,7 @@
   height: 100%; /* Full-height sidebar */
   background-color: var(--dark-grey);
   padding-top: 20px;
-  z-index: 999; /* Sidebar stays below the navbar */
+  z-index: 9; /* Sidebar stays below the navbar */
   overflow-y: auto;
 }
 
@@ -81,6 +81,8 @@
   font-size: 25px;
   color: var(--white);
   display: block;
+  overflow-y: auto;
+
 }
 
 /* Hover effects on side nav links */
@@ -98,22 +100,60 @@
 }
 
 /* *** MODAL */
+/* The overlay should cover the whole screen and be semi-transparent */
+/* Overlay */
 .overlay {
   position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(3px);
-  z-index: 1;
+  background: rgba(0, 0, 0, 0.5);  /* Semi-transparent background */
+  backdrop-filter: blur(3px);  /* Optional blur effect */
+  z-index: 8; /* Ensure overlay is above the page content */
+  display: none;  /* Initially hidden */
 }
 
-.hidden {
-  display: none;
+/* Custom Modal */
+.modal {
+  position: absolute;
+  top: 30%;  /* Center modal vertically */
+  left: 50%; /* Center modal horizontally */
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 20; /* Ensure modal is above overlay */
+  display: none; /* Initially hidden */
+  width: 40%;  /* Optional: Set a fixed width for the modal */
+  max-width: 600px; /* Optional: Max width for larger screens */
 }
+
+/* Display the modal and overlay when they are visible */
+.modal.visible, .overlay.visible {
+  display: block;  /* Show modal and overlay when they're visible */
+  opacity: 1; /* Ensure the opacity is set correctly */
+}
+
+/* Transition for smooth opening/closing */
+.modal, .overlay {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.modal.visible, .overlay.visible {
+  opacity: 1;
+}
+
+
+
+/* Optional: Add some responsiveness for smaller screens */
+@media (max-width: 768px) {
+  .modal {
+    width: 90%;
+    max-width: 400px; /* Smaller modal on mobile */
+  }
+}
+
 
 
 /* *** ADMIN LAYOUT */
@@ -121,12 +161,14 @@
 .admin-content {
   margin-left: 190px; /* Space for sidebar */
   padding-left:  20px;  /* General padding for the content */
+  margin-top: 63px;
 }
 
 /* Content body */
 .admin-body {
   background-color: #f5f5f5;
   margin-top: 0;  /* Ensure there's no margin above the content */
+  position: relative; /* Ensure it's positioned relatively to contain modal */
 }
 
 /* *** ADMIN TABLE STYLES */

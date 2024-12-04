@@ -19,11 +19,12 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
 // });
 
 // *** Handle Modal clicks and open
+// *** Handle Modal clicks and open
 document.addEventListener('DOMContentLoaded', function() {
-  // Ensure that the close button exists before adding the listener
-  const closeModalBtn = document.querySelector('.modal-close');
+  // Ensure that the modal and overlay exist before adding the listeners
+  const modal = document.getElementById('modal');
   const overlay = document.getElementById('overlay');
-  const modal = document.getElementById('modal1');
+  const closeModalBtn = document.querySelector('.modal-close');
 
   // Function to close the modal
   const closeModal = function () {
@@ -31,10 +32,15 @@ document.addEventListener('DOMContentLoaded', function() {
     overlay.classList.remove('visible');
   };
 
+  // Open modal function
+  const openModal = function () {
+    modal.classList.add('visible');
+    overlay.classList.add('visible');
+  };
+
   // Close the modal when the cancel button is clicked
   if (closeModalBtn) {
     closeModalBtn.addEventListener('click', closeModal);
-    overlay.addEventListener('click', closeModal);
   }
 
   // Close modal when clicking the overlay
@@ -47,30 +53,42 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.key === "Escape" && modal.classList.contains('visible')) {
       closeModal();
     }
-  })
-});
-
-const openModalBtns = document.querySelectorAll('.editable-row'); // Update this selector to match your rows
-
-// Open modal when a row is clicked
-openModalBtns.forEach(row => {
-  row.addEventListener('click', function () {
-    const userId = row.getAttribute('data-id');
-    const firstName = row.getAttribute('data-first-name');
-    const lastName = row.getAttribute('data-last-name');
-    const email = row.getAttribute('data-email');
-
-    // Populate modal with data
-    document.getElementById('entity-first-name').value = firstName;
-    document.getElementById('entity-last-name').value = lastName;
-    document.getElementById('entity-email').value = email;
-
-    // Optionally set the form action
-    const formAction = `/update-user/${userId}`;
-    document.querySelector('form').setAttribute('action', formAction);
-
-    openModal(); // Open the modal
   });
+
+  // Attach row click events dynamically (This is the important part)
+  const attachRowClickEvents = () => {
+    const openModalBtns = document.querySelectorAll('.editable-row');
+    openModalBtns.forEach(row => {
+      row.addEventListener('click', function () {
+        const userId = row.getAttribute('data-id');
+        const firstName = row.getAttribute('data-first-name');
+        const lastName = row.getAttribute('data-last-name');
+        const email = row.getAttribute('data-email');
+
+        // Populate modal with data
+        document.getElementById('entity-first-name').value = firstName;
+        document.getElementById('entity-last-name').value = lastName;
+        document.getElementById('entity-email').value = email;
+
+        // Optionally set the form action
+        const formAction = `/update-user/${userId}`;
+        document.querySelector('form').setAttribute('action', formAction);
+
+        openModal(); // Open the modal
+      });
+    });
+  };
+
+  // Initialize the row click events on page load
+  attachRowClickEvents();
+
+  // Reattach row click events when search results are rendered (if applicable)
+  const searchResultsContainer = document.getElementById('searchResults');
+  if (searchResultsContainer) {
+    searchResultsContainer.addEventListener('DOMNodeInserted', () => {
+      attachRowClickEvents();
+    });
+  }
 });
 
 
@@ -108,3 +126,31 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+// *** SEARCH BAR
+// Search function triggered by input in the search box
+async function liveSearch(query) {
+  if (!query) {
+    // If there's no query, reset the table to show all rows
+    const allRows = document.querySelectorAll('#mainTable .editable-row');
+    allRows.forEach(row => row.style.display = '');  // Show all rows
+    return;
+  }
+
+  // Convert the query to lower case for case-insensitive comparison
+  const queryLower = query.toLowerCase();
+  
+  // Get all the rows in the main table
+  const rows = document.querySelectorAll('#mainTable .editable-row');
+
+  rows.forEach(row => {
+    const firstName = row.getAttribute('data-first-name').toLowerCase(); // Get first name
+    const lastName = row.getAttribute('data-last-name').toLowerCase();   // Get last name
+
+    // Check if the query matches the first or last name
+    if (firstName.includes(queryLower) || lastName.includes(queryLower)) {
+      row.style.display = '';  // Show matching row
+    } else {
+      row.style.display = 'none';  // Hide non-matching row
+    }
+  });
+}

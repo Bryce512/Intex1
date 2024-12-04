@@ -8,43 +8,8 @@
       placeholder="Search" 
       oninput="liveSearch(this.value)">
   </div>
-  
-  <div id="searchResults"></div>
-    
+      
 </div>
-<script>
-  // Search function triggered by input in the search box
-async function liveSearch(query) {
-  if (!query) {
-    // If there's no query, reset the table to show all rows
-    const allRows = document.querySelectorAll('#mainTable .editable-row');
-    allRows.forEach(row => row.style.display = '');  // Show all rows
-    console.log("No query, showing all rows");
-    return;
-  }
-
-  // Convert the query to lower case for case-insensitive comparison
-  const queryLower = query.toLowerCase();
-  
-  // Get all the rows in the main table
-  const rows = document.querySelectorAll('#mainTable .editable-row');
-  console.log(`Searching for: ${queryLower}`);
-
-  rows.forEach(row => {
-    const firstName = row.getAttribute('data-first-name').toLowerCase(); // Get first name
-    const lastName = row.getAttribute('data-last-name').toLowerCase();   // Get last name
-
-    // Check if the query matches the first or last name
-    if (firstName.includes(queryLower) || lastName.includes(queryLower)) {
-      row.style.display = '';  // Show matching row
-    } else {
-      row.style.display = 'none';  // Hide non-matching row
-    }
-  });
-}
-
-
-</script>
 
 <table id="mainTable">
   <thead>
