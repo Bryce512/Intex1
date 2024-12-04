@@ -384,6 +384,12 @@ app.get('/howYouCanHelp', (req, res) => {
   });
 });
 
+// about
+app.get('/about', (req, res) => {
+  res.render('public_views/about', {
+    layout: false });  // Renders external.ejs from public_views folder
+});
+
 // homelessness and cold  
 app.get('/about-homelessness-and-the-cold', (req, res) => {
   res.render('public_views/about-homelessness-and-the-cold', {
