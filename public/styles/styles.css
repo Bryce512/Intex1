@@ -55,6 +55,31 @@
   width: 7%;
 }
 
+.eventBtn{
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  right: 35px;
+  width: 7%;
+  /* Add flexbox properties to center text */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center; 
+}
+
+.eventBtnContainer {
+  display: flex; /* This ensures the buttons are in a horizontal row */
+  gap: 10px; /* Optional: space between the buttons */
+  margin-bottom: 20px; /* Optional: add some margin below the buttons */
+}
+
+
 .addBtn:hover {
   background-color: var(--primary-light);
 }

@@ -4,6 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Executed Events</title>
+  <div class="search-container">
+    <div class="search-container">
+      <input 
+        type="text" 
+        class="search-input" 
+        id="searchBox" 
+        placeholder="Search" 
+        oninput="liveSearch(this.value)">
+    </div>
+        
+  </div>
   <style>
     table {
       width: 100%;
@@ -24,9 +35,11 @@
 </head>
 
 <!-- Buttons to filter by status -->
-<button onclick="window.location.href='/events?status=pending'">Pending</button>
-<button onclick="window.location.href='/events?status=approved'">Approved</button>
-<button onclick="window.location.href='/events?status=finished'">Finished</button>
+<div class="eventBtnContainer">
+  <button class="eventBtn" onclick="window.location.href='/events?status=pending'">Pending</button>
+  <button class="eventBtn" onclick="window.location.href='/events?status=approved'">Approved</button>
+  <button class="eventBtn" onclick="window.location.href='/events?status=finished'">Finished</button>
+</div>
 
 
 <table>
@@ -36,6 +49,7 @@
       <tr>
         <th>Actual Start Date</th>
         <th>Actual Start Time</th>
+        <th>Organization</th>
         <th>Actual Duration</th>
         <th>Actual Number of People</th>
         <th>Type Description</th> 
@@ -50,6 +64,7 @@
       <!-- Columns for requested_events -->
       <tr>
         <th>Estimated Date</th>
+        <th>Organization</th>
         <th>Contact Name</th>
         <th>Phone</th>
         <th>Street Address</th>
@@ -78,6 +93,7 @@
           <!-- Display columns for executed_events -->
           <td><%= event.actual_start_date %></td>
           <td><%= event.actual_start_time %></td>
+          <td><%= event.organization %></td>
           <td><%= event.actual_duration %></td>
           <td><%= event.actual_num_people %></td>
           <td><%= event.type_description %></td> 
@@ -90,6 +106,7 @@
         <% } else { %>
           <!-- Display columns for requested_events -->
           <td><%= event.estimated_date %></td>
+          <td><%=event.organization %></td>
           <td><%= event.first_name %> <%= event.last_name %></td>
           <td><%= event.phone %></td>
           <td><%= event.street_address %></td>

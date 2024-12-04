@@ -365,9 +365,11 @@ app.get('/events', async (req, res) => {
       // Query the executed_events table for finished events
       events = await knex('executed_events')
         .select('*',
-        'type.type_description' // Add type_description
+        'type.type_description', // Add type_description
+        'requested_events.organization'
       )
-      .leftJoin('type', 'executed_events.type_id', '=', 'type.type_id'); // Join with type table
+      .leftJoin('type', 'executed_events.type_id', '=', 'type.type_id') // Join with type table
+      .leftJoin('requested_events', 'executed_events.event_id', '=', 'requested_events.event_id');
 
 
     } else {
@@ -393,12 +395,13 @@ app.get('/events', async (req, res) => {
           'requested_events.table_shape',
           'requested_events.additional_notes',
           'requested_events.status',
+          'requested_events.organization',
           'contact_info.first_name',
           'contact_info.last_name',
           'contact_info.phone',
           'location.city',
           'location.state',
-          'location.zip'
+          'location.zip',
         )
         .leftJoin('contact_info', 'requested_events.contact_id', '=', 'contact_info.contact_id')
         .leftJoin('location', 'requested_events.loc_id', '=', 'location.loc_id')
@@ -417,6 +420,41 @@ app.get('/events', async (req, res) => {
     res.status(500).send('An error occurred while fetching events.');
   }
 });
+
+
+// Search Bar grabbing data
+// app.get('/search', async (req, res) => {
+//   try {
+//     const query = req.query.query.trim().toLowerCase(); // Trim and convert query to lowercase
+
+//     if (!query) {
+//       return res.json([]); // Return an empty array if the query is empty
+//     }
+
+//     const searchTerms = query.split(' '); // Split query into individual terms (e.g., ["john", "doe"])
+
+//     let events;
+
+//     if (searchTerms.length > 1) {
+//       // If multiple terms, search for combinations of first and last names
+//       events = await knex('contact_info')
+//         .whereRaw('LOWER(first_name) LIKE ?', [`%${searchTerms[0]}%`])
+//         .andWhereRaw('LOWER(last_name) LIKE ?', [`%${searchTerms[1]}%`])
+//         .orWhereRaw('LOWER(first_name) LIKE ?', [`%${searchTerms[1]}%`])
+//         .andWhereRaw('LOWER(last_name) LIKE ?', [`%${searchTerms[0]}%`]);
+//     } else {
+//       // If a single term, search in both first and last names
+//       events = await knex('contact_info')
+//         .whereRaw('LOWER(first_name) LIKE ?', [`%${query}%`])
+//         .orWhereRaw('LOWER(last_name) LIKE ?', [`%${query}%`]);
+//     }
+
+//     res.json(events); // Return the matching users as JSON
+//   } catch (error) {
+//     console.error('Error retrieving search results:', error);
+//     res.status(500).json({ error: 'Error retrieving search results' });
+//   }
+// });
 
 
 
@@ -501,6 +539,12 @@ app.get('/donate', (req, res) => {
 // Jen's story
 app.get('/jensstory', (req, res) => {
   res.render('public_views/jensstory', {
+    layout: false });  // Renders external.ejs from public_views folder
+});
+
+// Thanks to sponsors 
+app.get('/thank-you-to-our-sponsors', (req, res) => {
+  res.render('public_views/thank-you-to-our-sponsors', {
     layout: false });  // Renders external.ejs from public_views folder
 });
 
