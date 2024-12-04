@@ -155,101 +155,117 @@ input[type="checkbox"] {
   <form action="/scheduleEvent" method="POST">
     <h1>Schedule an Event</h1>
 
-    <!-- Have you scheduled an event before? -->
-    <div class="question">
-      <label>Have you scheduled an event with us before?</label><br>
-      <button type="button" id="yesButton">Yes</button>
-      <button type="button" id="noButton">No</button>
+  <!-- Have you scheduled an event before? -->
+  <div class="question">
+    <label>Have you scheduled an event with us before?</label><br>
+    <div class="radio-group">
+      <label>
+        <input type="radio" id="yesRadio" name="scheduledBefore" value="yes">
+        Yes
+      </label>
+      <label>
+        <input type="radio" id="noRadio" name="scheduledBefore" value="no">
+        No
+      </label>
+    </div>
+  </div>
+
+    <!-- Email input when "Yes" is selected -->
+    <div id="emailSection" style="display: none;">
+      <label for="existingEmail">Enter the email address you previously used to schedule an event:</label>
+      <input type="email" id="existingEmail" name="existingEmail">
     </div>
 
     <!-- Personal Information Section -->
-    <div class="section-header">Personal Information</div>
+    <div id="personalInfoSection" style="display: none;">
+      <div class="section-header">Personal Information</div>
 
-    <div class="form-group-inline">
-      <div>
-        <label for="firstName">First Name</label>
-        <input type="text" id="firstName" name="firstName" required>
-      </div>
-      <div>
-        <label for="lastName">Last Name</label>
-        <input type="text" id="lastName" name="lastName" required>
-      </div>
-    </div>
-
-    <div>
-      <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" required>
-    </div>
-    <div>
-      <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" name="phone" required>
-    </div>
-
-    <div>
-      <label for="city">City You Live In</label>
-      <input type="text" id="city" name="city" required>
-    </div>
-    <div class="form-group-inline">
+      <div class="form-group-inline">
         <div>
-            <label for="state">State</label>
-            <select id="state" name="state" required>
-              <option value="" disabled selected>Select State</option>
-              <option value="AL">AL</option>
-              <option value="AK">AK</option>
-              <option value="AZ">AZ</option>
-              <option value="AR">AR</option>
-              <option value="CA">CA</option>
-              <option value="CO">CO</option>
-              <option value="CT">CT</option>
-              <option value="DE">DE</option>
-              <option value="FL">FL</option>
-              <option value="GA">GA</option>
-              <option value="HI">HI</option>
-              <option value="ID">ID</option>
-              <option value="IL">IL</option>
-              <option value="IN">IN</option>
-              <option value="IA">IA</option>
-              <option value="KS">KS</option>
-              <option value="KY">KY</option>
-              <option value="LA">LA</option>
-              <option value="ME">ME</option>
-              <option value="MD">MD</option>
-              <option value="MA">MA</option>
-              <option value="MI">MI</option>
-              <option value="MN">MN</option>
-              <option value="MS">MS</option>
-              <option value="MO">MO</option>
-              <option value="MT">MT</option>
-              <option value="NE">NE</option>
-              <option value="NV">NV</option>
-              <option value="NH">NH</option>
-              <option value="NJ">NJ</option>
-              <option value="NM">NM</option>
-              <option value="NY">NY</option>
-              <option value="NC">NC</option>
-              <option value="ND">ND</option>
-              <option value="OH">OH</option>
-              <option value="OK">OK</option>
-              <option value="OR">OR</option>
-              <option value="PA">PA</option>
-              <option value="RI">RI</option>
-              <option value="SC">SC</option>
-              <option value="SD">SD</option>
-              <option value="TN">TN</option>
-              <option value="TX">TX</option>
-              <option value="UT">UT</option>
-              <option value="VT">VT</option>
-              <option value="VA">VA</option>
-              <option value="WA">WA</option>
-              <option value="WV">WV</option>
-              <option value="WI">WI</option>
-              <option value="WY">WY</option>
-            </select>
-          </div>
-      <div>
-        <label for="zip">Zip Code</label>
-        <input type="text" id="zip" name="zip" required>
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" name="firstName" required>
+        </div>
+        <div>
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" name="lastName" required>
+        </div>
       </div>
+
+      <div>
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div>
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone" required>
+      </div>
+
+      <div>
+        <label for="city">City You Live In</label>
+        <input type="text" id="city" name="city" required>
+      </div>
+      <div class="form-group-inline">
+          <div>
+              <label for="state">State</label>
+              <select id="state" name="state" required>
+                <option value="" disabled selected>Select State</option>
+                <option value="AL">AL</option>
+                <option value="AK">AK</option>
+                <option value="AZ">AZ</option>
+                <option value="AR">AR</option>
+                <option value="CA">CA</option>
+                <option value="CO">CO</option>
+                <option value="CT">CT</option>
+                <option value="DE">DE</option>
+                <option value="FL">FL</option>
+                <option value="GA">GA</option>
+                <option value="HI">HI</option>
+                <option value="ID">ID</option>
+                <option value="IL">IL</option>
+                <option value="IN">IN</option>
+                <option value="IA">IA</option>
+                <option value="KS">KS</option>
+                <option value="KY">KY</option>
+                <option value="LA">LA</option>
+                <option value="ME">ME</option>
+                <option value="MD">MD</option>
+                <option value="MA">MA</option>
+                <option value="MI">MI</option>
+                <option value="MN">MN</option>
+                <option value="MS">MS</option>
+                <option value="MO">MO</option>
+                <option value="MT">MT</option>
+                <option value="NE">NE</option>
+                <option value="NV">NV</option>
+                <option value="NH">NH</option>
+                <option value="NJ">NJ</option>
+                <option value="NM">NM</option>
+                <option value="NY">NY</option>
+                <option value="NC">NC</option>
+                <option value="ND">ND</option>
+                <option value="OH">OH</option>
+                <option value="OK">OK</option>
+                <option value="OR">OR</option>
+                <option value="PA">PA</option>
+                <option value="RI">RI</option>
+                <option value="SC">SC</option>
+                <option value="SD">SD</option>
+                <option value="TN">TN</option>
+                <option value="TX">TX</option>
+                <option value="UT">UT</option>
+                <option value="VT">VT</option>
+                <option value="VA">VA</option>
+                <option value="WA">WA</option>
+                <option value="WV">WV</option>
+                <option value="WI">WI</option>
+                <option value="WY">WY</option>
+              </select>
+            </div>
+        <div>
+          <label for="zip">Zip Code</label>
+          <input type="text" id="zip" name="zip" required>
+        </div>
+    </div>
     </div>
 
     <!-- Event Information Section -->
@@ -397,7 +413,7 @@ input[type="checkbox"] {
         </div>
       </div>      
     <div>
-      <label for="storyDuration">Story Duration (minutes)</label>
+      <label for="storyDuration">Story Duration (minutes). Can range anywhere from 5 to 45 minutes.</label>
       <input type="number" id="storyDuration" name="storyDuration">
     </div>
     <div>
@@ -421,6 +437,26 @@ input[type="checkbox"] {
 
     <button type="submit">Submit</button>
   </form>
+
+  <script>
+    // Initially hide the sections
+    document.getElementById('emailSection').style.display = 'none';
+    document.getElementById('personalInfoSection').style.display = 'none';
+  
+    // Show email section when 'Yes' button is clicked
+    document.getElementById('yesRadio').addEventListener('click', function() {
+      document.getElementById('emailSection').style.display = 'block';
+      document.getElementById('personalInfoSection').style.display = 'none';
+    });
+  
+    // Show personal info section when 'No' button is clicked
+    document.getElementById('noRadio').addEventListener('click', function() {
+      document.getElementById('emailSection').style.display = 'none';
+      document.getElementById('personalInfoSection').style.display = 'block';
+    });
+  </script>
+  
+
   <script>
     // Check for 'success' query parameter in the URL
     const urlParams = new URLSearchParams(window.location.search);
