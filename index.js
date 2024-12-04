@@ -475,8 +475,8 @@ app.get('/jensstory', (req, res) => {
 app.get('/event', (req, res) => {
   // Fetch location sizes and table shapes independently
   Promise.all([
-    knex('location_size').select('size_description'), // Fetch size descriptions
-    knex('table_shape').select('shape_description')  // Fetch shape descriptions
+    knex('location_size').select('loc_size','size_description'), // Fetch size descriptions
+    knex('table_shape').select('table_shape','shape_description')  // Fetch shape descriptions
   ])
   .then(([locationSizes, tableShapes]) => {
     // Render the page without layout
@@ -490,6 +490,66 @@ app.get('/event', (req, res) => {
     console.error('Error fetching Location sizes and table shapes:', error);
     res.status(500).send('Internal Server Error');
   });
+});
+
+// Add someone's Event Schedule Request to the Database
+app.post('/scheduleEvent', (req, res) => {
+  // Extract form values from req.body
+  const firstName = req.body.firstName || ''; // Default to empty string if not provided
+  const lastName = req.body.lastName || '';
+  const email = req.body.email || '';
+  const phone = req.body.phone || ''; 
+  const city = req.body.city || ''; 
+  const state = req.body.state || ''; 
+  const zip = parseInt(req.body.zip, 10); // Convert to integer
+  const organization = req.body.organization || ''; 
+  const street = req.body.street || '';
+  const eventCity = req.body.eventCity || '';
+  const eventState = req.body.eventState || '';  
+  const eventZip = parseInt(req.body.eventZip, 10);
+  const locationSize = req.body.locationSize || '';
+  const eventDate = req.body.eventDate || new Date().toISOString().split('T')[0]; // Default to today 
+  const startTime = req.body.startTime || '12:00:00';
+  const eventDuration = parseFloat(req.body.eventDuration);
+  const numAdults = parseInt(req.body.numAdults, 10);
+  const numYouth = parseInt(req.body.numYouth, 10);
+  const numChildren = parseInt(req.body.numYouth, 10);
+  const eventType = req.body.eventType || 'Both'; // Default to Both
+  const numMachines = parseInt(req.body.numMachines, 10);
+  const shareStory = req.body.shareStory === 'true'; // Checkbox returns true or undefined
+  const storyDuration = parseInt(req.body.storyDuration, 10) || 0;
+  const numTables = parseInt(req.body.numTables, 10);
+  const tableShape = req.body.tableShape || '';
+  const additionalNotes = req.body.additionalNotes || '';
+
+  // Insert the new Pokémon into the database
+  knex('requested_events')
+      .insert({
+          estimated_date: eventDate,
+          street_address: street,
+          estimated_start_time: startTime,
+          estimated_duration: eventDuration,
+          estimated_type: eventType,
+          loc_size: locationSize,
+          estimated_num_adults: numAdults,
+          estimated_num_youth: numYouth,
+          estimated_num_children: numChildren,
+          num_machines: numMachines,
+          share_story: shareStory,
+          story_minutes: storyDuration,
+          num_tables: numTables,
+          table_shape: tableShape,
+          additional_notes: additionalNotes,
+          organization: organization,
+      })
+      .then(() => {
+        res.render('public_views/publicHome', {
+        layout: false });
+      })
+      .catch(error => {
+          console.error('Error adding Event:', error);
+          res.status(500).send('Internal Server Error');
+      });
 });
 
 // port number, (parameters) => what you want it to do.
