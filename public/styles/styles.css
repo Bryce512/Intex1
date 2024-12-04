@@ -11,6 +11,7 @@
   --font-size-small: 1rem;
 }
 
+/* *** NAVBAR STYLES */
 /* Navbar fixed to the top */
 .nav-wrapper {
   position: fixed;
@@ -22,9 +23,47 @@
   z-index: 1000; /* Ensure it stays on top */
 }
 
+.logoutButton {
+  position: absolute;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  right: 20px;
+  margin-top: 15px;
+}
+
+.logoutButton:hover {
+  background-color: var(--primary-light);
+}
+
+.addBtn {
+  position: absolute;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  right: 35px;
+  width: 7%;
+}
+
+.addBtn:hover {
+  background-color: var(--primary-light);
+}
+
+
+/* *** SIDE NAV Styles */
 /* Side navigation */
 .custom-sidenav {
-  position: fixed;
+  position: absolute;
   top: 63px; /* Leave space for the navbar */
   left: 0;
   width: 190px; /* Width of the sidebar */
@@ -70,6 +109,8 @@
   margin-top: 0;  /* Ensure there's no margin above the content */
 }
 
+/* *** ADMIN TABLE STYLES */
+
 /* Table row hover effect */
 table tbody tr:hover {
   background-color: #e0e0e0;  /* Light grey background on hover */
@@ -85,7 +126,6 @@ table tbody tr:hover {
   background-color: #b0e8e3;  /* Light teal when selected */
 }
 
-
 /* Optional: Add some padding to the table for better spacing */
 table {
   width: 100%;
@@ -97,9 +137,7 @@ th, td {
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
-
-
-
+                /* *** END TABLE STYLES */
 
 
 
@@ -131,21 +169,7 @@ p {
   /* margin-bottom: 30px; */
 }
 
-/* CTA Button */
-.cta-button {
-  background-color: #3498DB;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
 
-.cta-button:hover {
-  background-color: #2980B9;
-}
 
 /* Responsive Design */
 @media (max-width: 480px) {

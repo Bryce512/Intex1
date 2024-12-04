@@ -1,3 +1,24 @@
+//  *** Log Out handler
+document.getElementById('logoutBtn').addEventListener('click', function() {
+  // Redirect to logout route
+  window.location.href = '/logout';
+});
+
+// *** Add button Handler
+document.getElementById('addBtn').addEventListener('click', function() {
+  // run different queries based on page
+  if (entity === 'user') {
+    
+  }
+  else if (entity === 'events') {
+    
+  }
+  else if (entity === 'volunteers') {
+    
+  }
+});
+
+// *** Handle Modal clicks and open
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize all modals
   var elems = document.querySelectorAll('.modal');
@@ -51,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // *** Handle change row colors on hover
   // Add event listeners for row hover
   document.querySelectorAll('.editable-row').forEach(row => {
     row.addEventListener('mouseenter', () => {
@@ -61,8 +83,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
-
-
 
 
 // *** color Selected Page in ADMIN Side Nav

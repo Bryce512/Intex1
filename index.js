@@ -3,9 +3,9 @@ let app = express();
 let path = require('path');
 const ejsLayouts = require('express-ejs-layouts');
 const res = require('express/lib/response');
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000;
+let authorized = false;
 
-const authorized = false;
 // grab html form from file 
 // allows to pull JSON data from form 
 app.set("view engine", "ejs");
@@ -40,186 +40,244 @@ app.get('/', (req, res) => {
     layout: false });  // Renders external.ejs from public_views folder
 });
 
+// *** --------------------------------- LOGIN Routes --------------------------------***
+
+
 // Serve the login page (login.ejs)
 app.get('/login', (req, res) => {
-  res.render('admin_Views/login');  // Renders login.ejs from admin_Views folder
+  res.render('admin_Views/login', {
+    layout: false,
+    navItems:[]
+  });  // Renders login.ejs from admin_Views folder
 });
-
-// *** --------------------------------- ADMIN ONLY Routes --------------------------------***
 
 // Login Route
 app.post('/login', async (req, res) => {
-  const username = req.body.username;
-  const password = req.body.password;
-  
+  const { username, password } = req.body;
   try {
       // Query the user table to find the record
-      const user = await knex('user')
+      const user = await knex('users')
           .select('*')
-          .where({ username, password }) // Replace with hashed password comparison in production
+          .where('username', username) // Replace with hashed password comparison in production
           .first(); // Returns the first matching record
           
-      if (user) {
-          security = true;
-          res.redirect("/admin");  // Redirect to admin page on success
+      if (user && user.password === password) {  // Compare the plain text password
+            // Authentication successful
+          console.log("Log in Success")
+          authorized = true;
+          res.redirect("adminHome");  // Redirect to admin page on success
       } else {
-          security = false;
-          res.render('admin_Views/login', { error: 'Invalid username or password' });
+        console.log("Log in failed")
+          authorized = false;
+          res.render('admin_Views/login', { 
+            error: 'Invalid username or password',
+            layout: false });
       }
   } catch (error) {
       console.error('Database error:', error);
-      res.render('admin_Views/login', { error: 'An error occurred. Please try again.' });
+      res.render('admin_Views/login', { 
+        error: 'An error occurred. Please try again.',
+        layout: false });
   }
 });
 
+app.get('/logout', (req, res) => {
+    authorized = false;
+    return res.redirect('/publicHome');  // In case of an error, go back to admin home
+});
+
+
+
+// *** --------------------------------- ADMIN ONLY Routes --------------------------------***
+
 // Admin Home Page
 app.get('/adminHome', (req, res) => {
-  res.render("admin_Views/adminHome", {
+  if (authorized) {
+      res.render("admin_Views/adminHome", {
     title: 'Admin Home',
     navItems: [],
     layout: 'layouts/adminLayout'});  // Use the admin layout for this route
+  } else {
+    res.redirect('/login');
+  }
+
 });
 
 // User Maintenance Page
 app.get('/users', async (req, res) => {
-  try {
-    // Fetch users from the 'users' table
-    const users = await knex('contact_info').select().orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
+  if (authorized) {
+    try {
+        // Fetch users from the 'users' table
+        const users = await knex('contact_info').select().orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
 
-    // Render the users page and pass the users data to the view
-    res.render("admin_Views/users", {
-      title: 'Manage Users',
-      navItems: [],
-      layout: 'layouts/adminLayout', // Use the admin layout for this route
-      users: users // Pass the users data to the view
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error retrieving users");
+        // Render the users page and pass the users data to the view
+        res.render("admin_Views/users", {
+          title: 'Manage Users',
+          navItems: [],
+          layout: 'layouts/adminLayout', // Use the admin layout for this route
+          users: users // Pass the users data to the view
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).send("Error retrieving users");
+      }
+  } else {
+    res.redirect('/login');
   }
+  
 });
 
 app.post('/update-user/:id', (req, res) => {
-  const id = req.params.id;
-  // Access each value directly from req.body
-  const first_name = req.body.firstName;
-  const last_name = req.body.lastName;
-  const email = req.body.email;
-  // Update the Character in the database
-  knex('contact_info')
-    .where('contact_id', id)
-    .update({
-      first_name: first_name,
-      last_name: last_name,
-      email: email,
-    })
-    .then(() => {
-      res.redirect('/users'); // Redirect to the list of Character after saving
-    })
-    .catch(error => {
-      console.error('Error updating Character:', error);
-      res.status(500).send('Internal Server Error');
-    });
+
+  if (authorized) {
+    const id = req.params.id;
+    // Access each value directly from req.body
+    const first_name = req.body.firstName;
+    const last_name = req.body.lastName;
+    const email = req.body.email;
+    // Update the Character in the database
+    knex('contact_info')
+      .where('contact_id', id)
+      .update({
+        first_name: first_name,
+        last_name: last_name,
+        email: email,
+      })
+      .then(() => {
+        res.redirect('/users'); // Redirect to the list of Character after saving
+      })
+      .catch(error => {
+        console.error('Error updating Character:', error);
+        res.status(500).send('Internal Server Error');
+      });
+  } else {
+    res.redirect('/login');
+  }
+  
 });
 
 // Search Bar grabbing data
 app.get('/search', async (req, res) => {
-  try {
-    const query = req.query.query.toLowerCase(); // Get the search query from the request
+  if (authorized) {
+    try {
+        const query = req.query.query.toLowerCase(); // Get the search query from the request
 
-    // Search for users whose first_name or last_name matches the query
-    const users = await knex('contact_info')
-      .whereRaw('LOWER(first_name) LIKE ?', [`%${query}%`])
-      .orWhereRaw('LOWER(last_name) LIKE ?', [`%${query}%`]);
+        // Search for users whose first_name or last_name matches the query
+        const users = await knex('contact_info')
+          .whereRaw('LOWER(first_name) LIKE ?', [`%${query}%`])
+          .orWhereRaw('LOWER(last_name) LIKE ?', [`%${query}%`]);
 
-    res.json(users); // Return the matching users as JSON
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error retrieving search results" });
+        res.json(users); // Return the matching users as JSON
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error retrieving search results" });
+      }
+  } else {
+    res.redirect('/login');
   }
 });
 
 
 // Volunteers Page
 app.get('/volunteers', (req, res) => {
-  res.render("admin_Views/volunteers", {
-    title: 'Manage Volunteers',
-    navItems: [],
-    layout: 'layouts/adminLayout'  // Use the admin layout for this route
-  });
+  if (authorized) {
+    res.render("admin_Views/volunteers", {
+        title: 'Manage Volunteers',
+        navItems: [],
+        layout: 'layouts/adminLayout'  // Use the admin layout for this route
+      });
+  } else {
+    res.redirect('/login');
+  }
 });
 
 // *** ------------------------------ Events Begin ---------------- ***//
 app.get('/events', async (req, res) => {
-  try {
-    // Fetch events from the 'events' table
-    const events = await knex({r:'requested_events'})
-    .join({c: 'contact_info'}, 'c.contact_id', '=', 'r.contact_id')
-    .select().orderBy('estimated_date', 'asc'); // Adjust field names as needed
+  if (authorized) {
+    try {
+        // Fetch events from the 'events' table
+        const events = await knex({r:'requested_events'})
+        .join({c: 'contact_info'}, 'c.contact_id', '=', 'r.contact_id')
+        .select().orderBy('estimated_date', 'asc'); // Adjust field names as needed
 
-    // Render the events page and pass the events data to the view
-    res.render("admin_Views/events", {
-      title: 'Manage Events',
-      navItems: [],
-      layout: 'layouts/adminLayout', // Use the admin layout for this route
-      events: events // Pass the events data to the view
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error retrieving events");
+        // Render the events page and pass the events data to the view
+        res.render("admin_Views/events", {
+          title: 'Manage Events',
+          navItems: [],
+          layout: 'layouts/adminLayout', // Use the admin layout for this route
+          events: events // Pass the events data to the view
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).send("Error retrieving events");
+      }
+  } else {
+    res.redirect('/login');
   }
+  
 });
-// *** ------------------------------ End Events ------------- *** //
 
-
+// *** ------------------------------ FAQ Routes ------------- *** //
 
 // FAQs Page
 app.get('/faqs', (req, res) => {
-  res.render("admin_Views/FAQs", {
-    title: 'Manage FAQs',
-    navItems: [],  // You can add navigation items here if needed
-    layout: 'layouts/adminLayout'  // Use the admin layout for this route
-  });
+  if (authorized) {
+    res.render("admin_Views/FAQs", {
+        title: 'Manage FAQs',
+        navItems: [],  // You can add navigation items here if needed
+        layout: 'layouts/adminLayout'  // Use the admin layout for this route
+      });
+  } else {
+    res.redirect('/login');
+  }
 });
 
 // Trainings Page
 app.get('/trainings', (req, res) => {
-  res.render("admin_Views/trainings", {
-    title: 'Manage Trainings',
-    navItems: [],  // You can add navigation items here if needed
-    layout: 'layouts/adminLayout'  // Use the admin layout for this route
-  });
+  if (authorized) {
+    res.render("admin_Views/trainings", {
+        title: 'Manage Trainings',
+        navItems: [],  // You can add navigation items here if needed
+        layout: 'layouts/adminLayout'  // Use the admin layout for this route
+      });
+  } else {
+    res.redirect('/login');
+  }
 });
 
 //see if this route works, do we need a different route to display the records
 app.get("/searchUser", (req, res) => {
-  const { searchFirstName, searchLastName } = req.query;
+  if (authorized) {
+    const { searchFirstName, searchLastName } = req.query;
 
-  // Build the query
-  let query = knex.select().from('contact_info');
+      // Build the query
+      let query = knex.select().from('contact_info');
 
-  if (searchFirstName) {
-    query = query.where(knex.raw('UPPER(first_name)'), '=', searchFirstName.toUpperCase());
-  }
-  
-  if (searchLastName) {
-    query = query.andWhere(knex.raw('UPPER(last_name)'), '=', searchLastName.toUpperCase());
-  }
-
-  // Execute the query
-  // is users the right list 
-  query
-    .then(results => {
-      if (results.length > 0) {
-        res.render("displayUser", { users: results });
-      } else {
-        res.render("displayUser", { users: [], message: "No matches found." });
+      if (searchFirstName) {
+        query = query.where(knex.raw('UPPER(first_name)'), '=', searchFirstName.toUpperCase());
       }
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({ err });
-    });
+      
+      if (searchLastName) {
+        query = query.andWhere(knex.raw('UPPER(last_name)'), '=', searchLastName.toUpperCase());
+      }
+
+      // Execute the query
+      // is users the right list 
+      query
+        .then(results => {
+          if (results.length > 0) {
+            res.render("displayUser", { users: results });
+          } else {
+            res.render("displayUser", { users: [], message: "No matches found." });
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).json({ err });
+        });
+  } else {
+    res.redirect('/login');
+  }
 });
 
 
