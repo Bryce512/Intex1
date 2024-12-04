@@ -403,64 +403,93 @@ app.get('/event', (req, res) => {
 // Add someone's Event Schedule Request to the Database
 app.post('/scheduleEvent', (req, res) => {
   // Extract form values from req.body
-  const firstName = req.body.firstName || ''; // Default to empty string if not provided
+  const firstName = req.body.firstName || ''; 
   const lastName = req.body.lastName || '';
   const email = req.body.email || '';
   const phone = req.body.phone || ''; 
   const city = req.body.city || ''; 
   const state = req.body.state || ''; 
-  const zip = parseInt(req.body.zip, 10); // Convert to integer
+  const zip = parseInt(req.body.zip, 10) || 0; // Convert to integer
   const organization = req.body.organization || ''; 
   const street = req.body.street || '';
   const eventCity = req.body.eventCity || '';
   const eventState = req.body.eventState || '';  
   const eventZip = parseInt(req.body.eventZip, 10);
   const locationSize = req.body.locationSize || '';
-  const eventDate = req.body.eventDate || new Date().toISOString().split('T')[0]; // Default to today 
+  const eventDate = req.body.eventDate || new Date().toISOString().split('T')[0]; 
   const startTime = req.body.startTime || '12:00:00';
   const eventDuration = parseFloat(req.body.eventDuration);
   const numAdults = parseInt(req.body.numAdults, 10);
   const numYouth = parseInt(req.body.numYouth, 10);
   const numChildren = parseInt(req.body.numYouth, 10);
-  const eventType = req.body.eventType || 'Both'; // Default to Both
+  const eventType = req.body.eventType || 'Both'; 
   const numMachines = parseInt(req.body.numMachines, 10);
-  const shareStory = req.body.shareStory === 'true'; // Checkbox returns true or undefined
+  const shareStory = req.body.shareStory === 'true'; 
   const storyDuration = parseInt(req.body.storyDuration, 10) || 0;
   const numTables = parseInt(req.body.numTables, 10);
   const tableShape = req.body.tableShape || '';
   const additionalNotes = req.body.additionalNotes || '';
 
-  // Insert the new Event into the database
-  knex('requested_events')
-      .insert({
-          estimated_date: eventDate,
-          street_address: street,
-          estimated_start_time: startTime,
-          estimated_duration: eventDuration,
-          type_id: eventType,
-          loc_size: locationSize,
-          estimated_num_adults: numAdults,
-          estimated_num_youth: numYouth,
-          estimated_num_children: numChildren,
-          num_machines: numMachines,
-          share_story: shareStory,
-          story_minutes: storyDuration,
-          num_tables: numTables,
-          table_shape: tableShape,
-          additional_notes: additionalNotes,
-          organization: organization,
+  // Start a transaction
+  knex.transaction(trx => {
+    // Step 1: Check if the zip code exists in the 'location' table
+    return trx('location')
+      .select('loc_id')
+      .where('zip', eventZip)
+      .first()  // This returns the first match or undefined if not found
+      .then(location => {
+        let loc_id;
+
+        if (location) {
+          // Zip code exists, use the existing loc_id
+          loc_id = location.loc_id;
+        } else {
+          // Zip code doesn't exist, insert it into the location table
+          return trx('location')
+            .insert({
+              city: eventCity,
+              state: eventState,
+              zip: eventZip,
+            })
+            .returning('loc_id') // Get the newly inserted loc_id
+            .then(newLocation => {
+              loc_id = newLocation[0].loc_id;  // Capture the new loc_id
+            });
+        }
+
+        // Step 2: Now that we have the loc_id, insert the event into requested_events
+        return trx('requested_events')
+          .insert({
+            estimated_date: eventDate,
+            street_address: street,
+            estimated_start_time: startTime,
+            estimated_duration: eventDuration,
+            type_id: eventType,
+            loc_size: locationSize,
+            estimated_num_adults: numAdults,
+            estimated_num_youth: numYouth,
+            estimated_num_children: numChildren,
+            num_machines: numMachines,
+            share_story: shareStory,
+            story_minutes: storyDuration,
+            num_tables: numTables,
+            table_shape: tableShape,
+            additional_notes: additionalNotes,
+            organization: organization,
+            loc_id: loc_id, // Insert the loc_id from the location table
+          });
       })
       .then(() => {
-        res.render('public_views/publicHome', {
-          layout: false,
-          title: 'Home'
-        });
+        // Commit the transaction and send success response
+        res.redirect('/event?success=true');
       })
       .catch(error => {
-          console.error('Error adding Event:', error);
-          res.status(500).send('Internal Server Error');
+        console.error('Error scheduling event:', error);
+        res.status(500).send('Internal Server Error');
       });
+  });
 });
+
 
 // port number, (parameters) => what you want it to do.
 
