@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('modal');
   const overlay = document.getElementById('overlay');
   const closeModalBtn = document.querySelector('.modal-close');
+  const addButton = document.getElementById('addButton'); // Reference the Add button
+
 
   // Function to close the modal
   const closeModal = function () {
@@ -37,6 +39,14 @@ document.addEventListener('DOMContentLoaded', function() {
     modal.classList.add('visible');
     overlay.classList.add('visible');
   };
+
+  // Open the modal when the Add button is clicked (reset the form)
+  if (addButton) {
+    addButton.addEventListener('click', function() {
+      resetModalForm(); // Reset fields before opening the modal
+      openModal(); // Open the modal
+    });
+  }
 
   // Close the modal when the cancel button is clicked
   if (closeModalBtn) {
@@ -54,6 +64,18 @@ document.addEventListener('DOMContentLoaded', function() {
       closeModal();
     }
   });
+
+  // Reset the modal form fields to default (for "Add" functionality)
+  const resetModalForm = function () {
+    document.getElementById('entity-first-name').value = '';
+    document.getElementById('entity-last-name').value = '';
+    document.getElementById('entity-email').value = '';
+    document.getElementById('entity-phone').value = '';
+    document.getElementById('entity-sewing-level').value = '';
+    document.getElementById('entity-hours-willing').value = '';
+    document.getElementById('entity-password').value = '';
+    document.getElementById('entity-username').value = '';
+  };
 
   // Attach row click events dynamically (This is the important part)
   const attachRowClickEvents = () => {

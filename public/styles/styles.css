@@ -38,7 +38,7 @@ nav .collection {
 }
 
 .logoutButton {
-  position: absolute;
+  position: relative;
   background-color: var(--primary-color);
   color: var(--white);
   border: none;
@@ -102,7 +102,7 @@ nav .collection {
 /* *** SIDE NAV Styles */
 /* Side navigation */
 .custom-sidenav {
-  position: absolute;
+  position: fixed;
   top: 63px; /* Leave space for the navbar */
   left: 0;
   width: 190px; /* Width of the sidebar */
@@ -156,7 +156,7 @@ nav .collection {
 /* Custom Modal */
 .modal {
   position: absolute;
-  top: 30%;  /* Center modal vertically */
+  top: 10%;  /* Center modal vertically */
   left: 50%; /* Center modal horizontally */
   background-color: white;
   padding: 20px;

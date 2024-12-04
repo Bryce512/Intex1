@@ -55,7 +55,7 @@ app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
       // Query the user table to find the record
-      const user = await knex('users')
+      const user = await knex('admins')
           .select('*')
           .where('username', username) // Replace with hashed password comparison in production
           .first(); // Returns the first matching record
@@ -108,10 +108,10 @@ app.get('/admins', async (req, res) => {
   if (authorized) {
     try {
         // Fetch admins from the 'admins' table
-        const admins = await knex('contact_info as c').select()
-        .join('admins as a', 'a.contact_id', '=', 'c.contact_id')
-        .join('team_members as tm', 'tm.contact_id', '=', 'c.contact_id')
-        .join('sewing_level as sl', 'sl.sewing_level', '=', 'tm.sewing_level')
+        const admins = await knex('admins as a').select()
+        .join('contact_info as c', 'a.contact_id', '=', 'c.contact_id')
+        .leftJoin('team_members as tm', 'tm.contact_id', '=', 'c.contact_id')
+        .leftJoin('sewing_level as sl', 'sl.sewing_level', '=', 'tm.sewing_level')
         .orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
         // Render the admins page and pass the admins data to the view
         res.render("admin_Views/admins", {
@@ -160,10 +160,12 @@ app.post('/update-admin/:id', (req, res) => {
 });
 
 
-// *** ------------------------------ team_members Begin ---------------- ***//
+// *** ------------------------------ Team_members Begin ---------------- ***//
 app.get('/team_members', async (req, res) => {
   if(authorized) {
     try {
+        const sewingLevels = await knex('sewing_level')
+        .select('sewing_level', 'level_description');
         const team_members = await knex({c: 'contact_info'})
           .select(
             'c.contact_id',
@@ -176,13 +178,12 @@ app.get('/team_members', async (req, res) => {
             'tm.hours_willing'
           )
           .leftJoin('team_members as tm', 'c.contact_id', '=', 'tm.contact_id')
-          .leftJoin('sewing_level as s', 'tm.sewing_level', '=', 's.sewing_level');
-
-        const sewingLevels = await knex('sewing_level')
-        .select('sewing_level', 'level_description');
+          .leftJoin('sewing_level as s', 'tm.sewing_level', '=', 's.sewing_level')
+          .orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
+          ;
         
         return res.render('admin_Views/team_members', {
-          sewingLevels,
+          sewingLevels: sewingLevels,
           title: 'Manage Team Members',
           team_members: team_members,
           layout: 'layouts/adminLayout',
@@ -193,10 +194,11 @@ app.get('/team_members', async (req, res) => {
         console.error('Error:', err);
         return res.render('admin_Views/team_members', {
           title: 'Manage Team Members',
+          sewingLevels: sewingLevels,
           team_members: [],
           error: 'Failed to load Team Members: ' + err.message,
           layout: 'layouts/adminLayout',
-          navItems: []
+          navItems: [],
         });
       }
   } else {
