@@ -376,6 +376,15 @@ app.get('/thank-you-to-our-sponsors', (req, res) => {
     layout: false });  // Renders external.ejs from public_views folder
 });
 
+// How you can help
+app.get('/howYouCanHelp', (req, res) => {
+  res.render('public_views/howYouCanHelp', {
+    title: 'How You Can Help',
+    layout: 'layouts/mainLayout',
+    navItems: []
+  });
+});
+
 // Schedule an Event
 app.get('/event', (req, res) => {
   // Fetch location sizes and table shapes independently
