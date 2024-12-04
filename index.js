@@ -407,6 +407,32 @@ app.get('/our-tech', (req, res) => {
     layout: false });  // Renders external.ejs from public_views folder
 });
 
+// homelessness and cold  
+app.get('/new-page-1', (req, res) => {
+  res.render('public_views/new-page-1', {
+    layout: false });  // Renders external.ejs from public_views folder
+});
+
+// homelessness and cold  
+app.get('/vests-distributed-to-date', (req, res) => {
+  res.render('public_views/vests-distributed-to-date', {
+    layout: false });  // Renders external.ejs from public_views folder
+});
+
+// homelessness and cold  
+app.get('/faqss', (req, res) => {
+  res.render('public_views/faqss', {
+    layout: false });  // Renders external.ejs from public_views folder
+});
+
+// homelessness and cold  
+app.get('/contact', (req, res) => {
+  res.render('public_views/contact', {
+    layout: false });  // Renders external.ejs from public_views folder
+});
+
+
+
 // Schedule an Event
 app.get('/event', (req, res) => {
   // Fetch location sizes and table shapes independently
