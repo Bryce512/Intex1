@@ -155,6 +155,13 @@ input[type="checkbox"] {
   <form action="/scheduleEvent" method="POST">
     <h1>Schedule an Event</h1>
 
+    <!-- Have you scheduled an event before? -->
+    <div class="question">
+      <label>Have you scheduled an event with us before?</label><br>
+      <button type="button" id="yesButton">Yes</button>
+      <button type="button" id="noButton">No</button>
+    </div>
+
     <!-- Personal Information Section -->
     <div class="section-header">Personal Information</div>
 
@@ -367,22 +374,16 @@ input[type="checkbox"] {
     </div>
 
     <div>
-        <label>Type of Event</label>
-        <div class="radio-group">
+      <label>Type of Event</label>
+      <div class="radio-group">
+        <% types.forEach((type) => { %>
           <label>
-            <input type="radio" id="sewing" name="eventType" value="Sewing">
-            Sewing
+            <input type="radio" id="<%= type.type_description %>" name="eventType" value="<%= type.type_id %>">
+            <%= type.type_description %>
           </label>
-          <label>
-            <input type="radio" id="nonSewing" name="eventType" value="Non-Sewing">
-            Non-Sewing
-          </label>
-          <label>
-            <input type="radio" id="both" name="eventType" value="Both">
-            Both
-          </label>
-        </div>
-      </div>      
+        <% }); %>
+      </div>
+    </div>         
 
     <div>
       <label for="numMachines">Number of Machines</label>
@@ -420,5 +421,16 @@ input[type="checkbox"] {
 
     <button type="submit">Submit</button>
   </form>
+  <script>
+    // Check for 'success' query parameter in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+      alert('Your event has been successfully scheduled!');
+      // Remove the query parameter from the URL to avoid repeated pop-ups
+      const newUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  </script>
+  
 </body>
 </html>
