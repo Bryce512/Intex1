@@ -157,7 +157,7 @@ input[type="checkbox"] {
 
   <!-- Have you scheduled an event before? -->
   <div class="question">
-    <label>Have you scheduled an event with us before?</label><br>
+    <label>Have you signed up to be a team member prior to filling out this form, or have you scheduled an event with us in the past? Select "Yes" if you have done either.</label><br>
     <div class="radio-group">
       <label>
         <input type="radio" id="yesRadio" name="scheduledBefore" value="yes">
@@ -172,7 +172,7 @@ input[type="checkbox"] {
 
     <!-- Email input when "Yes" is selected -->
     <div id="emailSection" style="display: none;">
-      <label for="existingEmail">Enter the email address you previously used to schedule an event:</label>
+      <label for="existingEmail">Enter the email address you previously used to sign up as a team member or you used to schedule an event:</label>
       <input type="text" id="existingEmail" name="existingEmail">
     </div>
 
@@ -392,16 +392,23 @@ input[type="checkbox"] {
     <div>
       <label>Type of Event</label>
       <div class="radio-group">
-        <% types.forEach((type) => { %>
-          <label>
-            <input type="radio" id="<%= type.type_description %>" name="eventType" value="<%= type.type_id %>">
-            <%= type.type_description %>
-          </label>
-        <% }); %>
+        <label>
+          <input type="radio" id="sewing" name="eventType" value="1">
+          Sewing
+        </label>
+        <label>
+          <input type="radio" id="nonSewing" name="eventType" value="2">
+          Non-Sewing
+        </label>
+        <label>
+          <input type="radio" id="both" name="eventType" value="3">
+          Both
+        </label>
       </div>
-    </div>         
+    </div>
+            
 
-    <div>
+    <div id="numMachinesSection">
       <label for="numMachines">Number of Machines</label>
       <input type="number" id="numMachines" name="numMachines">
     </div>
@@ -413,21 +420,21 @@ input[type="checkbox"] {
         </div>
       </div>      
     <div>
-      <label for="storyDuration">Story Duration (minutes). Can range anywhere from 5 to 45 minutes.</label>
+      <label for="storyDuration">Jen's story can range anywhere from 5 to 45 minutes. Enter how long you would like the story to be in minutes. Leave blank if you do not want the story</label>
       <input type="number" id="storyDuration" name="storyDuration">
     </div>
     <div>
-      <label for="numTables">Number of Tables You'll Be Able to Provide</label>
-      <input type="number" id="numTables" name="numTables">
-    </div>
-    <div>
-        <label for="tableShape">Table Shape</label>
+        <label for="tableShape">Table Shape (rectangle preferred)</label>
         <select id="tableShape" name="tableShape" required>
           <option value="" disabled selected>Select Shape</option> <!-- Default option -->
           <% tableShapes.forEach(shape => { %>
             <option value="<%= shape.table_shape %>"><%= shape.shape_description %></option>
           <% }) %>
         </select>
+      </div>
+      <div>
+        <label for="numTables">Number of Tables You'll Be Able to Provide</label>
+        <input type="number" id="numTables" name="numTables">
       </div>
       
     <div>
@@ -454,7 +461,47 @@ input[type="checkbox"] {
       document.getElementById('emailSection').style.display = 'none';
       document.getElementById('personalInfoSection').style.display = 'block';
     });
+
+    // Event listener for changing event type
+    document.querySelectorAll('input[name="eventType"]').forEach(function(input) {
+      input.addEventListener('change', function() {
+        var eventType = document.querySelector('input[name="eventType"]:checked').value;
+        var numMachinesInput = document.getElementById('numMachines');
+        
+        // If a non-sewing event is selected, set machines to 0 and disable the input
+        if (eventType === 2) {
+          numMachinesInput.value = 0;
+          numMachinesInput.disabled = true;
+        } else {
+          numMachinesInput.disabled = false;
+        }
+      });
+    });
   </script>
+
+<script>
+  // Initially hide the "Number of Machines" section
+  document.getElementById('numMachinesSection').style.display = 'none';
+
+  // Event listener for changing event type
+  document.querySelectorAll('input[name="eventType"]').forEach(function(input) {
+    input.addEventListener('change', function() {
+      var eventType = document.querySelector('input[name="eventType"]:checked').value;
+      var numMachinesSection = document.getElementById('numMachinesSection');
+      var numMachinesInput = document.getElementById('numMachines');
+
+      // Show and enable numMachines input if "Sewing" or "Both" is selected
+      if (eventType === 'sewing' || eventType === 'both') {
+        numMachinesSection.style.display = 'block';
+        numMachinesInput.disabled = false;
+      } else {
+        numMachinesSection.style.display = 'none';
+        numMachinesInput.disabled = true;
+      }
+    });
+  });
+</script>
+
   
 
   <script>
