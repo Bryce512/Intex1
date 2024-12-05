@@ -470,7 +470,7 @@ app.post('/scheduleEvent', (req, res) => {
   const phone = req.body.phone || ''; 
   const city = req.body.city || ''; 
   const state = req.body.state || ''; 
-  const zip = parseInt(req.body.zip, 10) || 0; // Convert to integer
+  const zip = parseInt(req.body.zip, 10) || 84401; // Convert to integer
   const organization = req.body.organization || ''; 
   const street = req.body.street || '';
   const eventCity = req.body.eventCity || '';
@@ -484,7 +484,7 @@ app.post('/scheduleEvent', (req, res) => {
   const numYouth = parseInt(req.body.numYouth, 10);
   const numChildren = parseInt(req.body.numYouth, 10);
   const eventType = req.body.eventType || 'Both'; 
-  const numMachines = parseInt(req.body.numMachines, 10);
+  const numMachines = parseInt(req.body.numMachines, 10) || 0;
   const shareStory = req.body.shareStory === 'true'; 
   const storyDuration = parseInt(req.body.storyDuration, 10) || 0;
   const numTables = parseInt(req.body.numTables, 10);
@@ -545,8 +545,6 @@ app.post('/scheduleEvent', (req, res) => {
       })
       .then(() => {
         // Step 3: Check if the email exists in the 'contact_info' table
-        if (existingEmail) {
-          // If an existingEmail is provided, check the contact_info table
           return trx('contact_info')
             .select('contact_id')
             .where('email', existingEmail)  // Use the provided existing email
@@ -571,21 +569,6 @@ app.post('/scheduleEvent', (req, res) => {
                   });
               }
             });
-        } else {
-          // If no existingEmail, create a new contact with the provided email
-          return trx('contact_info')
-            .insert({
-              first_name: firstName,
-              last_name: lastName,
-              phone: phone,
-              email: email,
-              loc_id: loc_id, // Insert the loc_id for personal info
-            })
-            .returning('contact_id') // Get the newly inserted contact_id
-            .then(newContact => {
-              contact_id = newContact[0].contact_id;  // Capture the new contact_id
-            });
-        }
       })
       .then(() => {
         // Step 4: Insert the event into requested_events table
@@ -622,7 +605,11 @@ app.post('/scheduleEvent', (req, res) => {
   });
 });
 
-
+// Join the Team Page
+app.get('/joinTeam', (req, res) => {
+  res.render('public_views/joinTeam', {
+    layout: false });  // Renders external.ejs from public_views folder
+});
 
 // port number, (parameters) => what you want it to do.
 

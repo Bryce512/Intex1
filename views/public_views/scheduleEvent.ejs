@@ -24,6 +24,14 @@ h1 {
   margin-bottom: 20px;
 }
 
+h2 {
+      text-align: center;
+      font-size: 18px; /* Smaller than h1 but larger than normal text */
+      font-weight: normal; /* Removes bolding */
+      margin-bottom: 20px;
+      color: #333; /* Slightly darker text for emphasis */
+}
+
 form {
   background: #fff;
   padding: 30px;
@@ -154,6 +162,9 @@ input[type="checkbox"] {
 <body>
   <form action="/scheduleEvent" method="POST">
     <h1>Schedule an Event</h1>
+    <h2>Thank you for signing up to host an event with the Turtle Shelter Project! We are so excited to work with you. In order to start the process of scheduling your event, we have a few questions we need you to fill out. Please fill out every question before submitting. You can except an email back in a few days to confirm if we are available on the date you selected.</h2>
+
+  <div class="section-header">General Information</div>
 
   <!-- Have you scheduled an event before? -->
   <div class="question">
@@ -368,7 +379,7 @@ input[type="checkbox"] {
     <!-- Duration Section below Start Time -->
     <div>
       <label for="eventDuration">Duration (hours)</label>
-      <input type="number" id="eventDuration" name="eventDuration" required>
+      <input type="number" id="eventDuration" name="eventDuration" step="0.01" required>
     </div>
 
     
@@ -409,7 +420,7 @@ input[type="checkbox"] {
             
 
     <div id="numMachinesSection">
-      <label for="numMachines">Number of Machines</label>
+      <label for="numMachines">It is extremely helpful if members of your organization bring sewing machines they can use. How many sewing machines can your organization provide? (there must be a person who can operate each machine that is brought)</label>
       <input type="number" id="numMachines" name="numMachines">
     </div>
     <div>
@@ -419,8 +430,8 @@ input[type="checkbox"] {
           <label for="shareStory">Yes</label>
         </div>
       </div>      
-    <div>
-      <label for="storyDuration">Jen's story can range anywhere from 5 to 45 minutes. Enter how long you would like the story to be in minutes. Leave blank if you do not want the story</label>
+    <div id="storyDurationSection" style="display: none;">
+      <label for="storyDuration">Jen's story can range anywhere from 5 to 45 minutes. Enter how long you would like the story to be in minutes?</label>
       <input type="number" id="storyDuration" name="storyDuration">
     </div>
     <div>
@@ -433,7 +444,7 @@ input[type="checkbox"] {
         </select>
       </div>
       <div>
-        <label for="numTables">Number of Tables You'll Be Able to Provide</label>
+        <label for="numTables">Number of Tables You Can Provide (you must provide your own tables)</label>
         <input type="number" id="numTables" name="numTables">
       </div>
       
@@ -461,22 +472,6 @@ input[type="checkbox"] {
       document.getElementById('emailSection').style.display = 'none';
       document.getElementById('personalInfoSection').style.display = 'block';
     });
-
-    // Event listener for changing event type
-    document.querySelectorAll('input[name="eventType"]').forEach(function(input) {
-      input.addEventListener('change', function() {
-        var eventType = document.querySelector('input[name="eventType"]:checked').value;
-        var numMachinesInput = document.getElementById('numMachines');
-        
-        // If a non-sewing event is selected, set machines to 0 and disable the input
-        if (eventType === 2) {
-          numMachinesInput.value = 0;
-          numMachinesInput.disabled = true;
-        } else {
-          numMachinesInput.disabled = false;
-        }
-      });
-    });
   </script>
 
 <script>
@@ -491,7 +486,7 @@ input[type="checkbox"] {
       var numMachinesInput = document.getElementById('numMachines');
 
       // Show and enable numMachines input if "Sewing" or "Both" is selected
-      if (eventType === 'sewing' || eventType === 'both') {
+      if (eventType === '1' || eventType === '3') {
         numMachinesSection.style.display = 'block';
         numMachinesInput.disabled = false;
       } else {
@@ -502,13 +497,31 @@ input[type="checkbox"] {
   });
 </script>
 
-  
+<script>
+  // Initially hide the "Story Duration" section
+  document.getElementById('storyDurationSection').style.display = 'none';
+
+  // Event listener for checkbox change
+  document.getElementById('shareStory').addEventListener('change', function() {
+    var storyDurationSection = document.getElementById('storyDurationSection');
+    var storyDurationInput = document.getElementById('storyDuration');
+
+    // Show and enable story duration input if checkbox is checked
+    if (this.checked) {
+      storyDurationSection.style.display = 'block';
+      storyDurationInput.disabled = false;
+    } else {
+      storyDurationSection.style.display = 'none';
+      storyDurationInput.disabled = true;
+    }
+  });
+</script>
 
   <script>
     // Check for 'success' query parameter in the URL
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('success') === 'true') {
-      alert('Your event has been successfully scheduled!');
+      alert('Thank you for scheduling an event with the Turtle Shelter Project! You will be contacted by a member of our team soon with further details.');
       // Remove the query parameter from the URL to avoid repeated pop-ups
       const newUrl = window.location.origin + window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
