@@ -443,15 +443,13 @@ app.get('/event', (req, res) => {
   // Fetch location sizes and table shapes independently
   Promise.all([
     knex('location_size').select('loc_size','size_description'), // Fetch size descriptions
-    knex('table_shape').select('table_shape','shape_description'),  // Fetch shape descriptions
-    knex('type').select('type_id','type_description')  // Fetch type descriptions
+    knex('table_shape').select('table_shape','shape_description')  // Fetch shape descriptions
   ])
-  .then(([locationSizes, tableShapes, types]) => {
+  .then(([locationSizes, tableShapes]) => {
     // Render the page without layout
     res.render('public_views/scheduleEvent', {
       locationSizes,
       tableShapes,
-      types,
       title: 'Manage Events',
       layout: false  // Explicitly disable layout
     });
@@ -468,6 +466,7 @@ app.post('/scheduleEvent', (req, res) => {
   const firstName = req.body.firstName || ''; 
   const lastName = req.body.lastName || '';
   const email = req.body.email || '';
+  const existingEmail = req.body.existingEmail || '';  // New field for existing email
   const phone = req.body.phone || ''; 
   const city = req.body.city || ''; 
   const state = req.body.state || ''; 
@@ -480,7 +479,7 @@ app.post('/scheduleEvent', (req, res) => {
   const locationSize = req.body.locationSize || '';
   const eventDate = req.body.eventDate || new Date().toISOString().split('T')[0]; 
   const startTime = req.body.startTime || '12:00:00';
-  const eventDuration = parseFloat(req.body.eventDuration);
+  const eventDuration = parseFloat(req.body.eventDuration) || 0;
   const numAdults = parseInt(req.body.numAdults, 10);
   const numYouth = parseInt(req.body.numYouth, 10);
   const numChildren = parseInt(req.body.numYouth, 10);
@@ -494,14 +493,14 @@ app.post('/scheduleEvent', (req, res) => {
 
   // Start a transaction
   knex.transaction(trx => {
+    let loc_id, eventLoc_id, contact_id;
+
     // Step 1: Check if the zip code exists in the 'location' table (for personal info)
     return trx('location')
       .select('loc_id')
       .where('zip', zip)
       .first()
       .then(location => {
-        let loc_id;
-  
         if (location) {
           // Zip code exists, use the existing loc_id
           loc_id = location.loc_id;
@@ -518,9 +517,9 @@ app.post('/scheduleEvent', (req, res) => {
               loc_id = newLocation[0].loc_id; // Capture the new loc_id
             });
         }
-  
+      })
+      .then(() => {
         // Step 2: Check if the event zip code exists in the 'location' table (for event location)
-        let eventLoc_id;
         return trx('location')
           .select('loc_id')
           .where('zip', eventZip)
@@ -542,44 +541,74 @@ app.post('/scheduleEvent', (req, res) => {
                   eventLoc_id = newEventLocation[0].loc_id; // Capture the new loc_id for the event
                 });
             }
-          })
-          .then(() => {
-            // Step 3: Insert new contact into contact_info table with the loc_id
-            return trx('contact_info')
-              .insert({
-                first_name: firstName,
-                last_name: lastName,
-                phone: phone,
-                email: email,
-                loc_id: loc_id, // Insert the loc_id for personal info
-              })
-              .returning('contact_id') // Get the newly inserted contact_id
-              .then(newContact => {
-                const contact_id = newContact[0].contact_id;  // Capture the new contact_id
-  
-                // Step 4: Insert the event into requested_events table
-                return trx('requested_events')
+          });
+      })
+      .then(() => {
+        // Step 3: Check if the email exists in the 'contact_info' table
+        if (existingEmail) {
+          // If an existingEmail is provided, check the contact_info table
+          return trx('contact_info')
+            .select('contact_id')
+            .where('email', existingEmail)  // Use the provided existing email
+            .first()
+            .then(existingContact => {
+              if (existingContact) {
+                // If the contact exists, use the existing contact_id
+                contact_id = existingContact.contact_id;
+              } else {
+                // If the contact doesn't exist, create a new contact
+                return trx('contact_info')
                   .insert({
-                    estimated_date: eventDate,
-                    street_address: street,
-                    estimated_start_time: startTime,
-                    estimated_duration: eventDuration,
-                    type_id: eventType,
-                    loc_size: locationSize,
-                    estimated_num_adults: numAdults,
-                    estimated_num_youth: numYouth,
-                    estimated_num_children: numChildren,
-                    num_machines: numMachines,
-                    share_story: shareStory,
-                    story_minutes: storyDuration,
-                    num_tables: numTables,
-                    table_shape: tableShape,
-                    additional_notes: additionalNotes,
-                    organization: organization,
-                    contact_id: contact_id,  // Insert the contact_id from contact_info
-                    loc_id: eventLoc_id,  // Insert the loc_id for the event location
+                    first_name: firstName,
+                    last_name: lastName,
+                    phone: phone,
+                    email: email,
+                    loc_id: loc_id, // Insert the loc_id for personal info
+                  })
+                  .returning('contact_id') // Get the newly inserted contact_id
+                  .then(newContact => {
+                    contact_id = newContact[0].contact_id;  // Capture the new contact_id
                   });
-              });
+              }
+            });
+        } else {
+          // If no existingEmail, create a new contact with the provided email
+          return trx('contact_info')
+            .insert({
+              first_name: firstName,
+              last_name: lastName,
+              phone: phone,
+              email: email,
+              loc_id: loc_id, // Insert the loc_id for personal info
+            })
+            .returning('contact_id') // Get the newly inserted contact_id
+            .then(newContact => {
+              contact_id = newContact[0].contact_id;  // Capture the new contact_id
+            });
+        }
+      })
+      .then(() => {
+        // Step 4: Insert the event into requested_events table
+        return trx('requested_events')
+          .insert({
+            estimated_date: eventDate,
+            street_address: street,
+            estimated_start_time: startTime,
+            estimated_duration: eventDuration,
+            type_id: eventType,
+            loc_size: locationSize,
+            estimated_num_adults: numAdults,
+            estimated_num_youth: numYouth,
+            estimated_num_children: numChildren,
+            num_machines: numMachines,
+            share_story: shareStory,
+            story_minutes: storyDuration,
+            num_tables: numTables,
+            table_shape: tableShape,
+            additional_notes: additionalNotes,
+            organization: organization,
+            contact_id: contact_id,  // Insert the contact_id from contact_info
+            loc_id: eventLoc_id,  // Insert the loc_id for the event location
           });
       })
       .then(() => {
@@ -590,8 +619,9 @@ app.post('/scheduleEvent', (req, res) => {
         console.error('Error scheduling event:', error);
         res.status(500).send('Internal Server Error');
       });
-  });  
+  });
 });
+
 
 
 // port number, (parameters) => what you want it to do.
