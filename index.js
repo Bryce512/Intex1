@@ -816,6 +816,7 @@ app.get('/joinTeam', (req, res) => {
     layout: false });  // Renders external.ejs from public_views folder
 });
 
+
 // port number, (parameters) => what you want it to do.
 
 app.listen(PORT, () => console.log('Server started on port ' + PORT));
