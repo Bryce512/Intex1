@@ -35,30 +35,45 @@
   </tbody>
 </table>
 
-<!-- Modal Template -->
+
+<!-- ADD Modal Template -->
 <%- include('../components/modal', {
   title: 'Edit Admin',
+  deleteAction: '',
   formAction: '/update-admin',
   body: `
+    <div class="input-field">
+      <input id="entity-first-name" type="text" name="firstName" placeholder="First Name">
+    </div>
+    <div class="input-field">
+      <input id="entity-last-name" type="text" name="lastName" placeholder="Last Name">
+    </div>
+    <div class="input-field">
+      <input id="entity-email" type="email" name="email" placeholder="Email">
+    </div>
+    <div class="input-field">
+      <input id="entity-username" type="text" name="username" placeholder="Username">
+    </div>
+    <div class="input-field">
+      <input id="entity-password" type="text" name="password" placeholder="Password">
+    </div>
+`}) %>
+
+<!-- ADD modal -->
+<div id="AddModal" class="modal hidden">
+  <div class="modal-content">
+    <h4 id="modalTitle">Add Admin</h4>
+    <form action="/add-admin" method="POST">
       <div class="input-field">
-        <input id="entity-first-name" type="text" name="firstName" placeholder="First Name">
-        <label for="entity-first-name"></label>
+        <input id="add-entity-username" type="text" name="username" placeholder="Username" required>
       </div>
       <div class="input-field">
-        <input id="entity-last-name" type="text" name="lastName" placeholder="Last Name">
-        <label for="entity-last-name"></label>
+        <input id="add-entity-password" type="text" name="password" placeholder="Password" required>
       </div>
-      <div class="input-field">
-        <input id="entity-email" type="email" name="email" placeholder="Email">
-        <label for="entity-email"></label>
+      <div class="modal-footer">
+        <button type="button" class="modal-close adminModalClose btn grey">Cancel</button>
+        <button type="submit" class="btn green">Save</button>
       </div>
-      <div class="input-field">
-        <input id="entity-username" type="text" name="username" placeholder="Username">
-        <label for="entity-username"></label>
-      </div>
-      <div class="input-field">
-        <input id="entity-password" type="text" name="password" placeholder="Password">
-        <label for="entity-password"></label>
-      </div>
-  `
-}) %>
+    </form>
+  </div>
+</div>

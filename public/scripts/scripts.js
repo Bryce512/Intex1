@@ -4,34 +4,38 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
   window.location.href = '/logout';
 });
 
-// // *** Add button Handler
-// document.getElementById('addBtn').addEventListener('click', function() {
-//   // run different queries based on page
-//   if (entity === 'admin') {
-    
-//   }
-//   else if (entity === 'events') {
-    
-//   }
-//   else if (entity === 'team_members') {
-    
-//   }
-// });
+// *** Delete row 
+function deleteEntity(deleteAction) {
+  // Optional: Confirm before deletion
+  const confirmDelete = confirm("Are you sure you want to delete this item?");
+  
+  if (confirmDelete) {
+    // Redirect to the delete URL (or use AJAX for a more seamless experience)
+    window.location.href = deleteAction; // This will take the user to the delete route
+  }
+}
 
 
 // *** Handle Modal clicks and open
 document.addEventListener('DOMContentLoaded', function() {
   // Ensure that the modal and overlay exist before adding the listeners
   const modal = document.getElementById('modal');
+  const modal1 = document.getElementById('AddModal');
   const overlay = document.getElementById('overlay');
   const closeModalBtn = document.querySelector('.modal-close');
+  const closeAdminModalBtn = document.querySelector('.adminModalClose');
   const addButton = document.getElementById('addButton'); // Reference the Add button
+  const deleteButton = document.getElementById('deleteBtn');
 
 
   // Function to close the modal
   const closeModal = function () {
+    if (modal1){
+      modal1.classList.remove('visible');
+    }
     modal.classList.remove('visible');
     overlay.classList.remove('visible');
+    deleteButton.style.display = 'none'; // Hide the delete button when closing modal
   };
 
   // Open modal function
@@ -40,17 +44,20 @@ document.addEventListener('DOMContentLoaded', function() {
     overlay.classList.add('visible');
   };
 
-  // Open the modal when the Add button is clicked (reset the form)
-  if (addButton) {
-    addButton.addEventListener('click', function() {
-      resetBeforeAdd(); // Reset fields before opening the modal
-      openModal(); // Open the modal
-    });
+  const closeAdminModal = function () {
+    modal1.classList.remove('visible');
+    overlay.classList.remove('visible');
+    deleteButton.style.display = 'none'; // Hide the delete button when closing modal
   }
 
+  
   // Close the modal when the cancel button is clicked
   if (closeModalBtn) {
     closeModalBtn.addEventListener('click', closeModal);
+  }
+
+  if(closeAdminModalBtn) {
+    closeAdminModalBtn.addEventListener('click', closeAdminModal);
   }
 
   // Close modal when clicking the overlay
@@ -65,42 +72,50 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  // Open the modal when the Add button is clicked (reset the form)
+  if (addButton) {
+    addButton.addEventListener('click', function() {
+      if (pageType == "admin") {
+        openAddAdminModal()
+      }else {
+        addModal(); // Reset fields before opening the modal
+        openModal(); // Open the modal
+      }
+    });
+  }
+
+// Open Add Admin Modal
+    const openAddAdminModal = () => {
+      // Show modal
+      modal1.classList.add('visible');
+      overlay.classList.add('visible');
+    };
+
+
   // Reset the modal form fields to default (for "Add" functionality)
-  const resetBeforeAdd = function () {
+  const addModal = function () {
     // Select modal elements
     const titleElement = document.getElementById('modalTitle');  // Make sure the ID matches
     const form = document.querySelector('form');
     let title = '';
     let formAction = '';
 
-    if (pageType === "admin"){
-      // Populate modal with data
-      document.getElementById('entity-first-name').value = '';
-      document.getElementById('entity-last-name').value = '';
-      document.getElementById('entity-email').value = '';
-      document.getElementById('entity-password').value = '';
-      document.getElementById('entity-username').value = '';
-
-
-      // Optionally set the form action
-      formAction = `/add-admin`;
-      title = "Add Admin";
-    } 
-    else if (pageType === "team_member"){
+    
+    if (pageType === "team_member"){
         // Populate modal with data
         document.getElementById('entity-first-name').value = '';
         document.getElementById('entity-last-name').value = '';
         document.getElementById('entity-email').value = '';
+        document.getElementById('entity-loc').value = '';
         document.getElementById('entity-phone').value = '';
+        document.getElementById('entity-source').value = '';
         document.getElementById('entity-sewing-level').value = '';
         document.getElementById('entity-hours-willing').value = '';
-        console.log("reset page");
 
       // Optionally set the form action
-      formAction = `/add-event`;
+      formAction = `/add-team_member`;
       title = "Add Team Member";
       console.log(title);
-
     } 
     else if (pageType === "event") {
         // Populate modal with data
@@ -112,14 +127,12 @@ document.addEventListener('DOMContentLoaded', function() {
       formAction = `/add-event`;
       title = "Add Event";
     }else{
-      console.log('failed to make it into loop');
     }
 
     // Set the dynamic title in the modal
       // Ensure the titleElement exists before modifying it
       if (titleElement) {
         titleElement.textContent = title; // Update the title of the modal
-        console.log(pageType);
       }
 
     // Set the form action dynamically
@@ -130,8 +143,13 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Attach row click events dynamically (This is the important part)
-  const attachRowClickEvents = () => {
+  const editModal = () => {
+    let title = '';
     const openModalBtns = document.querySelectorAll('.editable-row');
+    const titleElement = document.getElementById('modalTitle');  // Make sure the ID matches
+    let deleteAction = '';
+
+
     openModalBtns.forEach(row => {
       row.addEventListener('click', function () {
         const Id = row.getAttribute('data-id');
@@ -152,19 +170,15 @@ document.addEventListener('DOMContentLoaded', function() {
           document.getElementById('entity-password').value = password;
           document.getElementById('entity-username').value = username;
 
-
-          // Optionally set the form action
-          const formAction = `/update-${entity}/${Id}`;
-          document.querySelector('form').setAttribute('action', formAction);
-
-          openModal(); // Open the modal
-
+          title = "Edit Admin";
         } else if (entity == "team_member"){
             // pull data from row
             const firstName = row.getAttribute('data-first-name');
             const lastName = row.getAttribute('data-last-name');
             const email = row.getAttribute('data-email');
+            const location = row.getAttribute('data-loc');
             const phone = row.getAttribute('data-phone');
+            const source = row.getAttribute('data-source');
             const sewing_level = row.getAttribute('data-sewing-level');
             const hours_willing = row.getAttribute('data-hours-willing');
 
@@ -172,14 +186,13 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('entity-first-name').value = firstName;
             document.getElementById('entity-last-name').value = lastName;
             document.getElementById('entity-email').value = email;
+            document.getElementById('entity-loc').value = location;
             document.getElementById('entity-phone').value = phone;
+            document.getElementById('entity-source').value = source;
             document.getElementById('entity-sewing-level').value = sewing_level;
             document.getElementById('entity-hours-willing').value = hours_willing;
 
-          // Optionally set the form action
-          const formAction = `/update-${entity}/${Id}`;
-          document.querySelector('form').setAttribute('action', formAction);
-          openModal(); // Open the modal
+            title = "Edit Team Member";
         } else if (entity == "event") {
             // pull data from row
             const firstName = row.getAttribute('data-first-name');
@@ -190,19 +203,36 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('entity-first-name').value = firstName;
             document.getElementById('entity-last-name').value = lastName;
             document.getElementById('entity-email').value = email;
-
-          // Optionally set the form action
-          const formAction = `/update-${entity}/${Id}`;
-          document.querySelector('form').setAttribute('action', formAction);
-          openModal(); // Open the modal
+            
+            title = "Edit Event";
         }
-        
+
+
+        deleteAction = `/delete-${entity}/${Id}`;
+        const formAction = `/update-${entity}/${Id}`;
+        titleElement.textContent = title; // Update the title of the modal
+        document.querySelector('form').setAttribute('action', formAction);
+        document.getElementById('deleteForm').setAttribute('action', deleteAction);
+
+
+        // Check if deleteAction exists and display the delete button accordingly
+        if (deleteAction) {
+          // Show the delete button and set its data-delete-action attribute
+          deleteButton.style.display = 'inline-block';
+          deleteButton.onclick = function() {
+            // Perform the delete action when the button is clicked
+            document.getElementById('deleteForm').submit();
+          };
+        }
+
+        openModal(); // Open the modal
+      
       });
     });
   };
 
   // Initialize the row click events on page load
-  attachRowClickEvents();
+  editModal();
 });
 
 // *** END Modal JS

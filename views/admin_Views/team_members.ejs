@@ -16,6 +16,8 @@
       <th>Name</th>
       <th>Email</th>
       <th>Phone</th>
+      <th>Location</th>
+      <th>How Did You Hear of Us?</th>
       <th>Sewing Level</th>
       <th>Hours Willing</th>
     </tr>
@@ -29,6 +31,8 @@
           data-last-name="<%= team_member.last_name %>"
           data-email="<%= team_member.email %>"
           data-phone="<%= team_member.phone %>"
+          data-loc="<%= team_member.loc_id %>"
+          data-source="<%= team_member.source_id %>"
           data-sewing-level="<%= team_member.sewing_level %>"
           data-hours-willing="<%= team_member.hours_willing %>"
           data-entity="team_member"
@@ -36,6 +40,8 @@
           <td><%= team_member.first_name %> <%= team_member.last_name %></td>
           <td><%= team_member.email %></td>
           <td><%= team_member.phone || 'Not Set' %></td>
+          <td><%= team_member.loc_id %></td>
+          <td><%= team_member.source_id || 'Not Set' %></td>
           <td><%= team_member.level_description || 'Not Set' %></td>
           <td><%= team_member.hours_willing || 'Not Set' %></td>
         </tr>
@@ -51,9 +57,11 @@
 
 <!-- Modal Template -->
 <%- include('../components/modal', {
-  title: 'Edit Team Members',
+  title: 'Edit Team Member',
   formAction: '/update-team_member',
+  deleteAction: '',
   body: `
+
   <div class="input-field">
     <input id="entity-first-name" type="text" name="firstName" placeholder="First Name" required>
     <label for="entity-first-name"></label>
@@ -67,8 +75,16 @@
     <label for="entity-email"></label>
   </div>
   <div class="input-field">
+    <input id="entity-loc" type="number" name="location" placeholder="Zip Code" required>
+    <label for="entity-loc"></label>
+  </div>
+  <div class="input-field">
     <input id="entity-phone" type="tel" name="phone" placeholder="Phone">
     <label for="entity-phone"></label>
+  </div>
+  <div class="input-field">
+    <input id="entity-source" type="number" name="source" placeholder="Source" required>
+    <label for="entity-source"></label>
   </div>
   <div class="input-field">
     <input id="entity-sewing-level" type="text" name="sewingLevel" placeholder="Sewing Level">

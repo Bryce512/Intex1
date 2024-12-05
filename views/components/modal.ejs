@@ -2,14 +2,20 @@
 <div id="modal" class="modal hidden">
   <div class="modal-content">
     <h4 id="modalTitle"><%= title %></h4>
-    <form action="<%= formAction %>" method="POST">
+    <form id="mainModalForm" action="<%= formAction %>" method="POST">
       <%- body %>
       <div class="modal-footer">
+        <button type="button" id="deleteBtn" class="left btn red" style="display: none;" onclick="deleteEntity('<%= deleteAction %>')">Delete</button>
         <button type="button" class="modal-close btn grey">Cancel</button>
         <button type="submit" class="btn green">Save</button>
       </div>
     </form>
   </div>
 </div>
+
+<!-- Hidden delete form for POST request -->
+<form id="deleteForm" action="<%= deleteAction %>" method="POST" style="display: none;">
+  <button type="submit" id="hiddenDeleteButton">Delete</button>
+</form>
 
 <div class="overlay hidden" id="overlay"></div>

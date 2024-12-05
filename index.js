@@ -96,6 +96,7 @@ app.get('/adminHome', (req, res) => {
       res.render("admin_Views/adminHome", {
     title: 'Admin Home',
     navItems: [],
+    pageType: 'AdminHome',
     layout: 'layouts/adminLayout'});  // Use the admin layout for this route
   } else {
     res.redirect('/login');
@@ -174,12 +175,15 @@ app.get('/team_members', async (req, res) => {
             'c.last_name',
             'c.email',
             'c.phone',
+            'tm.source_id',
             'tm.sewing_level',
             's.level_description',
-            'tm.hours_willing'
+            'tm.hours_willing',
+            'c.loc_id'
           )
           .leftJoin('team_members as tm', 'c.contact_id', '=', 'tm.contact_id')
           .leftJoin('sewing_level as s', 'tm.sewing_level', '=', 's.sewing_level')
+          .join('sources', 'tm.source_id', '=', 'sources.source_id')
           .orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
           ;
         
@@ -264,8 +268,7 @@ app.post('/update-team_member/:id', async (req, res) => {
 // *** ------------------------------ Events Begin ---------------- ***//
 // Route to fetch and display executed_events
 
-if (authorized) {
-    
+if (authorized) { 
 }else {
   res.redirect('/login');
 }
@@ -345,6 +348,7 @@ app.get('/events', async (req, res) => {
 app.get('/faqs', (req, res) => {
     res.render("admin_Views/FAQs", {
         title: 'Manage FAQs',
+        pageType: 'FAQ',
         navItems: [],  // You can add navigation items here if needed
         layout: 'layouts/adminLayout'  // Use the admin layout for this route
       });
@@ -355,6 +359,7 @@ app.get('/trainings', (req, res) => {
   if (authorized) {
     res.render("admin_Views/trainings", {
         title: 'Manage Trainings',
+        pageType: 'trainings',
         navItems: [],  // You can add navigation items here if needed
         layout: 'layouts/adminLayout'  // Use the admin layout for this route
       });
@@ -362,6 +367,128 @@ app.get('/trainings', (req, res) => {
     res.redirect('/login');
   }
 });
+// *** --------------------------------- BEGIN ADD Routes --------------------------------***
+app.post('/add-admin', (req, res) => {
+  // Extract values from the request body
+  const contact_id = req.body.contactId;  // The selected contact ID from the dropdown
+  const username = req.body.username || ''; // Username input
+  const password = req.body.password || ''; // Password input
+
+  // Validation (optional, but you might want to validate these fields)
+  if (!contact_id || !username || !password) {
+    return res.status(400).send('Missing required fields');
+  }
+
+  // Insert into the admins table
+  knex('admins')
+    .insert({
+      contact_id: contact_id, // The contact_id selected from the dropdown
+      username: username,
+      password: password // You might want to hash the password before saving it
+    })
+    .then(() => {
+      // Redirect to the admins page after successful insertion
+      res.redirect('/admins');
+    })
+    .catch(error => {
+      console.error('Error adding admin:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+
+
+app.post('/add-team_member', (req, res) => {
+  // Extract form values from req.body
+  const first_name = req.body.firstName || ''; // Default to empty string if not provided
+  const last_name = req.body.lastName || ''; // Default to empty string if not provided
+  const email = req.body.email || ''; // Checkbox returns true or undefined
+  const phone = req.body.phone || null;
+  const source = req.body.source || '';
+  const sewing_level = parseInt(req.body.sewingLevel, 10) || null; // Convert level to Int
+  const hours_willing = parseInt(req.body.hoursWilling, 10) || null; // Convert to integer
+
+  // Insert the contact information into the contact_info table
+  knex('contact_info')
+      .insert({
+          first_name: toTitleCase(first_name),   // Ensure first_name is uppercase
+          last_name: toTitleCase(last_name),
+          phone: phone,
+          email: email
+      })
+      .returning('contact_id') // Return the contact_id of the newly inserted row
+      .then(contactIds => {
+        const contact_id = contactIds[0].contact_id; // Correct: Extract the contact_id from the object
+          // Now insert into the team_members table using the generated contact_id
+          return knex('team_members')
+              .insert({
+                  contact_id: contact_id, // Use the generated contact_id here
+                  source_id: source,
+                  sewing_level: sewing_level,
+                  hours_willing: hours_willing
+              });
+      })
+      .then(() => {
+          res.redirect('/team_members'); // Redirect to the main page after successful insertion
+      })
+      .catch(error => {
+          console.error('Error adding team member:', error);
+          res.status(500).send('Internal Server Error');
+      });
+});
+
+
+
+// *** --------------------------------- END ADD Routes --------------------------------***
+
+
+// *** --------------------------------- Begin DELETE Routes --------------------------------***
+
+app.post('/delete-admin/:id', async (req, res) => {
+  const id = req.params.id;
+  knex('admins')
+    .where('contact_id', id)
+    .del() // Deletes the record with the specified ID
+    .then(() => {
+      res.redirect('/admins'); // Redirect to the planet list after deletion
+    })
+    .catch(error => {
+      console.error('Error deleting Admin:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+app.post('/delete-team_member/:id', async (req, res) => {
+  const id = req.params.id;
+  knex('team_members')
+    .where('contact_id', id)
+    .del() // Deletes the record with the specified ID
+    .then(() => {
+      res.redirect('/team_members'); // Redirect to the planet list after deletion
+    })
+    .catch(error => {
+      console.error('Error deleting Team Member:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+
+app.post('/delete-event/:id', async (req, res) => {
+  const id = req.params.id;
+  knex('events')
+    .where('event_id', id)
+    .del() // Deletes the record with the specified ID
+    .then(() => {
+      res.redirect('/events'); // Redirect to the planet list after deletion
+    })
+    .catch(error => {
+      console.error('Error deleting Event:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+// *** --------------------------------- End DELETE Routes --------------------------------***
+
+
 
 // *** --------------------------------- PUBLIC Routes --------------------------------***
 // Serve static files (e.g., CSS) if needed
@@ -627,3 +754,10 @@ app.post('/scheduleEvent', (req, res) => {
 // port number, (parameters) => what you want it to do.
 
 app.listen(PORT, () => console.log('Server started on port ' + PORT));
+
+function toTitleCase(s) {
+  return s.toLowerCase()
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+}
