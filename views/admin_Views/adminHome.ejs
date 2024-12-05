@@ -1,19 +1,19 @@
 <div class="admin-dashboard">  
   <!-- Tableau Visualization -->
-  <div class='tableauPlaceholder' id='viz1733338070924' style='position: relative'>
+  <div class='tableauPlaceholder' id='viz1733436702559' style='position: relative'>
     <noscript>
       <a href='#'>
-        <img alt=' ' src='https://public.tableau.com/static/images/IN/INTEX_17333378440660/ItemsCompletedatEachEvent/1_rss.png' style='border: none' />
+        <img alt='Admin Dashboard ' src='https://public.tableau.com/static/images/IN/INTEX_17333378440660/AdminDashboard/1_rss.png' style='border: none' />
       </a>
     </noscript>
     <object class='tableauViz' style='display:none;'>
       <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
       <param name='embed_code_version' value='3' />
       <param name='site_root' value='' />
-      <param name='name' value='INTEX_17333378440660/ItemsCompletedatEachEvent' />
-      <param name='tabs' value='yes' />
+      <param name='name' value='INTEX_17333378440660/AdminDashboard' />
+      <param name='tabs' value='no' />
       <param name='toolbar' value='yes' />
-      <param name='static_image' value='https://public.tableau.com/static/images/IN/INTEX_17333378440660/ItemsCompletedatEachEvent/1.png' />
+      <param name='static_image' value='https://public.tableau.com/static/images/IN/INTEX_17333378440660/AdminDashboard/1.png' />
       <param name='animate_transition' value='yes' />
       <param name='display_static_image' value='yes' />
       <param name='display_spinner' value='yes' />
@@ -26,38 +26,44 @@
 
   <!-- Tableau initialization script -->
   <script type='text/javascript'>
-    document.addEventListener('DOMContentLoaded', function() {
-      var divElement = document.getElementById('viz1733338070924');
-      var vizElement = divElement.getElementsByTagName('object')[0];
-      vizElement.style.width = '80%';
-      vizElement.style.height = (divElement.offsetWidth * 0.6) + 'px';
-      
-      var scriptElement = document.createElement('script');
-      scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
-      vizElement.parentNode.insertBefore(scriptElement, vizElement);
-    });
-
-    // Add resize handler to make the visualization responsive
-    window.addEventListener('resize', function() {
-      var divElement = document.getElementById('viz1733338070924');
-      var vizElement = divElement.getElementsByTagName('object')[0];
-      vizElement.style.height = (divElement.offsetWidth * 0.6) + 'px';
-    });
+    var divElement = document.getElementById('viz1733436702559');
+    var vizElement = divElement.getElementsByTagName('object')[0];
+    if (divElement.offsetWidth > 800) {
+      vizElement.style.width = '100%';
+      vizElement.style.height = '927px';
+    } else if (divElement.offsetWidth > 500) {
+      vizElement.style.width = '100%';
+      vizElement.style.height = '927px';
+    } else {
+      vizElement.style.width = '100%';
+      vizElement.style.height = '1277px';
+    }
+    var scriptElement = document.createElement('script');
+    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+    vizElement.parentNode.insertBefore(scriptElement, vizElement);
   </script>
 </div>
 
 <style>
   .admin-dashboard {
-    padding: 10px;
-    width: 80%;
-    max-width: 1000px;
-    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    min-width: 1200px;
+    overflow-x: auto;
   }
 
   .tableauPlaceholder {
-    margin-top: 10px;
     width: 100%;
-    display: flex;
-    justify-content: center;
+    min-width: 1200px;
+  }
+
+  @media (max-width: 768px) {
+    .admin-dashboard {
+      padding: 10px;
+    }
   }
 </style>
