@@ -810,10 +810,116 @@ app.post('/scheduleEvent', (req, res) => {
   });
 });
 
-// Join the Team Page
+// Load the Join the Team Page
 app.get('/joinTeam', (req, res) => {
-  res.render('public_views/joinTeam', {
-    layout: false });  // Renders external.ejs from public_views folder
+  // Fetch location sizes and table shapes independently
+  Promise.all([
+    knex('sources').select('source_id','source_description'), // Fetch size descriptions
+    knex('sewing_level').select('sewing_level','level_description')  // Fetch shape descriptions
+  ])
+  .then(([sources, sewingLevels]) => {
+    // Render the page without layout
+    res.render('public_views/joinTeam', {
+      sources,
+      sewingLevels,
+      title: 'Join the Team',
+      layout: false  // Explicitly disable layout
+    });
+  })
+  .catch(error => {
+    console.error('Error fetching sources and sewing levels:', error);
+    res.status(500).send('Internal Server Error');
+  });
+});
+
+// Add someone's submission to be a team member to the Database
+app.post('/joinTeam', (req, res) => {
+  // Extract form values
+  const firstName = req.body.firstName || ''; 
+  const lastName = req.body.lastName || '';
+  const email = req.body.email || '';
+  const existingEmail = req.body.existingEmail || '';
+  const phone = req.body.phone || ''; 
+  const city = req.body.city || ''; 
+  const state = req.body.state || ''; 
+  const zip = parseInt(req.body.zip, 10) || 84401;
+  const source = parseInt(req.body.source, 10); 
+  const sewingLevel = parseInt(req.body.sewingLevel, 10);
+  const hoursWilling = parseInt(req.body.hoursWilling, 10);
+
+  // Start a transaction
+  knex.transaction(trx => {
+    let loc_id, contact_id;
+
+    // Step 1: Check if the zip code exists in the 'location' table (for personal info)
+    return trx('location')
+      .select('loc_id')
+      .where('zip', zip)
+      .first()
+      .then(location => {
+        if (location) {
+          // Zip code exists, use the existing loc_id
+          loc_id = location.loc_id;
+        } else {
+          // Zip doesn't exist, insert new location into location table
+          return trx('location')
+            .insert({
+              city: city,
+              state: state,
+              zip: zip,
+            })
+            .returning('loc_id') // Get the newly inserted loc_id
+            .then(newLocation => {
+              loc_id = newLocation[0].loc_id; // Capture the new loc_id
+            });
+        }
+      })
+      .then(() => {
+        // Step 2: Check if the email exists in the 'contact_info' table
+          return trx('contact_info')
+            .select('contact_id')
+            .where('email', existingEmail)  // Use the provided existing email
+            .first()
+            .then(existingContact => {
+              if (existingContact) {
+                // If the contact exists, use the existing contact_id
+                contact_id = existingContact.contact_id;
+              } else {
+                // If the contact doesn't exist, create a new contact
+                return trx('contact_info')
+                  .insert({
+                    first_name: firstName,
+                    last_name: lastName,
+                    phone: phone,
+                    email: email,
+                    loc_id: loc_id, // Insert the loc_id for personal info
+                  })
+                  .returning('contact_id') // Get the newly inserted contact_id
+                  .then(newContact => {
+                    contact_id = newContact[0].contact_id;  // Capture the new contact_id
+                  });
+              }
+            });
+      })
+      .then(() => {
+        // Step 4: Insert the event into requested_events table
+        return trx('team_members')
+          .insert({
+            contact_id: contact_id,  // Insert the contact_id from contact_info
+            source_id: source,
+            sewing_level: sewingLevel,
+            hours_willing: hoursWilling,
+          });
+      })
+      .then(() => {
+        // Commit the transaction and send success response
+        res.redirect('/joinTeam?success=true');
+      })
+      .catch(error => {
+        console.error('Error signing up to be a team member:', error);
+        res.status(500).send('Internal Server Error');
+      });
+  });
 });
 
 
