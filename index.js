@@ -114,12 +114,23 @@ app.get('/admins', async (req, res) => {
         .leftJoin('team_members as tm', 'tm.contact_id', '=', 'c.contact_id')
         .leftJoin('sewing_level as sl', 'sl.sewing_level', '=', 'tm.sewing_level')
         .orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
+
+        const team_members = await knex('team_members as tm')
+        .select('tm.contact_id', 'c.first_name', 'c.last_name')
+        .join('contact_info as c', 'tm.contact_id', '=', 'c.contact_id')  // Join team_members with contact_info
+        .leftJoin('admins as a', 'tm.contact_id', '=', 'a.contact_id')  // Left join with admins to exclude admins
+        .whereNull('a.contact_id')  // Only select team members not in the admins table
+        .orderBy('c.last_name', 'asc')  // Ordering by last_name first
+        .orderBy('c.first_name', 'asc');  // Then by first_name
+      
+
         // Render the admins page and pass the admins data to the view
         res.render("admin_Views/admins", {
           title: 'Manage Admins',
           navItems: [],
           layout: 'layouts/adminLayout', // Use the admin layout for this route
           admins: admins,
+          teamMembers: team_members,
           pageType: "admin" // Pass the admins data to the view
         });
       } catch (error) {
