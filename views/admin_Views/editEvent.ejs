@@ -1,213 +1,216 @@
-
-
 <form id="editEventForm" action="" method="POST">
-<div class="modal-content">
-  <!-- First Name -->
-  <div class="input-field">
-    <input id="entity-first-name" type="text" name="firstName" placeholder="First Name">
+  <div class="modal-content">
+    <!-- First Name -->
+    <div class="input-field">
+      <label for="entity-first-name">First Name</label>
+      <input id="entity-first-name" type="text" name="firstName" placeholder="First Name" value="<%= event.first_name %>">
+    </div>
+
+    <!-- Last Name -->
+    <div class="input-field">
+      <label for="entity-last-name">Last Name</label>
+      <input id="entity-last-name" type="text" name="lastName" placeholder="Last Name" value="<%= event.last_name %>">
+    </div>
+
+    <!-- Email -->
+    <div class="input-field">
+      <label for="entity-email">Email</label>
+      <input id="entity-email" type="email" name="email" placeholder="Email" value="<%= event.email %>">
+    </div>
+
+    <!-- Status Dropdown -->
+    <div class="input-field">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="requested" <%= event.status === 'requested' ? 'selected' : '' %>>Requested</option>
+        <option value="finished" <%= event.status === 'finished' ? 'selected' : '' %>>Finished</option>
+      </select>
+    </div>
+
+    <!-- Type Description Dropdown -->
+    <div class="input-field">
+      <label for="type-description">Type Description</label>
+      <select id="type-description" name="type-description">
+        <option value="corporate" <%= event.type_description === 'corporate' ? 'selected' : '' %>>Corporate</option>
+        <option value="community" <%= event.type_description === 'community' ? 'selected' : '' %>>Community</option>
+        <option value="non-profit" <%= event.type_description === 'non-profit' ? 'selected' : '' %>>Non-Profit</option>
+        <option value="social" <%= event.type_description === 'social' ? 'selected' : '' %>>Social</option>
+      </select>
+    </div>
+
+    <!-- Finished Event Fields (Only for finished status) -->
+    <% if (status === 'finished') { %>
+      <div class="input-field">
+        <label for="actual-start-date">Actual Start Date</label>
+        <input id="actual-start-date" type="date" name="actualStartDate" placeholder="Start Date" value="<%= event.actual_start_date %>">
+      </div>
+
+      <div class="input-field">
+        <label for="actual-start-time">Actual Start Time</label>
+        <input id="actual-start-time" type="time" name="actualStartTime" placeholder="Start Time" value="<%= event.actual_start_time %>">
+      </div>
+
+      <div class="input-field">
+        <label for="actual-duration">Actual Duration</label>
+        <input id="actual-duration" type="text" name="actualDuration" placeholder="Duration" value="<%= event.actual_duration %>">
+      </div>
+
+      <div class="input-field">
+        <label for="actual-num-people">Number of People</label>
+        <input id="actual-num-people" type="number" name="actualNumPeople" placeholder="Number of People" value="<%= event.actual_num_people %>">
+      </div>
+
+      <div class="input-field">
+        <label for="pockets">Pockets</label>
+        <input id="pockets" type="number" name="pockets" placeholder="Pockets" value="<%= event.pockets %>">
+      </div>
+
+      <div class="input-field">
+        <label for="collars">Collars</label>
+        <input id="collars" type="number" name="collars" placeholder="Collars" value="<%= event.collars %>">
+      </div>
+
+      <div class="input-field">
+        <label for="envelopes">Envelopes</label>
+        <input id="envelopes" type="number" name="envelopes" placeholder="Envelopes" value="<%= event.envelopes %>">
+      </div>
+
+      <div class="input-field">
+        <label for="vests">Vests</label>
+        <input id="vests" type="number" name="vests" placeholder="Vests" value="<%= event.vests %>">
+      </div>
+
+      <div class="input-field">
+        <label for="items-completed">Items Completed</label>
+        <input id="items-completed" type="number" name="itemsCompleted" placeholder="Items Completed" value="<%= event.items_completed %>">
+      </div>
+
+      <div class="input-field">
+        <label for="actual-end-date">Actual End Date</label>
+        <input id="actual-end-date" type="date" name="actualEndDate" placeholder="End Date" value="<%= event.actual_end_date %>">
+      </div>
+    <% } else {%>
+
+    <!-- Requested Event Fields (Only for requested status) -->
+
+      <div class="input-field">
+        <label for="estimated-date">Estimated Date</label>
+        <input id="estimated-date" type="date" name="estimatedDate" placeholder="Estimated Date" value="<%= event.estimated_date %>">
+      </div>
+
+      <div class="input-field">
+        <label for="estimated-start-time">Estimated Start Time</label>
+        <input id="estimated-start-time" type="time" name="estimatedStartTime" placeholder="Start Time" value="<%= event.estimated_start_time %>">
+      </div>
+
+      <div class="input-field">
+        <label for="estimated-duration">Estimated Duration</label>
+        <input id="estimated-duration" type="text" name="estimatedDuration" placeholder="Duration" value="<%= event.estimated_duration %>">
+      </div>
+
+      <div class="input-field">
+        <label for="full-name">Full Name</label>
+        <input id="full-name" type="text" name="fullName" placeholder="Full Name" value="<%= event.full_name %>">
+      </div>
+
+      <div class="input-field">
+        <label for="phone">Phone</label>
+        <input id="phone" type="text" name="phone" placeholder="Phone" value="<%= event.phone %>">
+      </div>
+
+      <div class="input-field">
+        <label for="address">Street Address</label>
+        <input id="address" type="text" name="address" placeholder="Street Address" value="<%= event.address %>">
+      </div>
+
+      <div class="input-field">
+        <label for="city-state-zip">City, State, Zip</label>
+        <input id="city-state-zip" type="text" name="cityStateZip" placeholder="City, State, Zip" value="<%= event.city_state_zip %>">
+      </div>
+
+      <div class="input-field">
+        <label for="loc-size">Location Size</label>
+        <input id="loc-size" type="text" name="locSize" placeholder="Location Size" value="<%= event.loc_size %>">
+      </div>
+
+      <div class="input-field">
+        <label for="estimated-num-adults">Number of Adults</label>
+        <input id="estimated-num-adults" type="number" name="estimatedNumAdults" placeholder="Number of Adults" value="<%= event.estimated_num_adults %>">
+      </div>
+
+      <div class="input-field">
+        <label for="estimated-num-youth">Number of Youth</label>
+        <input id="estimated-num-youth" type="number" name="estimatedNumYouth" placeholder="Number of Youth" value="<%= event.estimated_num_youth %>">
+      </div>
+
+      <div class="input-field">
+        <label for="estimated-num-children">Number of Children</label>
+        <input id="estimated-num-children" type="number" name="estimatedNumChildren" placeholder="Number of Children" value="<%= event.estimated_num_children %>">
+      </div>
+
+      <div class="input-field">
+        <label for="num-machines">Number of Machines</label>
+        <input id="num-machines" type="number" name="numMachines" placeholder="Number of Machines" value="<%= event.num_machines %>">
+      </div>
+
+      <div class="input-field">
+        <label for="share-story">Share Story</label>
+        <input id="share-story" type="text" name="shareStory" placeholder="Share Story" value="<%= event.share_story %>">
+      </div>
+
+      <div class="input-field">
+        <label for="story-minutes">Story Minutes</label>
+        <input id="story-minutes" type="number" name="storyMinutes" placeholder="Story Minutes" value="<%= event.story_minutes %>">
+      </div>
+
+      <div class="input-field">
+        <label for="num-tables">Number of Tables</label>
+        <input id="num-tables" type="number" name="numTables" placeholder="Number of Tables" value="<%= event.num_tables %>">
+      </div>
+
+      <div class="input-field">
+        <label for="table-shape">Table Shape</label>
+        <input id="table-shape" type="text" name="tableShape" placeholder="Table Shape" value="<%= event.table_shape %>">
+      </div>
+    <% } %>
+
+    <!-- Additional Notes -->
+    <div class="input-field">
+      <label for="additional-notes">Additional Notes</label>
+      <textarea id="additional-notes" name="additionalNotes" class="materialize-textarea" placeholder="Additional Notes"><%= event.additional_notes %></textarea>
+    </div>
+
   </div>
 
-  <!-- Last Name -->
-  <div class="input-field">
-    <input id="entity-last-name" type="text" name="lastName" placeholder="Last Name">
+  <!-- Modal Footer -->
+  <div class="modal-footer">
+    <button type="button" id="deleteBtn" class="left btn red" style="display: none;" onclick="">Delete</button>
+    <button type="button" class="modal-close btn grey">Cancel</button>
+    <button type="submit" class="btn green">Save</button>
   </div>
-
-  <!-- Email -->
-  <div class="input-field">
-    <input id="entity-email" type="email" name="email" placeholder="Email">
-  </div>
-
-  <!-- Status Dropdown -->
-  <div class="input-field">
-    <select id="status" name="status">
-      <option value="requested">Requested</option>
-
-    </select>
-  </div>
-
-  <!-- Type Description Dropdown -->
-  <div class="input-field">
-    <select id="type-description" name="type-description">
-      <option value="corporate">Corporate</option>
-      <option value="community">Community</option>
-      <option value="non-profit">Non-Profit</option>
-      <option value="social">Social</option>
-    </select>
-  </div>
-
-
-  <!-- Finished Event Fields (Only for finished status) -->
-    <!-- Actual Start Date -->
-    <div class="input-field">
-      <input id="actual-start-date" type="date" name="actualStartDate" placeholder="Start Date">
-    </div>
-
-    <!-- Actual Start Time -->
-    <div class="input-field">
-      <input id="actual-start-time" type="time" name="actualStartTime" placeholder="Start Time">
-    </div>
-
-    <!-- Actual Duration -->
-    <div class="input-field">
-      <input id="actual-duration" type="text" name="actualDuration" placeholder="Duration">
-    </div>
-
-    <!-- Actual Number of People -->
-    <div class="input-field">
-      <input id="actual-num-people" type="number" name="actualNumPeople" placeholder="Number of People">
-    </div>
-
-    <!-- Actual Pockets -->
-    <div class="input-field">
-      <input id="pockets" type="number" name="pockets" placeholder="Pockets">
-    </div>
-
-    <!-- Actual Collars -->
-    <div class="input-field">
-      <input id="collars" type="number" name="collars" placeholder="Collars">
-    </div>
-
-    <!-- Actual Envelopes -->
-    <div class="input-field">
-      <input id="envelopes" type="number" name="envelopes" placeholder="Envelopes">
-    </div>
-
-    <!-- Actual Vests -->
-    <div class="input-field">
-      <input id="vests" type="number" name="vests" placeholder="Vests">
-    </div>
-
-    <!-- Actual Items Completed -->
-    <div class="input-field">
-      <input id="items-completed" type="number" name="itemsCompleted" placeholder="Items Completed">
-    </div>
-
-    <!-- Actual End Date -->
-    <div class="input-field">
-      <input id="actual-end-date" type="date" name="actualEndDate" placeholder="End Date">
-    </div>
-
-  <!-- Requested Event Fields (Only for requested status) -->
-  <div id="requested-fields" style="display:none;">
-    <!-- Estimated Date -->
-    <div class="input-field">
-      <input id="estimated-date" type="date" name="estimatedDate" placeholder="Estimated Date">
-    </div>
-
-    <!-- Estimated Start Time -->
-    <div class="input-field">
-      <input id="estimated-start-time" type="time" name="estimatedStartTime" placeholder="Start Time">
-    </div>
-
-    <!-- Estimated Duration -->
-    <div class="input-field">
-      <input id="estimated-duration" type="text" name="estimatedDuration" placeholder="Duration">
-    </div>
-
-    <!-- Full Name -->
-    <div class="input-field">
-      <input id="full-name" type="text" name="fullName" placeholder="Full Name">
-    </div>
-
-    <!-- Phone -->
-    <div class="input-field">
-      <input id="phone" type="text" name="phone" placeholder="Phone">
-    </div>
-
-    <!-- Address -->
-    <div class="input-field">
-      <input id="address" type="text" name="address" placeholder="Street Address">
-    </div>
-
-    <!-- City, State, Zip -->
-    <div class="input-field">
-      <input id="city-state-zip" type="text" name="cityStateZip" placeholder="City, State, Zip">
-    </div>
-
-    <!-- Location Size -->
-    <div class="input-field">
-      <input id="loc-size" type="text" name="locSize" placeholder="Location Size">
-    </div>
-
-    <!-- Estimated Number of Adults -->
-    <div class="input-field">
-      <input id="estimated-num-adults" type="number" name="estimatedNumAdults" placeholder="Number of Adults">
-    </div>
-
-    <!-- Estimated Number of Youth -->
-    <div class="input-field">
-      <input id="estimated-num-youth" type="number" name="estimatedNumYouth" placeholder="Number of Youth">
-    </div>
-
-    <!-- Estimated Number of Children -->
-    <div class="input-field">
-      <input id="estimated-num-children" type="number" name="estimatedNumChildren" placeholder="Number of Children">
-    </div>
-
-    <!-- Number of Machines -->
-    <div class="input-field">
-      <input id="num-machines" type="number" name="numMachines" placeholder="Number of Machines">
-    </div>
-
-    <!-- Share Story -->
-    <div class="input-field">
-      <input id="share-story" type="text" name="shareStory" placeholder="Share Story">
-    </div>
-
-    <!-- Story Minutes -->
-    <div class="input-field">
-      <input id="story-minutes" type="number" name="storyMinutes" placeholder="Story Minutes">
-    </div>
-
-    <!-- Number of Tables -->
-    <div class="input-field">
-      <input id="num-tables" type="number" name="numTables" placeholder="Number of Tables">
-    </div>
-
-    <!-- Table Shape -->
-    <div class="input-field">
-      <input id="table-shape" type="text" name="tableShape" placeholder="Table Shape">
-    </div>
-  </div>
-</div>
-  
-  <!-- Share Story (Requested Event) -->
-<div class="input-field">
-  <input id="share-story" type="text" name="shareStory" placeholder="Share Story">
-</div>
-
-<!-- Story Minutes (Requested Event) -->
-<div class="input-field">
-  <input id="story-minutes" type="number" name="storyMinutes" placeholder="Story Minutes">
-</div>
-
-<!-- Number of Tables (Requested Event) -->
-<div class="input-field">
-  <input id="num-tables" type="number" name="numTables" placeholder="Number of Tables">
-</div>
-
-<!-- Table Shape (Requested Event) -->
-<div class="input-field">
-  <input id="table-shape" type="text" name="tableShape" placeholder="Table Shape">
-</div>
-
-<!-- Additional Notes (Requested Event) -->
-<div class="input-field">
-  <textarea id="additional-notes" name="additionalNotes" class="materialize-textarea" placeholder="Additional Notes"></textarea>
-  <label for="additional-notes">Additional Notes</label>
-</div>  
-
-<div class="modal-footer">
-  <button type="button" id="deleteBtn" class="left btn red" style="display: none;" onclick="">Delete</button>
-  <button type="button" class="modal-close btn grey">Cancel</button>
-  <button type="submit" class="btn green">Save</button>
-</div>
 </form>
-</div>
-</div>
 
 <!-- Hidden delete form for POST request -->
-<form id="deleteForm"  method="POST" style="display: none;">
-<button type="submit" id="hiddenDeleteButton">Delete</button>
-
+<form id="deleteForm" method="POST" style="display: none;">
+  <button type="submit" id="hiddenDeleteButton">Delete</button>
 </form>
+
+<!-- JavaScript to handle visibility of fields
+<script>
+  const statusSelect = document.getElementById('status');
+  const requestedFields = document.getElementById('requested-fields');
+
+  // Show/hide fields based on status selection
+  statusSelect.addEventListener('change', function() {
+    if (statusSelect.value === 'finished') {
+      requestedFields.style.display = 'none';
+    } else {
+      requestedFields.style.display = 'block';
+    }
+  });
+  
+  // Run on page load to ensure the correct fields are shown
+  if (statusSelect.value === 'finished') {
+    requestedFields.style.display = 'none';
+  }
+</script> -->
