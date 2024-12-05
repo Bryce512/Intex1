@@ -22,6 +22,16 @@ nav a {
   color: white !important;  /* Change to desired color */
 }
 
+.nav-button-style-outline.enable-nav-button #headerNav nav>div:not(.folder):last-child a, .nav-button-style-outline.enable-nav-button #sidecarNav nav>div:not(.folder):last-child a {
+  border: none !important;
+  margin-left: 10px;
+}
+
+.nav-button-style-outline.enable-nav-button #headerNav nav>div:not(.folder):last-child a, .nav-button-style-outline.enable-nav-button #sidecarNav nav>div:not(.folder):last-child a :hover{
+  background-color: transparent !important;
+}
+
+
 nav .collection {
   border: none !important;
 }
@@ -198,7 +208,6 @@ nav .collection {
 .admin-content {
   margin-left: 190px; /* Space for sidebar */
   padding-left:  20px;  /* General padding for the content */
-  margin-top: 63px;
 }
 
 /* Content body */

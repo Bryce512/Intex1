@@ -8,6 +8,18 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="https://images.squarespace-cdn.com/content/v1/5b5a266fcef372310148d6d6/1532843250594-O9ODAV19O8HYI57VCZ1G/favicon.ico?format=100w"/>
   <style>
+    :root {
+    --primary-color: #34b3a8;
+    --primary-light: #B0E8E3;
+    --secondary-color: #EF767A;
+    --secondary-light: #F9C8CA;
+    --black: #000;
+    --white: #fff;
+    --dark-grey: #333333;
+    --font-size-large: 2rem;
+    --font-size-small: 1rem;
+    }
+
     .login-wrapper {
         font-family: Arial, sans-serif;
         background-color: #f4f7fc;
@@ -75,7 +87,7 @@
         width: 100%;
         padding: 12px;
         font-size: 1rem;
-        background-color: #0056b3;
+        background-color: var(--primary-color);
         color: white;
         border: none;
         border-radius: 4px;
@@ -84,7 +96,7 @@
         }
 
         .login-btn:hover {
-        background-color: #003d80;
+        background-color: var(--primary-light);
         }
 
         /* Error message styling */
@@ -97,16 +109,24 @@
         font-size: 0.9rem;
         border: 1px solid #f5c6cb;
         }
+
+        .home{
+            width: auto;
+            position: absolute;
+            top: 4%;
+            left: 2%;
+        }
     </style>
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
+    <a class="login-btn home" href="/">Back to Home</a>
     <div class="login-wrapper">
             <div class="login-container">
             <h1>Admin Login</h1>
             <form action="/login" method="POST">
                 <div class="form-group">
-                    <label for="username">username:</label>
+                    <label for="username">Username:</label>
                     <input 
                         type="text" 
                         id="username" 
