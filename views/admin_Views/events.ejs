@@ -19,6 +19,22 @@
   <button class="eventBtn" onclick="window.location.href='/events?status=finished'">Finished</button>
 </div>
 
+<script>
+  function formatDate(dateString) {
+    if (!dateString) return ''; // Handle empty or undefined dates
+    const date = new Date(dateString);
+    const options = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric', 
+      hour: 'numeric', 
+      minute: 'numeric' 
+    };
+    return date.toLocaleString('en-US', options);
+  }
+</script>
+
 
 <table>
   <thead>
@@ -43,6 +59,7 @@
       <tr>
         <th>Estimated Date</th>
         <th>Organization</th>
+        <th>Status</th>
         <th>Contact Name</th>
         <th>Phone</th>
         <th>Street Address</th>
@@ -60,7 +77,6 @@
         <th>Number of Tables</th>
         <th>Table Shape</th>
         <th>Additional Notes</th>
-        <th>Status</th>
       </tr>
     <% } %>
   </thead>
@@ -110,7 +126,8 @@
           <% } %>
       >
         <% if (status === 'finished') { %>
-          <td><%= event.actual_start_date %></td>
+          <!-- Display columns for executed_events -->
+          <td><script>document.write(formatDate('<%= event.actual_start_date %>'))</script></td>
           <td><%= event.actual_start_time %></td>
           <td><%= event.organization %></td>
           <td><%= event.actual_duration %></td>
@@ -121,10 +138,12 @@
           <td><%= event.envelopes %></td>
           <td><%= event.vests %></td>
           <td><%= event.items_completed %></td>
-          <td><%= event.actual_end_date %></td>
-        <% } else { %>
-          <td><%= event.estimated_date %></td>
-          <td><%= event.organization %></td>
+          <td><script>document.write(formatDate('<%= event.actual_end_date %>'))</script></td>
+          <% } else { %>
+          <!-- Display columns for requested_events -->
+          <td><script>document.write(formatDate('<%= event.estimated_date %>'))</script></td>
+          <td><%=event.organization %></td>
+          <td><%= event.status %></td>
           <td><%= event.first_name %> <%= event.last_name %></td>
           <td><%= event.phone %></td>
           <td><%= event.street_address %></td>
@@ -142,7 +161,6 @@
           <td><%= event.num_tables %></td>
           <td><%= event.table_shape %></td>
           <td><%= event.additional_notes %></td>
-          <td><%= event.status %></td>
         <% } %>
       </tr>
     <% }) %>
