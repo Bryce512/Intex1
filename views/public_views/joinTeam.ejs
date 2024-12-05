@@ -1,11 +1,343 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join the Team</title>
+  <style>
+
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+h1 {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+h2 {
+      text-align: center;
+      font-size: 18px; /* Smaller than h1 but larger than normal text */
+      font-weight: normal; /* Removes bolding */
+      margin-bottom: 20px;
+      color: #333; /* Slightly darker text for emphasis */
+}
+
+form {
+  background: #fff;
+  padding: 30px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+div {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+input[type="radio"], input[type="checkbox"] {
+  width: auto;
+  margin-right: 10px;
+}
+
+textarea {
+  resize: none;
+}
+
+button {
+  background: #000;
+  color: #fff;
+  padding: 10px 15px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+button:hover {
+  background: #333;
+}
+
+.form-group-inline {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.form-group-inline div {
+  flex: 1;
+}
+
+.form-group-inline div {
+  margin-right: 15px; /* Added margin between the inputs */
+}
+
+.section-header {
+  font-size: 18px;
+  margin-bottom: 15px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid #ddd;
+  margin-top: 25px;
+}
+
+
+.form-group-inline div {
+  display: block; /* Make radio buttons appear vertically */
+}
+
+input[type="checkbox"] {
+  width: auto;
+  margin-right: 10px; /* Space between checkbox and label */
+}
+
+.note {
+  font-size: 12px;
+  color: #888;
+}
+
+.inline-spacing {
+  margin-right: 10px;
+}
+
+.form-group-vertical {
+  display: flex;
+  flex-direction: column;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column; /* Stacks radio button rows vertically */
+}
+
+.radio-group div {
+  display: flex;
+  align-items: center; /* Aligns radio buttons and their labels horizontally */
+  margin-bottom: 10px; /* Adds space between rows */
+}
+
+.radio-group input[type="radio"] {
+  margin-right: 10px; /* Adds space between radio button and label */
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center; /* Align checkbox and text vertically */
+}
+
+.checkbox-group label {
+  margin-left: 2px; /* Ensure there is no extra margin causing misalignment */
+}
+
+
+  </style>
 </head>
 <body>
+  <form action="/joinTeam" method="POST">
     <h1>Join the Team</h1>
+    <h2>If you are looking for regular opportunities to serve with the Turtle Shelter Project, we would love to have you join us as a team member! Fill out the following form so we can reach out to you about the different service opportunites we offer.</h2>
+
+  <div class="section-header">General Information</div>
+
+  <!-- Have you scheduled an event before? -->
+  <div class="question">
+    <label>Have you signd up to host an event with us in the past?</label><br>
+    <div class="radio-group">
+      <label>
+        <input type="radio" id="yesRadio" name="scheduledBefore" value="yes">
+        Yes
+      </label>
+      <label>
+        <input type="radio" id="noRadio" name="scheduledBefore" value="no">
+        No
+      </label>
+    </div>
+  </div>
+
+    <!-- Email input when "Yes" is selected -->
+    <div id="emailSection" style="display: none;">
+      <label for="existingEmail">Enter the email address you previously used to schedule an event:</label>
+      <input type="text" id="existingEmail" name="existingEmail">
+    </div>
+
+    <!-- Personal Information Section -->
+    <div id="personalInfoSection" style="display: none;">
+      <div class="section-header">Personal Information</div>
+
+      <div class="form-group-inline">
+        <div>
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" name="firstName">
+        </div>
+        <div>
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" name="lastName">
+        </div>
+      </div>
+
+      <div>
+        <label for="email">Email Address</label>
+        <input type="text" id="email" name="email">
+      </div>
+      <div>
+        <label for="phone">Phone Number</label>
+        <input type="text" id="phone" name="phone">
+      </div>
+
+      <div>
+        <label for="city">City</label>
+        <input type="text" id="city" name="city">
+      </div>
+      <div class="form-group-inline">
+          <div>
+              <label for="state">State</label>
+              <select id="state" name="state">
+                <option value="" disabled selected>Select State</option>
+                <option value="AL">AL</option>
+                <option value="AK">AK</option>
+                <option value="AZ">AZ</option>
+                <option value="AR">AR</option>
+                <option value="CA">CA</option>
+                <option value="CO">CO</option>
+                <option value="CT">CT</option>
+                <option value="DE">DE</option>
+                <option value="FL">FL</option>
+                <option value="GA">GA</option>
+                <option value="HI">HI</option>
+                <option value="ID">ID</option>
+                <option value="IL">IL</option>
+                <option value="IN">IN</option>
+                <option value="IA">IA</option>
+                <option value="KS">KS</option>
+                <option value="KY">KY</option>
+                <option value="LA">LA</option>
+                <option value="ME">ME</option>
+                <option value="MD">MD</option>
+                <option value="MA">MA</option>
+                <option value="MI">MI</option>
+                <option value="MN">MN</option>
+                <option value="MS">MS</option>
+                <option value="MO">MO</option>
+                <option value="MT">MT</option>
+                <option value="NE">NE</option>
+                <option value="NV">NV</option>
+                <option value="NH">NH</option>
+                <option value="NJ">NJ</option>
+                <option value="NM">NM</option>
+                <option value="NY">NY</option>
+                <option value="NC">NC</option>
+                <option value="ND">ND</option>
+                <option value="OH">OH</option>
+                <option value="OK">OK</option>
+                <option value="OR">OR</option>
+                <option value="PA">PA</option>
+                <option value="RI">RI</option>
+                <option value="SC">SC</option>
+                <option value="SD">SD</option>
+                <option value="TN">TN</option>
+                <option value="TX">TX</option>
+                <option value="UT">UT</option>
+                <option value="VT">VT</option>
+                <option value="VA">VA</option>
+                <option value="WA">WA</option>
+                <option value="WV">WV</option>
+                <option value="WI">WI</option>
+                <option value="WY">WY</option>
+              </select>
+            </div>
+        <div>
+          <label for="zip">Zip Code</label>
+          <input type="text" id="zip" name="zip">
+        </div>
+    </div>
+    </div>
+
+    <!-- Event Information Section -->
+    <div class="section-header">Volunteer Information</div>
+
+    <div>
+        <label for="source">How did you hear about us?</label>
+        <select id="source" name="source" required>
+          <option value="" disabled selected>Select Source</option> <!-- Default option -->
+          <% sources.forEach(source => { %>
+            <option value="<%= source.source_id %>"><%= source.source_description %></option>
+          <% }) %>
+        </select>
+    </div>
+
+    <div>
+        <label for="sewingLevel">What is your sewing level?</label>
+        <select id="sewingLevel" name="sewingLevel" required>
+          <option value="" disabled selected>Select Level</option> <!-- Default option -->
+          <% sewingLevels.forEach(level => { %>
+            <option value="<%= level.sewing_level %>"><%= level.level_description %></option>
+          <% }) %>
+        </select>
+    </div>
+
+    <div>
+        <label for="hoursWilling">How many hours per month are you willing to work?</label>
+        <input type="number" id="hoursWilling" name="hoursWilling" required>
+      </div>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    // Initially hide the sections
+    document.getElementById('emailSection').style.display = 'none';
+    document.getElementById('personalInfoSection').style.display = 'none';
+  
+    // Show email section when 'Yes' button is clicked
+    document.getElementById('yesRadio').addEventListener('click', function() {
+      document.getElementById('emailSection').style.display = 'block';
+      document.getElementById('personalInfoSection').style.display = 'none';
+    });
+  
+    // Show personal info section when 'No' button is clicked
+    document.getElementById('noRadio').addEventListener('click', function() {
+      document.getElementById('emailSection').style.display = 'none';
+      document.getElementById('personalInfoSection').style.display = 'block';
+    });
+  </script>
+
+  <script>
+    // Check for 'success' query parameter in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+      alert('Thank you for signing up to be a team member! You will hear from us soon about more volunteer information.');
+      // Remove the query parameter from the URL to avoid repeated pop-ups
+      const newUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  </script>
+  
 </body>
 </html>
