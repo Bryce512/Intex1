@@ -64,6 +64,14 @@
   <div class="modal-content">
     <h4 id="modalTitle">Add Admin</h4>
     <form action="/add-admin" method="POST">
+      <select style="display: block;" name="add_entity_name" id="add-admin-dropdown" required>
+        <option value="">Select Team Member</option>
+        <% teamMembers.forEach(function(member) { %>
+          <option value="<%= member.contact_id %>">
+            <%= member.last_name %>, <%= member.first_name %>
+          </option>
+        <% }); %>
+      </select>
       <div class="input-field">
         <input id="add-entity-username" type="text" name="username" placeholder="Username" required>
       </div>

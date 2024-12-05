@@ -77,7 +77,12 @@ document.addEventListener('DOMContentLoaded', function() {
     addButton.addEventListener('click', function() {
       if (pageType == "admin") {
         openAddAdminModal()
-      }else {
+      } else if (pageType == "team_member") {
+        window.location.href = '/joinTeam';
+      } else if (pageType == "event") {
+        window.location.href = '/event'
+      }
+      else {
         addModal(); // Reset fields before opening the modal
         openModal(); // Open the modal
       }
@@ -101,23 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let formAction = '';
 
     
-    if (pageType === "team_member"){
-        // Populate modal with data
-        document.getElementById('entity-first-name').value = '';
-        document.getElementById('entity-last-name').value = '';
-        document.getElementById('entity-email').value = '';
-        document.getElementById('entity-loc').value = '';
-        document.getElementById('entity-phone').value = '';
-        document.getElementById('entity-source').value = '';
-        document.getElementById('entity-sewing-level').value = '';
-        document.getElementById('entity-hours-willing').value = '';
-
-      // Optionally set the form action
-      formAction = `/add-team_member`;
-      title = "Add Team Member";
-      console.log(title);
-    } 
-    else if (pageType === "event") {
+if (pageType === "event") {
         // Populate modal with data
         document.getElementById('entity-first-name').value = '';
         document.getElementById('entity-last-name').value = '';
@@ -126,7 +115,6 @@ document.addEventListener('DOMContentLoaded', function() {
       // Optionally set the form action
       formAction = `/add-event`;
       title = "Add Event";
-    }else{
     }
 
     // Set the dynamic title in the modal
@@ -137,7 +125,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Set the form action dynamically
     form.setAttribute('action', formAction);
-    
     // Open the modal
     openModal();    
   };
@@ -193,24 +180,13 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('entity-hours-willing').value = hours_willing;
 
             title = "Edit Team Member";
-        } else if (entity == "event") {
-            // pull data from row
-            const firstName = row.getAttribute('data-first-name');
-            const lastName = row.getAttribute('data-last-name');
-            const email = row.getAttribute('data-email');
-
-            // Populate modal with data
-            document.getElementById('entity-first-name').value = firstName;
-            document.getElementById('entity-last-name').value = lastName;
-            document.getElementById('entity-email').value = email;
-            
-            title = "Edit Event";
         }
 
-
+        // *** Finalize data before submitting to modal
         deleteAction = `/delete-${entity}/${Id}`;
         const formAction = `/update-${entity}/${Id}`;
         titleElement.textContent = title; // Update the title of the modal
+
         document.querySelector('form').setAttribute('action', formAction);
         document.getElementById('deleteForm').setAttribute('action', deleteAction);
 
@@ -220,12 +196,21 @@ document.addEventListener('DOMContentLoaded', function() {
           // Show the delete button and set its data-delete-action attribute
           deleteButton.style.display = 'inline-block';
           deleteButton.onclick = function() {
-            // Perform the delete action when the button is clicked
-            document.getElementById('deleteForm').submit();
+            // Validation: Confirm if the user wants to delete
+            const confirmDelete = confirm('Are you sure you want to delete this item?');
+
+            if (confirmDelete) {
+              // Perform the delete action when the button is clicked
+              document.getElementById('deleteForm').submit();
+            }
           };
         }
 
-        openModal(); // Open the modal
+        if (pageType === "event") {
+          window.location.href = `/editEvent/${Id}`;
+        } else {
+          openModal(); // Open the modal
+        }
       
       });
     });

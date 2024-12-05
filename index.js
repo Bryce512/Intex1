@@ -110,16 +110,27 @@ app.get('/admins', async (req, res) => {
     try {
         // Fetch admins from the 'admins' table
         const admins = await knex('admins as a').select()
-        .join('contact_info as c', 'a.contact_id', '=', 'c.contact_id')
-        .leftJoin('team_members as tm', 'tm.contact_id', '=', 'c.contact_id')
-        .leftJoin('sewing_level as sl', 'sl.sewing_level', '=', 'tm.sewing_level')
-        .orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
+          .join('contact_info as c', 'a.contact_id', '=', 'c.contact_id')
+          .leftJoin('team_members as tm', 'tm.contact_id', '=', 'c.contact_id')
+          .leftJoin('sewing_level as sl', 'sl.sewing_level', '=', 'tm.sewing_level')
+          .orderBy('last_name', "asc").orderBy('first_name',"asc"); // Adjust field names as needed
+
+        // Fetch team member names from 'contact_info', 'team_members', excluding admins
+        const teamMembers = await knex('team_members as tm')
+          .select('tm.contact_id', 'c.first_name', 'c.last_name')
+          .join('contact_info as c', 'tm.contact_id', '=', 'c.contact_id')
+          .leftJoin('admins as a', 'tm.contact_id', '=', 'a.contact_id')  // Left join admins to exclude them
+          .whereNull('a.contact_id')  // Exclude team members who are already in admins table
+          .orderBy('c.last_name', 'asc')
+          .orderBy('c.first_name', 'asc');
+        
         // Render the admins page and pass the admins data to the view
         res.render("admin_Views/admins", {
           title: 'Manage Admins',
           navItems: [],
           layout: 'layouts/adminLayout', // Use the admin layout for this route
           admins: admins,
+          teamMembers: teamMembers,
           pageType: "admin" // Pass the admins data to the view
         });
       } catch (error) {
@@ -269,6 +280,8 @@ app.post('/update-team_member/:id', async (req, res) => {
 // Route to fetch and display executed_events
 
 if (authorized) { 
+
+
 }else {
   res.redirect('/login');
 }
@@ -294,6 +307,7 @@ app.get('/events', async (req, res) => {
       events = await knex('requested_events')
         .select(
           'requested_events.estimated_date',
+          'requested_events.event_id',
           'requested_events.contact_id',
           'requested_events.street_address',
           'requested_events.loc_id',
@@ -337,10 +351,101 @@ app.get('/events', async (req, res) => {
       console.error('Error fetching events:', error.message, error.stack);
       res.status(500).send('An error occurred while fetching events.');
     }
+
   }else {
     res.redirect('/login');
   }
 });
+
+app.get('/editEvent/:id', async (req, res) => {
+  const status = req.query.status || 'pending'; // Default to 'pending' if no status is provided
+  const eventId = req.params.id; // Get the event ID from the URL path
+
+  if (authorized) {
+    try {
+      let events;
+
+      if (status === 'finished') {
+        // Query for finished events based on eventId
+        events = await knex('executed_events')
+          .select(
+            '*',
+            'type.type_description', // Add type_description
+            'requested_events.organization'
+          )
+          .leftJoin('type', 'executed_events.type_id', '=', 'type.type_id')
+          .leftJoin('requested_events', 'executed_events.event_id', '=', 'requested_events.event_id')
+          .where('executed_events.event_id', eventId); // Filter by event_id
+      } else {
+        // Default query for pending and approved events based on eventId
+        events = await knex('requested_events')
+          .select(
+            'requested_events.estimated_date',
+            'requested_events.event_id',
+            'requested_events.contact_id',
+            'requested_events.street_address',
+            'requested_events.loc_id',
+            'requested_events.estimated_start_time',
+            'requested_events.estimated_duration',
+            'requested_events.type_id',
+            'type.type_description',
+            'requested_events.loc_size',
+            'requested_events.estimated_num_adults',
+            'requested_events.estimated_num_youth',
+            'requested_events.estimated_num_children',
+            'requested_events.num_machines',
+            'requested_events.share_story',
+            'requested_events.story_minutes',
+            'requested_events.num_tables',
+            'requested_events.table_shape',
+            'requested_events.additional_notes',
+            'requested_events.status',
+            'requested_events.organization',
+            'contact_info.first_name',
+            'contact_info.last_name',
+            'contact_info.phone',
+            'location.city',
+            'location.state',
+            'location.zip',
+          )
+          .leftJoin('contact_info', 'requested_events.contact_id', '=', 'contact_info.contact_id')
+          .leftJoin('location', 'requested_events.loc_id', '=', 'location.loc_id')
+          .leftJoin('type', 'requested_events.type_id', '=', 'type.type_id')
+          .where('requested_events.status', status) // Filter by the status
+          .where('requested_events.event_id', eventId); // Filter by event_id
+      }
+
+      res.render('admin_Views/editEvent', { 
+        events,
+        status,
+        title: 'Manage FAQs',
+        pageType: 'FAQ',
+        layout: 'layouts/adminLayout'  // Use the admin layout for this route
+      });
+    } catch (error) {
+      console.error('Error fetching events:', error.message, error.stack);
+      res.status(500).send('An error occurred while fetching events.');
+    }
+  } else {
+    res.redirect('/login');
+  }
+});
+
+
+app.post('/update-event/:id', (req, res) => {
+  const eventId = req.params.id; // Get the event ID from the URL parameter
+  const updatedData = req.body; // Get the updated data from the form submission
+
+  console.log('Updating event with ID:', eventId);
+  console.log('Updated data:', updatedData);
+
+  // Perform your update logic here, such as saving the data to the database
+
+  // After updating, you might redirect the user to another page or render a success message
+  res.redirect('/events'); // Example redirect to the events page
+});
+
+
 // *** ------------------------------ End Events ------------- *** //
 
 // *** ------------------------------ FAQ Routes ------------- *** //
@@ -370,7 +475,7 @@ app.get('/trainings', (req, res) => {
 // *** --------------------------------- BEGIN ADD Routes --------------------------------***
 app.post('/add-admin', (req, res) => {
   // Extract values from the request body
-  const contact_id = req.body.contactId;  // The selected contact ID from the dropdown
+  const contact_id = req.body.add_entity_name;  // The selected contact ID from the dropdown
   const username = req.body.username || ''; // Username input
   const password = req.body.password || ''; // Password input
 
@@ -475,7 +580,7 @@ app.post('/delete-team_member/:id', async (req, res) => {
 
 app.post('/delete-event/:id', async (req, res) => {
   const id = req.params.id;
-  knex('events')
+  knex('requested_events')
     .where('event_id', id)
     .del() // Deletes the record with the specified ID
     .then(() => {

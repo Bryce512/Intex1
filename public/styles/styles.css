@@ -245,6 +245,17 @@ th, td {
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
+  /* Remove the border when the select is focused */
+#add-admin-dropdown:focus {
+  border: none;
+  outline: none; /* Optional: removes the outline as well */
+}
+
+/* Optional: If you want to customize the default appearance of the select box */
+#add-admin-dropdown {
+  border: 1px solid transparent; /* Optional: Set a default border */
+  background-color: #fff; /* Optional: Set a background color */
+}
 /* *** ------------------------------  END TABLE STYLES */
 
 
