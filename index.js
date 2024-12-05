@@ -511,18 +511,30 @@ app.get('/thank-you-to-our-sponsors', (req, res) => {
     layout: false });  // Renders external.ejs from public_views folder
 });
 
-// How you can help
+// Thanks to sponsors 
 app.get('/howYouCanHelp', (req, res) => {
   res.render('public_views/howYouCanHelp', {
-    title: 'How You Can Help',
-    layout: 'layouts/mainLayout',
-    navItems: []
-  });
+    layout: false });  // Renders external.ejs from public_views folder
 });
+
+// // How you can help
+// app.get('/howYouCanHelp', (req, res) => {
+//   res.render('public_views/howYouCanHelp', {
+//     title: 'How You Can Help',
+//     layout: 'layouts/mainLayout',
+//     navItems: []
+//   });
+// });
 
 // about
 app.get('/about', (req, res) => {
   res.render('public_views/about', {
+    layout: false });  // Renders external.ejs from public_views folder
+});
+
+// about
+app.get('/test', (req, res) => {
+  res.render('public_views/test', {
     layout: false });  // Renders external.ejs from public_views folder
 });
 
