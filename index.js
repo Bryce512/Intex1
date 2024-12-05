@@ -118,7 +118,8 @@ app.get('/admins', async (req, res) => {
           title: 'Manage Admins',
           navItems: [],
           layout: 'layouts/adminLayout', // Use the admin layout for this route
-          admins: admins // Pass the admins data to the view
+          admins: admins,
+          pageType: "admin" // Pass the admins data to the view
         });
       } catch (error) {
         console.error(error);
@@ -187,7 +188,8 @@ app.get('/team_members', async (req, res) => {
           title: 'Manage Team Members',
           team_members: team_members,
           layout: 'layouts/adminLayout',
-          navItems: []
+          navItems: [],
+          pageType: "team_member"
         });
 
       } catch (err) {
@@ -326,6 +328,7 @@ app.get('/events', async (req, res) => {
         status,
         title: 'Manage Events',
         navItems: [],
+        pageType: "event"
       });
     } catch (error) {
       console.error('Error fetching events:', error.message, error.stack);

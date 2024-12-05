@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Open the modal when the Add button is clicked (reset the form)
   if (addButton) {
     addButton.addEventListener('click', function() {
-      resetModalForm(); // Reset fields before opening the modal
+      resetBeforeAdd(); // Reset fields before opening the modal
       openModal(); // Open the modal
     });
   }
@@ -66,15 +66,67 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Reset the modal form fields to default (for "Add" functionality)
-  const resetModalForm = function () {
-    document.getElementById('entity-first-name').value = '';
-    document.getElementById('entity-last-name').value = '';
-    document.getElementById('entity-email').value = '';
-    document.getElementById('entity-phone').value = '';
-    document.getElementById('entity-sewing-level').value = '';
-    document.getElementById('entity-hours-willing').value = '';
-    document.getElementById('entity-password').value = '';
-    document.getElementById('entity-username').value = '';
+  const resetBeforeAdd = function () {
+    // Select modal elements
+    const titleElement = document.getElementById('modalTitle');  // Make sure the ID matches
+    const form = document.querySelector('form');
+    let title = '';
+    let formAction = '';
+
+    if (pageType === "admin"){
+      // Populate modal with data
+      document.getElementById('entity-first-name').value = '';
+      document.getElementById('entity-last-name').value = '';
+      document.getElementById('entity-email').value = '';
+      document.getElementById('entity-password').value = '';
+      document.getElementById('entity-username').value = '';
+
+
+      // Optionally set the form action
+      formAction = `/add-admin`;
+      title = "Add Admin";
+    } 
+    else if (pageType === "team_member"){
+        // Populate modal with data
+        document.getElementById('entity-first-name').value = '';
+        document.getElementById('entity-last-name').value = '';
+        document.getElementById('entity-email').value = '';
+        document.getElementById('entity-phone').value = '';
+        document.getElementById('entity-sewing-level').value = '';
+        document.getElementById('entity-hours-willing').value = '';
+        console.log("reset page");
+
+      // Optionally set the form action
+      formAction = `/add-event`;
+      title = "Add Team Member";
+      console.log(title);
+
+    } 
+    else if (pageType === "event") {
+        // Populate modal with data
+        document.getElementById('entity-first-name').value = '';
+        document.getElementById('entity-last-name').value = '';
+        document.getElementById('entity-email').value = '';
+
+      // Optionally set the form action
+      formAction = `/add-event`;
+      title = "Add Event";
+    }else{
+      console.log('failed to make it into loop');
+    }
+
+    // Set the dynamic title in the modal
+      // Ensure the titleElement exists before modifying it
+      if (titleElement) {
+        titleElement.textContent = title; // Update the title of the modal
+        console.log(pageType);
+      }
+
+    // Set the form action dynamically
+    form.setAttribute('action', formAction);
+    
+    // Open the modal
+    openModal();    
   };
 
   // Attach row click events dynamically (This is the important part)
@@ -151,16 +203,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Initialize the row click events on page load
   attachRowClickEvents();
-
-  // Reattach row click events when search results are rendered (if applicable)
-  const searchResultsContainer = document.getElementById('searchResults');
-  if (searchResultsContainer) {
-    searchResultsContainer.addEventListener('DOMNodeInserted', () => {
-      attachRowClickEvents();
-    });
-  }
 });
 
+// *** END Modal JS
 
 
 // *** Handle change row colors on hover
