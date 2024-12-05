@@ -291,3 +291,51 @@ p {
     margin: 20px auto;
   }
 }
+
+/* Contact Page Styles */
+.contact-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.contact-info {
+  margin: 20px 0;
+  font-size: 1.2em;
+  line-height: 1.6;
+}
+
+.contact-info a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.contact-info a:hover {
+  color: var(--primary-light);
+}
+
+.contact-title {
+  color: var(--dark-grey);
+  margin-bottom: 30px;
+}
+
+.contact-item {
+  margin: 10px 0;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .contact-container {
+    margin: 20px;
+    padding: 15px;
+  }
+  
+  .contact-info {
+    font-size: 1em;
+  }
+}
