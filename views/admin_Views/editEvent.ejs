@@ -1,3 +1,4 @@
+<% console.log(status) %>
 <form id="editEventForm" action="" method="POST">
   <div class="modal-content">
     <!-- First Name -->
@@ -20,8 +21,7 @@
 
     <!-- Status Dropdown -->
     <div class="input-field">
-      <label for="status">Status</label>
-      <select id="status" name="status">
+      <select id="status" name="status" style="display: block;">
         <option value="requested" <%= event.status === 'requested' ? 'selected' : '' %>>Requested</option>
         <option value="finished" <%= event.status === 'finished' ? 'selected' : '' %>>Finished</option>
       </select>
@@ -29,8 +29,7 @@
 
     <!-- Type Description Dropdown -->
     <div class="input-field">
-      <label for="type-description">Type Description</label>
-      <select id="type-description" name="type-description">
+      <select id="type-description" name="type-description" style="display: block;">
         <option value="corporate" <%= event.type_description === 'corporate' ? 'selected' : '' %>>Corporate</option>
         <option value="community" <%= event.type_description === 'community' ? 'selected' : '' %>>Community</option>
         <option value="non-profit" <%= event.type_description === 'non-profit' ? 'selected' : '' %>>Non-Profit</option>
