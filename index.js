@@ -433,7 +433,6 @@ app.post('/editEvent/:eventId', (req, res) => {
     const body = req.body;
 
     // Log the raw request body
-    console.log("Raw request body:", body);
 
     if (status === 'finished') {
 

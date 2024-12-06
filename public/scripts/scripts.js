@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   const closeAdminModal = function () {
+    modal.classList.remove('visible');
     modal1.classList.remove('visible');
     overlay.classList.remove('visible');
     deleteButton.style.display = 'none'; // Hide the delete button when closing modal
@@ -67,14 +68,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // Close modal when clicking the overlay
   if (overlay) {
     overlay.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeAdminModal);
+
   }
 
-  // Close modal when pressing the Escape key
-  document.addEventListener('keydown', function (e) {
-    if (e.key === "Escape" && modal.classList.contains('visible')) {
-      closeModal();
-    }
-  });
 
   // Open the modal when the Add button is clicked (reset the form)
   if (addButton) {
@@ -256,6 +253,20 @@ document.addEventListener('DOMContentLoaded', function() {
       link.classList.add('active');  // Add the 'active' class
     } else {
       link.classList.remove('active');  // Ensure it's removed for other links
+    }
+  });
+});
+
+// *** color change selected Event Filter
+document.addEventListener('DOMContentLoaded', function () {
+  const currentUrl = window.location.href; // Full URL, including query and hash
+  const navLinks = document.querySelectorAll('.eventBtnContainer a');
+  navLinks.forEach(link => {
+    const linkHref = link.getAttribute('href'); // The href of the link
+    if (currentUrl ===('http://localhost:3000' + linkHref || currentUrl ===('tsp.brycewhitworth.com' + linkHref) )) {
+      link.classList.add('active');  // Add active class if URL matches
+    } else {
+      link.classList.remove('active');  // Remove active class if URL doesn't match
     }
   });
 });

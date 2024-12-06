@@ -1,7 +1,7 @@
 /* General root styles */
 :root {
   --primary-color: #34b3a8;
-  --primary-light: #B0E8E3;
+  --primary-light: #94e0da;
   --secondary-color: #EF767A;
   --secondary-light: #F9C8CA;
   --black: #000;
@@ -79,6 +79,13 @@ nav .collection {
   width: 7%;
 }
 
+
+.eventBtnContainer {
+  display: flex; /* This ensures the buttons are in a horizontal row */
+  gap: 10px; /* Optional: space between the buttons */
+  margin-bottom: 20px; /* Optional: add some margin below the buttons */
+}
+
 .eventBtn{
   background-color: var(--primary-color);
   color: var(--white);
@@ -97,11 +104,12 @@ nav .collection {
   text-align: center; 
 }
 
-.eventBtnContainer {
-  display: flex; /* This ensures the buttons are in a horizontal row */
-  gap: 10px; /* Optional: space between the buttons */
-  margin-bottom: 20px; /* Optional: add some margin below the buttons */
+.eventBtnContainer a.active {
+  background-color: var(--primary-light) !important;  /* Light pink color */
+  color: var(--dark-grey);  /* Optionally, change the text color for better contrast */
 }
+
+
 
 
 .addBtn:hover {

@@ -14,13 +14,14 @@
 
 <!-- Buttons to filter by status -->
 <div class="eventBtnContainer">
-  <button class="eventBtn" onclick="window.location.href='/events?status=not_approved'">Not Approved</button>
-  <button class="eventBtn" onclick="window.location.href='/events?status=pending'">Pending</button>
-  <button class="eventBtn" onclick="window.location.href='/events?status=approved'">Approved</button>
-  <button class="eventBtn" onclick="window.location.href='/events?status=finished'">Finished</button>
+    <a href="/events?status=not_approved" class="eventBtn">Not Approved</a>
+    <a href="/events?status=pending" class="eventBtn">Pending</a>
+    <a href="/events?status=approved" class="eventBtn">Approved</a>
+    <a href="/events?status=finished" class="eventBtn">Finished</a>
 </div>
 
 <script>
+
   function formatDate(dateString) {
     if (!dateString) return ''; // Handle empty or undefined dates
     const date = new Date(dateString);
@@ -336,6 +337,10 @@
     <textarea id="additional-notes" name="additionalNotes" class="materialize-textarea" placeholder="Additional Notes"></textarea>
     <label for="additional-notes">Additional Notes</label>
   </div>  
+
+  <script>
+
+
+</script>
   `
 }) %>
-
