@@ -357,8 +357,15 @@ app.get('/events', async (req, res) => {
 
 app.get('/editEvent/:eventId', async (req, res) => {
   const eventId = req.params.eventId; // Extract the eventId from the route parameter
-  const status = req.query.status || 'pending'; // Default to 'pending' if no status is provided
+  let status = await knex('requested_events')
+    .select('requested_events.status')
+    .where('requested_events.event_id', eventId)
+      .first(); // get the status of the event
+  status = status.status;
 
+  const types = await knex('type').select('type_id','type.type_description')
+  const locationSizes = await knex('location_size').select('loc_size','size_description') // Fetch size descriptions
+  const tableShapes = await knex('table_shape').select('table_shape','shape_description')  // Fetch shape descriptions
   if (authorized) {
     try {
       // Query the database to get event details based on the eventId
@@ -368,11 +375,16 @@ app.get('/editEvent/:eventId', async (req, res) => {
         // Fetch the event details from the executed_events table if status is 'finished'
         event = await await knex('executed_events')
           .select('*',
+            'executed_events.*',
+            'location.*',
             'type.type_description', // Add type_description
-            'requested_events.organization'
+            'requested_events.organization',
+            'requested_events.status'
           )
           .leftJoin('type', 'executed_events.type_id', '=', 'type.type_id') // Join with type table
           .leftJoin('requested_events', 'executed_events.event_id', '=', 'requested_events.event_id')
+          .leftJoin('contact_info', 'requested_events.contact_id', '=', 'contact_info.contact_id')
+          .leftJoin('location', 'requested_events.loc_id', '=', 'location.loc_id')
           .where('executed_events.event_id', eventId)
           .first();  // Use .first() to return a single row for the event
       } else {
@@ -384,6 +396,7 @@ app.get('/editEvent/:eventId', async (req, res) => {
           'contact_info.first_name',
           'contact_info.last_name',
           'contact_info.phone',
+          'contact_info.email',
           'location.city',
           'location.state',
           'location.zip'
@@ -402,8 +415,11 @@ app.get('/editEvent/:eventId', async (req, res) => {
 
       // Render the page with the fetched event data
       res.render('admin_Views/editEvent', {
-        event,  // Pass the event data to the template
-        status,
+        event: event,  // Pass the event data to the template
+        status: status,
+        types: types,
+        locationSizes: locationSizes,
+        tableShapes: tableShapes,
         title: 'Edit Event',  // Change this to the title you want
         pageType: 'Event',  // Adjust as needed
         navItems: [],  // Add navigation items if needed
@@ -553,10 +569,11 @@ app.post('/delete-team_member/:id', async (req, res) => {
 
 app.post('/delete-event/:id', async (req, res) => {
   const id = req.params.id;
-  knex('events')
+  knex('requested_events')
     .where('event_id', id)
     .del() // Deletes the record with the specified ID
     .then(() => {
+      console.log('deleting event');
       res.redirect('/events'); // Redirect to the planet list after deletion
     })
     .catch(error => {

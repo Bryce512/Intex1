@@ -1,176 +1,293 @@
-<% console.log(status) %>
 <form id="editEventForm" action="" method="POST">
   <div class="modal-content">
     <!-- First Name -->
-    <div class="input-field">
-      <label for="entity-first-name">First Name</label>
-      <input id="entity-first-name" type="text" name="firstName" placeholder="First Name" value="<%= event.first_name %>">
+    <div class="input-field" style="display: flex; flex-direction: row; gap: 10px; align-items: center;">
+      <div style="flex: 1;">
+        <label for="entity-first-name">Event Contact First Name</label>
+        <input id="entity-first-name" type="text" name="firstName" placeholder="First Name" value="<%= event.first_name %>">
+      </div>
+    
+      <div style="flex: 1;">
+        <label for="entity-last-name">Event Contact Last Name</label>
+        <input id="entity-last-name" type="text" name="lastName" placeholder="Last Name" value="<%= event.last_name %>">
+      </div>
+
     </div>
-
-    <!-- Last Name -->
-    <div class="input-field">
-      <label for="entity-last-name">Last Name</label>
-      <input id="entity-last-name" type="text" name="lastName" placeholder="Last Name" value="<%= event.last_name %>">
-    </div>
-
-    <!-- Email -->
-    <div class="input-field">
-      <label for="entity-email">Email</label>
-      <input id="entity-email" type="email" name="email" placeholder="Email" value="<%= event.email %>">
-    </div>
-
-    <!-- Status Dropdown -->
-    <div class="input-field">
-      <select id="status" name="status" style="display: block;">
-        <option value="requested" <%= event.status === 'requested' ? 'selected' : '' %>>Requested</option>
-        <option value="finished" <%= event.status === 'finished' ? 'selected' : '' %>>Finished</option>
-      </select>
-    </div>
-
-    <!-- Type Description Dropdown -->
-    <div class="input-field">
-      <select id="type-description" name="type-description" style="display: block;">
-        <option value="corporate" <%= event.type_description === 'corporate' ? 'selected' : '' %>>Corporate</option>
-        <option value="community" <%= event.type_description === 'community' ? 'selected' : '' %>>Community</option>
-        <option value="non-profit" <%= event.type_description === 'non-profit' ? 'selected' : '' %>>Non-Profit</option>
-        <option value="social" <%= event.type_description === 'social' ? 'selected' : '' %>>Social</option>
-      </select>
-    </div>
-
-    <!-- Finished Event Fields (Only for finished status) -->
-    <% if (status === 'finished') { %>
-      <div class="input-field">
-        <label for="actual-start-date">Actual Start Date</label>
-        <input id="actual-start-date" type="date" name="actualStartDate" placeholder="Start Date" value="<%= event.actual_start_date %>">
-      </div>
-
-      <div class="input-field">
-        <label for="actual-start-time">Actual Start Time</label>
-        <input id="actual-start-time" type="time" name="actualStartTime" placeholder="Start Time" value="<%= event.actual_start_time %>">
-      </div>
-
-      <div class="input-field">
-        <label for="actual-duration">Actual Duration</label>
-        <input id="actual-duration" type="text" name="actualDuration" placeholder="Duration" value="<%= event.actual_duration %>">
-      </div>
-
-      <div class="input-field">
-        <label for="actual-num-people">Number of People</label>
-        <input id="actual-num-people" type="number" name="actualNumPeople" placeholder="Number of People" value="<%= event.actual_num_people %>">
-      </div>
-
-      <div class="input-field">
-        <label for="pockets">Pockets</label>
-        <input id="pockets" type="number" name="pockets" placeholder="Pockets" value="<%= event.pockets %>">
-      </div>
-
-      <div class="input-field">
-        <label for="collars">Collars</label>
-        <input id="collars" type="number" name="collars" placeholder="Collars" value="<%= event.collars %>">
-      </div>
-
-      <div class="input-field">
-        <label for="envelopes">Envelopes</label>
-        <input id="envelopes" type="number" name="envelopes" placeholder="Envelopes" value="<%= event.envelopes %>">
-      </div>
-
-      <div class="input-field">
-        <label for="vests">Vests</label>
-        <input id="vests" type="number" name="vests" placeholder="Vests" value="<%= event.vests %>">
-      </div>
-
-      <div class="input-field">
-        <label for="items-completed">Items Completed</label>
-        <input id="items-completed" type="number" name="itemsCompleted" placeholder="Items Completed" value="<%= event.items_completed %>">
-      </div>
-
-      <div class="input-field">
-        <label for="actual-end-date">Actual End Date</label>
-        <input id="actual-end-date" type="date" name="actualEndDate" placeholder="End Date" value="<%= event.actual_end_date %>">
-      </div>
-    <% } else {%>
-
-    <!-- Requested Event Fields (Only for requested status) -->
-
-      <div class="input-field">
-        <label for="estimated-date">Estimated Date</label>
-        <input id="estimated-date" type="date" name="estimatedDate" placeholder="Estimated Date" value="<%= event.estimated_date %>">
-      </div>
-
-      <div class="input-field">
-        <label for="estimated-start-time">Estimated Start Time</label>
-        <input id="estimated-start-time" type="time" name="estimatedStartTime" placeholder="Start Time" value="<%= event.estimated_start_time %>">
-      </div>
-
-      <div class="input-field">
-        <label for="estimated-duration">Estimated Duration</label>
-        <input id="estimated-duration" type="text" name="estimatedDuration" placeholder="Duration" value="<%= event.estimated_duration %>">
-      </div>
-
-      <div class="input-field">
-        <label for="full-name">Full Name</label>
-        <input id="full-name" type="text" name="fullName" placeholder="Full Name" value="<%= event.full_name %>">
-      </div>
-
-      <div class="input-field">
+    
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+      <!-- Phone -->
+      <div class="input-field" style="flex: 1; min-width: 200px;">
         <label for="phone">Phone</label>
         <input id="phone" type="text" name="phone" placeholder="Phone" value="<%= event.phone %>">
       </div>
-
-      <div class="input-field">
-        <label for="address">Street Address</label>
-        <input id="address" type="text" name="address" placeholder="Street Address" value="<%= event.address %>">
+    
+      <!-- Email -->
+      <div class="input-field" style="flex: 1; min-width: 200px;">
+        <label for="entity-email">Email</label>
+        <input id="entity-email" type="email" name="email" placeholder="Email" value="<%= event.email %>">
       </div>
+    </div>
 
-      <div class="input-field">
-        <label for="city-state-zip">City, State, Zip</label>
-        <input id="city-state-zip" type="text" name="cityStateZip" placeholder="City, State, Zip" value="<%= event.city_state_zip %>">
+  
+    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+  
+        <!-- Organization -->
+        <div class="input-field" style="flex: 1 1 200px;">
+          <label for="organization">Organization</label>
+          <input id="organization" type="text" name="organization" placeholder="Organization" value="<%= event.organization %>">
+        </div>
+      
+        <!-- Street Address -->
+        <div class="input-field" style="flex: 1 1 200px;">
+          <label for="address">Street Address</label>
+          <input id="address" type="text" name="address" placeholder="Street Address" value="<%= event.street_address %>">
+        </div>
+      
+        <!-- City -->
+        <div class="input-field" style="flex: 1 1 200px;">
+          <label for="eventCity" class="title">City</label>
+          <input 
+            type="text" 
+            id="eventCity" 
+            name="eventCity" 
+            class="field-element text" 
+            aria-required="true" 
+            value="<%= event.city || '' %>"  
+          </input>
+        </div>
+      
+        <!-- State -->
+        <div class="input-field" style="flex: 1 1 200px;">
+          <select 
+            style="display: block;" 
+            id="eventState" 
+            name="eventState" 
+            class="field-element text" 
+            aria-required="true"
+          >
+            <option value="" disabled>Select State</option>
+            <% const states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]; %>
+            <% states.forEach(function(state) { %>
+              <option value="<%= state %>" <%= event.state === state ? 'selected' : '' %>><%= state %></option>
+            <% }); %>
+          </select>
+        </div>
+      
+        <!-- Zip Code -->
+        <div class="input-field" style="flex: 1 1 200px;">
+          <label for="eventZip" class="title">Zip Code</label>
+          <input 
+            type="text" 
+            id="eventZip" 
+            name="eventZip" 
+            class="field-element text" 
+            maxlength="5" 
+            aria-required="true" 
+            value="<%= event.zip || '' %>"  
+          >
+        </div>
+      
       </div>
+      
+    
+    </div>
+     
+    
 
-      <div class="input-field">
-        <label for="loc-size">Location Size</label>
-        <input id="loc-size" type="text" name="locSize" placeholder="Location Size" value="<%= event.loc_size %>">
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+      <!-- Status Dropdown -->
+      <div class="input-field" style="flex: 1; min-width: 200px;">
+        <select id="status" name="status" style="display: block;">
+          <option value="pending" <%= status === 'pending' ? 'selected' : '' %>>Pending</option>
+          <option value="not_approved" <%= status === 'not_approved' ? 'selected' : '' %>>Not Approved</option>
+          <option value="approved" <%= status === 'approved' ? 'selected' : '' %>>Approved</option>
+          <option value="finished" <%= status === 'finished' ? 'selected' : '' %>>Finished</option>
+        </select>
       </div>
-
-      <div class="input-field">
-        <label for="estimated-num-adults">Number of Adults</label>
-        <input id="estimated-num-adults" type="number" name="estimatedNumAdults" placeholder="Number of Adults" value="<%= event.estimated_num_adults %>">
+    
+      <!-- Type Description Dropdown -->
+      <div class="input-field" style="flex: 1; min-width: 200px;">
+        <select style="display: block;" name="eventType" required>
+          <option value="">Select Event Type</option>
+          <% types.forEach(function(type) { %>
+            <option value="<%= type.type_id %>" 
+              <%= event.type_id === type.type_id ? 'selected' : '' %>>
+              <%= type.type_description %>
+            </option>
+          <% }); %>
+        </select>
       </div>
+      
+    </div>
+    
 
-      <div class="input-field">
-        <label for="estimated-num-youth">Number of Youth</label>
-        <input id="estimated-num-youth" type="number" name="estimatedNumYouth" placeholder="Number of Youth" value="<%= event.estimated_num_youth %>">
+    <!-- Finished Event Fields (Only for finished status) -->
+    <% if (status === 'finished') { %>
+
+      <% // Convert the ISO string into a Date object
+        const startDate = new Date(event.actual_start_date); 
+        const endDate = new Date (event.actual_end_date);
+
+        // Format it to 'YYYY-MM-DD' for the date input field
+        const formattedStartDate = startDate.toISOString().split('T')[0]; 
+        const formattedEndDate = endDate.toISOString().split('T')[0]; 
+      %>
+      <div class="input-field" style="display: flex; flex-direction: row; gap: 10px; align-items: center;">
+        <div style="flex: 1;">
+          <label for="actual-start-date">Actual Start Date</label>
+          <input id="actual-start-date" type="date" name="actualStartDate" placeholder="Start Date" value="<%= formattedStartDate %>">
+        </div>
+
+        <div style="flex: 1;">
+          <label for="actual-end-date">Actual End Date</label>
+          <input id="actual-end-date" type="date" name="actualEndDate" placeholder="End Date" value="<%= formattedEndDate %>">
+        </div>
+      
+        <div style="flex: 1;">
+          <label for="actual-start-time">Actual Start Time</label>
+          <input id="actual-start-time" type="time" name="actualStartTime" placeholder="Start Time" value="<%= event.actual_start_time %>">
+        </div>
+      
+        <div style="flex: 1;">
+          <label for="actual-duration">Actual Duration in hours</label>
+          <input id="actual-duration" type="text" name="actualDuration" placeholder="Duration" value="<%= event.actual_duration %>">
+        </div>
       </div>
-
-      <div class="input-field">
-        <label for="estimated-num-children">Number of Children</label>
-        <input id="estimated-num-children" type="number" name="estimatedNumChildren" placeholder="Number of Children" value="<%= event.estimated_num_children %>">
+      
+      <div class="input-field" style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <div style="flex: 1; min-width: 200px;">
+          <label for="actual-num-people">Number of People</label>
+          <input id="actual-num-people" type="number" name="actualNumPeople" placeholder="Number of People" value="<%= event.actual_num_people %>">
+        </div>
+      
+        <div style="flex: 1; min-width: 200px;">
+          <label for="pockets">Pockets</label>
+          <input id="pockets" type="number" name="pockets" placeholder="Pockets" value="<%= event.pockets %>">
+        </div>
+      
+        <div style="flex: 1; min-width: 200px;">
+          <label for="collars">Collars</label>
+          <input id="collars" type="number" name="collars" placeholder="Collars" value="<%= event.collars %>">
+        </div>
+      
+        <div style="flex: 1; min-width: 200px;">
+          <label for="envelopes">Envelopes</label>
+          <input id="envelopes" type="number" name="envelopes" placeholder="Envelopes" value="<%= event.envelopes %>">
+        </div>
+      
+        <div style="flex: 1; min-width: 200px;">
+          <label for="vests">Vests</label>
+          <input id="vests" type="number" name="vests" placeholder="Vests" value="<%= event.vests %>">
+        </div>
+      
+        <div style="flex: 1; min-width: 200px;">
+          <label for="items-completed">Pieces Completed</label>
+          <input id="items-completed" type="number" name="itemsCompleted" placeholder="Items Completed" value="<%= event.items_completed %>">
+        </div>
       </div>
+    
+    <% } else {%>
 
-      <div class="input-field">
-        <label for="num-machines">Number of Machines</label>
-        <input id="num-machines" type="number" name="numMachines" placeholder="Number of Machines" value="<%= event.num_machines %>">
+    <% // Convert the ISO string into a date object
+      const startDate = new Date(event.estimated_date); 
+
+      // Format it to 'YYYY-MM-DD' for the date input field
+      const formattedStartDate = startDate.toISOString().split('T')[0]; 
+    %>
+
+    <!-- Requested Event Fields (Only for requested status) -->
+
+    <div class="input-field" style="display: flex; flex-direction: row; gap: 10px; align-items: center;">
+      <div style="flex: 1;">
+        <label for="estimated-date">Estimated Date</label>
+        <input id="estimated-date" type="date" name="estimatedDate" placeholder="Estimated Date" value="<%= formattedStartDate %>">
       </div>
-
-      <div class="input-field">
-        <label for="share-story">Share Story</label>
-        <input id="share-story" type="text" name="shareStory" placeholder="Share Story" value="<%= event.share_story %>">
+    
+      <div style="flex: 1;">
+        <label for="estimated-start-time">Estimated Start Time</label>
+        <input id="estimated-start-time" type="time" name="estimatedStartTime" placeholder="Start Time" value="<%= event.estimated_start_time %>">
       </div>
+    
+      <div style="flex: 1;">
+        <label for="estimated-duration">Estimated Duration in hours</label>
+        <input id="estimated-duration" type="text" name="estimatedDuration" placeholder="Duration" value="<%= event.estimated_duration %>">
+      </div>
+    </div>
 
-      <div class="input-field">
+    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        <!-- Location Size -->
+        <div class="input-field" style="flex: 1; width: 200px;">
+          <select style="display: block;" name="locationSize" id="location-size-dropdown" required>
+            <option value="">Select Location Size</option>
+            <% locationSizes.forEach(function(locationSize) { %>
+              <option value="<%= locationSize.loc_id %>" 
+                <%= event.location_size === locationSize.loc_id ? 'selected' : '' %>>
+                <%= locationSize.size_description %>
+              </option>
+            <% }); %>
+          </select>
+        </div>
+      
+    
+      <div class="input-field" style="flex: 1; min-width: 200px; display: block;">
+        <select style="display: block;" name="shareStory" required>
+          <option value="">Share Jen's Story?</option>
+          <option value="true" <%= event.share_story === true ? 'selected' : '' %>>Yes, Share Jen's story</option>
+          <option value="false" <%= event.share_story === false ? 'selected' : '' %>>No, Do not share Jen's story</option>
+        </select>            
+      </div>
+           
+    
+      <!-- Story Minutes -->
+      <div class="input-field" style="flex: 1; min-width: 200px;">
         <label for="story-minutes">Story Minutes</label>
         <input id="story-minutes" type="number" name="storyMinutes" placeholder="Story Minutes" value="<%= event.story_minutes %>">
       </div>
-
-      <div class="input-field">
+    
+      <!-- Number of Tables -->
+      <div class="input-field" style="flex: 1; min-width: 200px;">
         <label for="num-tables">Number of Tables</label>
         <input id="num-tables" type="number" name="numTables" placeholder="Number of Tables" value="<%= event.num_tables %>">
       </div>
-
-      <div class="input-field">
-        <label for="table-shape">Table Shape</label>
-        <input id="table-shape" type="text" name="tableShape" placeholder="Table Shape" value="<%= event.table_shape %>">
+    
+      <!-- Table Shape -->
+      <div class="input-field" style="flex: 1; min-width: 200px;">
+        <select style="display: block;" name="add_entity_name" id="add-admin-dropdown" required>
+          <option value="">Select Table Shape</option>
+          <% tableShapes.forEach(function(table) { %>
+            <option value="<%= table.table_shape %>" <%= event.table_shape === table.table_shape ? 'selected' : '' %>> 
+              <%= table.shape_description %> 
+            </option>
+          <% }); %>
+        </select>
       </div>
+      
+
+        <!-- Number of Adults -->
+      <div class="input-field" style="flex: 1; min-width: 200px;">
+        <label for="estimated-num-adults">Number of Adults</label>
+        <input id="estimated-num-adults" type="number" name="estimatedNumAdults" placeholder="Number of Adults" value="<%= event.estimated_num_adults %>">
+      </div>
+    
+      <!-- Number of Youth -->
+      <div class="input-field" style="flex: 1; min-width: 200px;">
+        <label for="estimated-num-youth">Number of Youth (ages 10+)</label>
+        <input id="estimated-num-youth" type="number" name="estimatedNumYouth" placeholder="Number of Youth" value="<%= event.estimated_num_youth %>">
+      </div>
+    
+      <!-- Number of Children -->
+      <div class="input-field" style="flex: 1; min-width: 200px;">
+        <label for="estimated-num-children">Number of Children (under 10)</label>
+        <input id="estimated-num-children" type="number" name="estimatedNumChildren" placeholder="Number of Children" value="<%= event.estimated_num_children %>">
+      </div>
+    
+      <!-- Number of Machines -->
+      <div class="input-field" style="flex: 1; min-width: 200px;">
+        <label for="num-machines">Number of Machines</label>
+        <input id="num-machines" type="number" name="numMachines" placeholder="Number of Machines" value="<%= event.num_machines %>">
+      </div>
+    </div>
+    
     <% } %>
 
     <!-- Additional Notes -->
@@ -182,34 +299,38 @@
   </div>
 
   <!-- Modal Footer -->
-  <div class="modal-footer">
-    <button type="button" id="deleteBtn" class="left btn red" style="display: none;" onclick="">Delete</button>
-    <button type="button" class="modal-close btn grey">Cancel</button>
-    <button type="submit" class="btn green">Save</button>
+  <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <!-- Delete button on the left -->
+    <button type="button" id="deleteBtn" class="btn red" onclick="submitDeleteForm()">Delete</button>
+    
+    <!-- Wrapper for Cancel and Save buttons on the right -->
+    <div style="display: flex; gap: 10px;">
+      <button type="button" class="modal-close btn grey">Cancel</button>
+      <button type="submit" class="btn green">Save</button>
+    </div>
   </div>
+  
 </form>
 
 <!-- Hidden delete form for POST request -->
-<form id="deleteForm" method="POST" style="display: none;">
-  <button type="submit" id="hiddenDeleteButton">Delete</button>
+<!-- Delete Event Form -->
+// <!-- Hidden delete form for POST request -->
+<form id="deleteEventForm" method="POST" action="/delete-event/<%= event.event_id %>" style="display: none;">
+  <button type="submit" id="deleteEventButton" class="btn red" style="display: none;">Delete</button>
 </form>
 
-<!-- JavaScript to handle visibility of fields
 <script>
-  const statusSelect = document.getElementById('status');
-  const requestedFields = document.getElementById('requested-fields');
 
-  // Show/hide fields based on status selection
-  statusSelect.addEventListener('change', function() {
-    if (statusSelect.value === 'finished') {
-      requestedFields.style.display = 'none';
-    } else {
-      requestedFields.style.display = 'block';
+      // Function to handle the delete button click and submit the form
+    function submitDeleteForm() {
+      // Show confirmation dialog before proceeding
+      const confirmDelete = confirm('Are you sure you want to delete this event?');
+
+      if (confirmDelete) {
+        // Find the hidden form and submit it
+        const deleteForm = document.getElementById('deleteEventForm');
+        deleteForm.submit(); // Submit the form programmatically
+      }
     }
-  });
-  
-  // Run on page load to ensure the correct fields are shown
-  if (statusSelect.value === 'finished') {
-    requestedFields.style.display = 'none';
-  }
-</script> -->
+</script>
+

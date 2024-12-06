@@ -208,6 +208,7 @@ nav .collection {
 .admin-content {
   margin-left: 190px; /* Space for sidebar */
   padding-left:  20px;  /* General padding for the content */
+  margin-right: 20px;
 }
 
 /* Content body */
