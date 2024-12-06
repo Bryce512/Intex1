@@ -1,4 +1,4 @@
-<form id="editEventForm" action="" method="POST">
+<form id="editEventForm" action="/editEvent/<%= event.event_id %>" method="POST">
   <div class="modal-content">
     <!-- First Name -->
     <div class="input-field" style="display: flex; flex-direction: row; gap: 10px; align-items: center;">
@@ -220,7 +220,7 @@
           <select style="display: block;" name="locationSize" id="location-size-dropdown" required>
             <option value="">Select Location Size</option>
             <% locationSizes.forEach(function(locationSize) { %>
-              <option value="<%= locationSize.loc_id %>" 
+              <option value="<%= locationSize.loc_size %>" 
                 <%= event.location_size === locationSize.loc_id ? 'selected' : '' %>>
                 <%= locationSize.size_description %>
               </option>
@@ -252,7 +252,7 @@
     
       <!-- Table Shape -->
       <div class="input-field" style="flex: 1; min-width: 200px;">
-        <select style="display: block;" name="add_entity_name" id="add-admin-dropdown" required>
+        <select style="display: block;" name="tableShape" id="add-admin-dropdown" required>
           <option value="">Select Table Shape</option>
           <% tableShapes.forEach(function(table) { %>
             <option value="<%= table.table_shape %>" <%= event.table_shape === table.table_shape ? 'selected' : '' %>> 
@@ -314,7 +314,7 @@
 
 <!-- Hidden delete form for POST request -->
 <!-- Delete Event Form -->
-// <!-- Hidden delete form for POST request -->
+<!-- Hidden delete form for POST request -->
 <form id="deleteEventForm" method="POST" action="/delete-event/<%= event.event_id %>" style="display: none;">
   <button type="submit" id="deleteEventButton" class="btn red" style="display: none;">Delete</button>
 </form>
