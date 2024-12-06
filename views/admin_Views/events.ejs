@@ -58,7 +58,7 @@
     <% } else { %>
       <!-- Columns for requested_events -->
       <tr>
-        <th>Estimated Date</th>
+        <th style="padding-right: 11%;">Estimated Date</th>
         <th>Organization</th>
         <th>Contact Name</th>
         <th>Phone</th>
@@ -88,43 +88,7 @@
           data-last-name="<%= event.last_name %>"
           data-organization="<%= event.organization %>"
           data-entity="events"
-          data-date="event.actual-start-time"
-          <% if (status === 'finished') { %>
-            data-actual-start-date="<%= event.actual_start_date %>"
-            data-actual-start-time="<%= event.actual_start_time %>"
-            data-organization="<%= event.organization %>"
-            data-actual-duration="<%= event.actual_duration %>"
-            data-actual-num-people="<%= event.actual_num_people %>"
-            data-type-description="<%= event.type_description %>"
-            data-pockets="<%= event.pockets %>"
-            data-collars="<%= event.collars %>"
-            data-envelopes="<%= event.envelopes %>"
-            data-vests="<%= event.vests %>"
-            data-items-completed="<%= event.items_completed %>"
-            data-actual-end-date="<%= event.actual_end_date %>"
-          <% } else { %>
-            data-estimated-date="<%= event.estimated_date %>"
-            data-estimated-time="<%= event.estimated_start_time %>"
-            data-estimated-duration="<%= event.estimated_duration %>"
-            data-organization="<%= event.organization %>"
-            data-full-name="<%= event.first_name %> <%= event.last_name %>"
-            data-phone="<%= event.phone %>"
-            data-address="<%= event.street_address %>"
-            data-city-state-zip="<%= event.city %>, <%= event.state %> <%= event.zip %>"
-            data-type-description="<%= event.type_description %>"
-            data-loc-size="<%= event.loc_size %>"
-            data-estimated-num-adults="<%= event.estimated_num_adults %>"
-            data-estimated-num-youth="<%= event.estimated_num_youth %>"
-            data-estimated-num-children="<%= event.estimated_num_children %>"
-            data-num-machines="<%= event.num_machines %>"
-            data-share-story="<%= event.share_story %>"
-            data-story-minutes="<%= event.story_minutes %>"
-            data-num-tables="<%= event.num_tables %>"
-            data-table-shape="<%= event.table_shape %>"
-            data-additional-notes="<%= event.additional_notes %>"
-            data-status="<%= event.status %>"
-          <% } %>
-      >
+          data-date="event.actual-start-time">
         <% if (status === 'finished') { %>
           <!-- Display columns for executed_events -->
           <td><script>document.write(formatDate('<%= event.actual_start_date %>'))</script></td>
