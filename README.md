@@ -8,6 +8,7 @@ The Turtle Shelter Project is a non-profit organization dedicated to providing f
 # url: https://tsp.brycewhitworth.com
 # username (to access the login page): sarahlee
 # password (to access the login page): pass123
+# Videos for each class: https://docs.google.com/document/d/1mLzp0-AqDmUetOzJLuHy7PP-8waTdEPSMPme-CWU0qM/edit?usp=sharing
 
 ### Public Features
 - Information about the organization and its mission
