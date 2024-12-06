@@ -1,4 +1,4 @@
-<p>Events: <%= events.length %></p>
+<p>Events <%= status %>: <%= events.length %></p>
 
 <div class="search-container">
   <div class="search-container">
@@ -14,6 +14,7 @@
 
 <!-- Buttons to filter by status -->
 <div class="eventBtnContainer">
+  <button class="eventBtn" onclick="window.location.href='/events?status=not_approved'">Not Approved</button>
   <button class="eventBtn" onclick="window.location.href='/events?status=pending'">Pending</button>
   <button class="eventBtn" onclick="window.location.href='/events?status=approved'">Approved</button>
   <button class="eventBtn" onclick="window.location.href='/events?status=finished'">Finished</button>
@@ -36,7 +37,7 @@
 </script>
 
 
-<table>
+<table id="mainTable">
   <thead>
     <% if (status === 'finished') { %>
       <!-- Columns for executed_events -->
@@ -59,7 +60,6 @@
       <tr>
         <th>Estimated Date</th>
         <th>Organization</th>
-        <th>Status</th>
         <th>Contact Name</th>
         <th>Phone</th>
         <th>Street Address</th>
@@ -84,11 +84,11 @@
     <% events.forEach(event => { %>
       <tr class="editable-row"
           data-id="<%= event.event_id %>"
-          data-email="<%= event.email %>"
           data-first-name="<%= event.first_name %>"
           data-last-name="<%= event.last_name %>"
-          data-entity="event"
-          data-status="<%= event.status %>"
+          data-organization="<%= event.organization %>"
+          data-entity="events"
+          data-date="event.actual-start-time"
           <% if (status === 'finished') { %>
             data-actual-start-date="<%= event.actual_start_date %>"
             data-actual-start-time="<%= event.actual_start_time %>"
@@ -143,7 +143,6 @@
           <!-- Display columns for requested_events -->
           <td><script>document.write(formatDate('<%= event.estimated_date %>'))</script></td>
           <td><%=event.organization %></td>
-          <td><%= event.status %></td>
           <td><%= event.first_name %> <%= event.last_name %></td>
           <td><%= event.phone %></td>
           <td><%= event.street_address %></td>
@@ -151,7 +150,7 @@
           <td><%= event.estimated_start_time %></td>
           <td><%= event.estimated_duration %></td>
           <td><%= event.type_description %></td>
-          <td><%= event.loc_size %></td>
+          <td><%= event.size_description %></td>
           <td><%= event.estimated_num_adults %></td>
           <td><%= event.estimated_num_youth %></td>
           <td><%= event.estimated_num_children %></td>
@@ -159,7 +158,7 @@
           <td><%= event.share_story %></td>
           <td><%= event.story_minutes %></td>
           <td><%= event.num_tables %></td>
-          <td><%= event.table_shape %></td>
+          <td><%= event.shape_description %></td>
           <td><%= event.additional_notes %></td>
         <% } %>
       </tr>
@@ -375,8 +374,4 @@
   </div>  
   `
 }) %>
-
-
-
-
 

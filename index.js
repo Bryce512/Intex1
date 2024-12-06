@@ -2,9 +2,8 @@ let express = require('express');
 let app = express();
 let path = require('path');
 const ejsLayouts = require('express-ejs-layouts');
-const res = require('express/lib/response');
 const PORT = process.env.PORT || 3000;
-let authorized = true;
+let authorized = false;
 
 // grab html form from file 
 // allows to pull JSON data from form 
@@ -279,10 +278,6 @@ app.post('/update-team_member/:id', async (req, res) => {
 // *** ------------------------------ Events Begin ---------------- ***//
 // Route to fetch and display executed_events
 
-if (authorized) { 
-}else {
-  res.redirect('/login');
-}
 app.get('/events', async (req, res) => {
   const status = req.query.status || 'pending'; // Default to 'pending' if no status is provided
   if (authorized) {
@@ -297,45 +292,32 @@ app.get('/events', async (req, res) => {
         'requested_events.organization'
       )
       .leftJoin('type', 'executed_events.type_id', '=', 'type.type_id') // Join with type table
-      .leftJoin('requested_events', 'executed_events.event_id', '=', 'requested_events.event_id');
+      .leftJoin('requested_events', 'executed_events.event_id', '=', 'requested_events.event_id')
+      .orderBy('requested_events.estimated_date', 'desc'); // order by most recent date;
 
 
     } else {
       // Default query for pending and approved events
       events = await knex('requested_events')
         .select(
-          'requested_events.estimated_date',
-          'requested_events.contact_id',
-          'requested_events.street_address',
-          'requested_events.event_id',
-          'requested_events.loc_id',
-          'requested_events.estimated_start_time',
-          'requested_events.estimated_duration',
-          'requested_events.type_id',
+          'requested_events.*',
           'type.type_description',
-          'requested_events.loc_size',
-          'requested_events.estimated_num_adults',
-          'requested_events.estimated_num_youth',
-          'requested_events.estimated_num_children',
-          'requested_events.num_machines',
-          'requested_events.share_story',
-          'requested_events.story_minutes',
-          'requested_events.num_tables',
-          'requested_events.table_shape',
-          'requested_events.additional_notes',
-          'requested_events.status',
-          'requested_events.organization',
           'contact_info.first_name',
           'contact_info.last_name',
           'contact_info.phone',
           'location.city',
           'location.state',
           'location.zip',
+          'location_size.*',
+          'table_shape.*'
         )
         .leftJoin('contact_info', 'requested_events.contact_id', '=', 'contact_info.contact_id')
         .leftJoin('location', 'requested_events.loc_id', '=', 'location.loc_id')
         .leftJoin('type', 'requested_events.type_id', '=', 'type.type_id')
-        .where('requested_events.status', status); // Filter by the status
+        .leftJoin('table_shape', 'requested_events.table_shape', '=', 'table_shape.table_shape')
+        .leftJoin('location_size', 'requested_events.loc_size', '=', 'location_size.loc_size')
+        .where('requested_events.status', status)
+        .orderBy('requested_events.estimated_date', 'desc'); // order by most recent date
     }
 
       res.render('admin_Views/events', { 
@@ -356,96 +338,341 @@ app.get('/events', async (req, res) => {
 
 
 app.get('/editEvent/:eventId', async (req, res) => {
-  const eventId = req.params.eventId; // Extract the eventId from the route parameter
-  let status = await knex('requested_events')
-    .select('requested_events.status')
-    .where('requested_events.event_id', eventId)
-      .first(); // get the status of the event
-  status = status.status;
+  if (authorized) { 
+    const eventId = req.params.eventId; // Extract the eventId from the route parameter
+    let status = await knex('requested_events')
+      .select('requested_events.status')
+      .where('requested_events.event_id', eventId)
+        .first(); // get the status of the event
+    status = status.status;
 
-  const types = await knex('type').select('type_id','type.type_description')
-  const locationSizes = await knex('location_size').select('loc_size','size_description') // Fetch size descriptions
-  const tableShapes = await knex('table_shape').select('table_shape','shape_description')  // Fetch shape descriptions
-  if (authorized) {
-    try {
-      // Query the database to get event details based on the eventId
-      let event;
-      
-      if (status === 'finished') {
-        // Fetch the event details from the executed_events table if status is 'finished'
-        event = await await knex('executed_events')
-          .select('*',
-            'executed_events.*',
-            'location.*',
-            'type.type_description', // Add type_description
-            'requested_events.organization',
-            'requested_events.status'
+    const types = await knex('type').select('type_id','type.type_description')
+    const locationSizes = await knex('location_size').select('loc_size','size_description') // Fetch size descriptions
+    const tableShapes = await knex('table_shape').select('table_shape','shape_description')  // Fetch shape descriptions
+    if (authorized) {
+      try {
+        // Query the database to get event details based on the eventId
+        let event;
+        
+        if (status === 'finished') {
+          // Fetch the event details from the executed_events table if status is 'finished'
+          event = await await knex('executed_events')
+            .select('*',
+              'executed_events.*',
+              'location.*',
+              'type.type_description', // Add type_description
+              'requested_events.organization',
+              'requested_events.status'
+            )
+            .leftJoin('type', 'executed_events.type_id', '=', 'type.type_id') // Join with type table
+            .leftJoin('requested_events', 'executed_events.event_id', '=', 'requested_events.event_id')
+            .leftJoin('contact_info', 'requested_events.contact_id', '=', 'contact_info.contact_id')
+            .leftJoin('location', 'requested_events.loc_id', '=', 'location.loc_id')
+            .where('executed_events.event_id', eventId)
+            .first();  // Use .first() to return a single row for the event
+        } else {
+          // Fetch the event details from the requested_events table for other statuses
+          event = await knex('requested_events')
+          .select(
+            'requested_events.*',  // Select all columns from requested_events table
+            'type.type_description',  // Select specific columns from type table
+            'contact_info.first_name',
+            'contact_info.last_name',
+            'contact_info.phone',
+            'contact_info.email',
+            'location.city',
+            'location.state',
+            'location.zip',
           )
-          .leftJoin('type', 'executed_events.type_id', '=', 'type.type_id') // Join with type table
-          .leftJoin('requested_events', 'executed_events.event_id', '=', 'requested_events.event_id')
           .leftJoin('contact_info', 'requested_events.contact_id', '=', 'contact_info.contact_id')
           .leftJoin('location', 'requested_events.loc_id', '=', 'location.loc_id')
-          .where('executed_events.event_id', eventId)
-          .first();  // Use .first() to return a single row for the event
-      } else {
-        // Fetch the event details from the requested_events table for other statuses
-        event = await knex('requested_events')
-        .select(
-          'requested_events.*',  // Select all columns from requested_events table
-          'type.type_description',  // Select specific columns from type table
-          'contact_info.first_name',
-          'contact_info.last_name',
-          'contact_info.phone',
-          'contact_info.email',
-          'location.city',
-          'location.state',
-          'location.zip'
-        )
-        .leftJoin('contact_info', 'requested_events.contact_id', '=', 'contact_info.contact_id')
-        .leftJoin('location', 'requested_events.loc_id', '=', 'location.loc_id')
-        .leftJoin('type', 'requested_events.type_id', '=', 'type.type_id')
-          .where('requested_events.event_id', eventId)  // Filter by eventId
-          .first();  // Use .first() to return a single row for the event
-      }
+          .leftJoin('type', 'requested_events.type_id', '=', 'type.type_id')
+            .where('requested_events.event_id', eventId)  // Filter by eventId
+            .first();  // Use .first() to return a single row for the event
+        }
 
-      if (!event) {
-        // If no event is found, send a 404 response
-        return res.status(404).send('Event not found');
-      }
+        if (!event) {
+          // If no event is found, send a 404 response
+          return res.status(404).send('Event not found');
+        }
 
-      // Render the page with the fetched event data
-      res.render('admin_Views/editEvent', {
-        event: event,  // Pass the event data to the template
-        status: status,
-        types: types,
-        locationSizes: locationSizes,
-        tableShapes: tableShapes,
-        title: 'Edit Event',  // Change this to the title you want
-        pageType: 'Event',  // Adjust as needed
-        navItems: [],  // Add navigation items if needed
-        layout: 'layouts/adminLayout'  // Use the admin layout for this route
-      });
-    } catch (error) {
-      console.error('Error fetching event:', error.message, error.stack);
-      res.status(500).send('An error occurred while fetching the event.');
+        console.log(event);
+        // Render the page with the fetched event data
+        res.render('admin_Views/editEvent', {
+          event: event,  // Pass the event data to the template
+          status: status,
+          types: types,
+          locationSizes: locationSizes,
+          tableShapes: tableShapes,
+          title: 'Edit Event',  // Change this to the title you want
+          pageType: 'editEvent',  // Adjust as needed
+          navItems: [],  // Add navigation items if needed
+          layout: 'layouts/adminLayout'  // Use the admin layout for this route
+        });
+      } catch (error) {
+        console.error('Error fetching event:', error.message, error.stack);
+        res.status(500).send('An error occurred while fetching the event.');
+      }
+    } else {
+      // Redirect to login page if not authorized
+      res.redirect('/login');
     }
-  } else {
-    // Redirect to login page if not authorized
+  }else {
+    res.redirect('/login');
+  }
+  
+});
+
+app.post('/editEvent/:eventId', (req, res) => {
+
+  if (authorized) { 
+    const event_id = req.params.eventId;
+    const status = req.body.status || '';
+
+
+    const body = req.body;
+
+    // Log the raw request body
+    console.log("Raw request body:", body);
+
+    if (status === 'finished') {
+
+    }else {}
+
+    // Extract form values
+    const firstName = req.body.firstName || ''; 
+    const lastName = req.body.lastName || '';
+    const email = req.body.email || '';
+    const phone = req.body.phone || ''; 
+    const city = req.body.eventCity || ''; 
+    const state = req.body.eventState || ''; 
+    const organization = req.body.organization || ''; 
+    const address = req.body.address || '';
+    const eventCity = req.body.eventCity || '';
+    const eventState = req.body.eventState || '';  
+    const eventZip = req.body.eventZip || ''; // No parsing yet, just raw value
+    const estDate = req.body.estimatedDate || new Date().toISOString().split('T')[0]; 
+    const estStartTime = req.body.estimatedStartTime || '12:00:00';
+    const estDuration = req.body.estimatedDuration || 0 ;
+    const estNumAdults = req.body.estimatedNumAdults || 0 ; 
+    const estNumYouth = req.body.estimatedNumYouth || 0 ; 
+    const estNumChildren = req.body.estimatedNumChildren || 0 ;
+    const eventType = req.body.eventType || null ; 
+    const numMachines = req.body.numMachines || 0 ;
+    const shareStory = req.body.shareStory === 'true'; 
+    const storyDuration = req.body.storyMinutes || '0' ;
+    const numTables = req.body.numTables || 0 ;
+    const tableShape = req.body.tableShape || null ;
+    const additionalNotes = req.body.additionalNotes || '';
+    const loc_size = req.body.locationSize || 3 ; // Defaulting to 3
+
+      // Additional fields for 'finished' events
+      const actualStartDate = body.actualStartDate || new Date();
+      const actualEndDate = body.actualEndDate || new Date();
+      const actualStartTime = body.actualStartTime || '12:00:00';
+      const actualDuration = body.actualDuration || 0 ;
+      const actualNumPeople = body.actualNumPeople || 0 ;
+      const pockets = body.pockets || 0 ;
+      const collars = body.collars || 0 ;
+      const envelopes = body.envelopes || 0 ;
+      const vests = body.vests || 0 ;
+      const itemsCompleted = body.itemsCompleted || 0 ;
+    
+
+
+    // Now, proceed with the database logic using the validated values
+    knex.transaction(trx => {
+      let loc_id, eventLoc_id, contact_id;
+
+      // Step 1: Check if the zip code exists in the 'location' table (for personal info)
+      return trx('location')
+        .select('loc_id')
+        .where('zip', eventZip)
+        .first()
+        .then(location => {
+          if (location) {
+            // Zip code exists, use the existing loc_id
+            loc_id = location.loc_id;
+          } else {
+            // Zip doesn't exist, insert new location into location table
+            return trx('location')
+              .insert({
+                city: city,
+                state: state,
+                zip: zip,
+              })
+              .returning('loc_id') // Get the newly inserted loc_id
+              .then(newLocation => {
+                loc_id = newLocation[0].loc_id; // Capture the new loc_id
+              });
+          }
+        })
+        .then(() => {
+          // Step 2: Check if the event zip code exists in the 'location' table (for event location)
+          return trx('location')
+            .select('loc_id')
+            .where('zip', eventZip)
+            .first()
+            .then(existingLocation => {
+              if (existingLocation) {
+                // Event zip exists, use the existing loc_id for the event
+                eventLoc_id = existingLocation.loc_id;
+              } else {
+                // Event zip doesn't exist, insert new location for the event
+                return trx('location')
+                  .insert({
+                    city: eventCity,
+                    state: eventState,
+                    zip: eventZip,
+                  })
+                  .returning('loc_id')
+                  .then(newEventLocation => {
+                    eventLoc_id = newEventLocation[0].loc_id; // Capture the new loc_id for the event
+                  });
+              }
+            });
+        })
+        .then(() => {
+          // Step 3: Check if the email exists in the 'contact_info' table
+            return trx('contact_info')
+              .select('contact_id')
+              .where('email', email)  // Use the provided existing email
+              .first()
+              .then(existingContact => {
+                if (existingContact) {
+                  // If the contact exists, use the existing contact_id
+                  contact_id = existingContact.contact_id;
+                } else {
+                  // If the contact doesn't exist, create a new contact
+                  return trx('contact_info')
+                    .insert({
+                      first_name: firstName,
+                      last_name: lastName,
+                      phone: phone,
+                      email: email,
+                      loc_id: loc_id, // Insert the loc_id for personal info
+                    })
+                    .returning('contact_id') // Get the newly inserted contact_id
+                    .then(newContact => {
+                      contact_id = newContact[0].contact_id;  // Capture the new contact_id
+                    });
+                }
+              });
+        })
+        .then(() => {
+            // Handle empty strings and convert them to null for numeric fields
+            const validNumAdults = !isNaN(parseInt(estNumAdults)) ? parseInt(estNumAdults) : null;
+            const validNumYouth = !isNaN(parseInt(estNumYouth)) ? parseInt(estNumYouth) : null;
+            const validNumChildren = !isNaN(parseInt(estNumChildren)) ? parseInt(estNumChildren) : null;
+            const validNumMachines = !isNaN(parseInt(numMachines)) ? parseInt(numMachines) : null;
+            const validStoryDuration = !isNaN(parseInt(storyDuration)) ? parseInt(storyDuration) : null;
+            const validNumTables = !isNaN(parseInt(numTables)) ? parseInt(numTables) : null;
+            
+
+          // Step 4: Insert the event into requested_events table
+          return trx('requested_events')
+          .where('event_id', event_id)
+            .update({
+              estimated_date: estDate,
+              street_address: address,
+              estimated_start_time: estStartTime,
+              estimated_duration: estDuration,
+              type_id: eventType,
+              loc_size: loc_size,
+              estimated_num_adults: validNumAdults,
+              estimated_num_youth: validNumYouth,
+              estimated_num_children: validNumChildren,
+              num_machines: validNumMachines,
+              share_story: shareStory,
+              story_minutes: validStoryDuration,
+              num_tables: validNumTables,
+              table_shape: tableShape,
+              additional_notes: additionalNotes,
+              organization: organization,
+              status: status,
+              contact_id: contact_id,  // Insert the contact_id from contact_info
+              loc_id: eventLoc_id,  // Insert the loc_id for the event location
+            });
+        })
+        .then(() => {
+          // Step 5: Check if the status is 'finished' and insert into executed_events
+          if (status === 'finished') {
+            return trx('executed_events')
+                .where('event_id', event_id)  // Check if the event already exists in executed_events
+                .first()  // Get the first match
+                .then(existingExecutedEvent => {
+                    if (!existingExecutedEvent) {
+                      return trx('executed_events')
+                        .insert({
+                          event_id: event_id,  // Insert the event_id into executed_events
+                          actual_start_date: actualStartDate,  // You can add a timestamp column in your table
+                          actual_start_time: actualStartTime,
+                          actual_duration: actualDuration,
+                          actual_num_people: actualNumPeople,
+                          type_id: eventType,
+                          pockets: pockets,
+                          collars: collars,
+                          envelopes: envelopes,
+                          vests: vests,
+                          items_completed: itemsCompleted,
+                          actual_end_date: actualEndDate
+                        });
+                      }  else {
+                        return trx('executed_events')
+                        .where('event_id', event_id)
+                        .update({
+                          actual_start_date: actualStartDate,  // You can add a timestamp column in your table
+                          actual_start_time: actualStartTime,
+                          actual_duration: actualDuration,
+                          actual_num_people: actualNumPeople,
+                          type_id: eventType,
+                          pockets: pockets,
+                          collars: collars,
+                          envelopes: envelopes,
+                          vests: vests,
+                          items_completed: itemsCompleted,
+                          actual_end_date: actualEndDate
+                        });
+                      }
+                })
+          }
+    })
+        .then(() => {
+          // Step 6: Commit the transaction and redirect to the edit event page
+          if (status === 'finished') {
+            res.redirect(`/editEvent/${event_id}`);  // Redirect to the edit event page
+          } else {
+            res.redirect('/events');  // Otherwise, redirect to the events list
+          }
+        })
+        .catch(error => {
+          console.error('Error Editing event:', error);
+          res.status(500).send('Internal Server Error');
+        });
+    });
+  }else {
     res.redirect('/login');
   }
 });
+
+
 
 // *** ------------------------------ End Events ------------- *** //
 
 // *** ------------------------------ FAQ Routes ------------- *** //
 // FAQs Page
 app.get('/faqs', (req, res) => {
-    res.render("admin_Views/FAQs", {
-        title: 'Manage FAQs',
-        pageType: 'FAQ',
-        navItems: [],  // You can add navigation items here if needed
-        layout: 'layouts/adminLayout'  // Use the admin layout for this route
-      });
+  if (authorized) { 
+      res.render("admin_Views/FAQs", {
+      title: 'Manage FAQs',
+      pageType: 'FAQ',
+      navItems: [],  // You can add navigation items here if needed
+      layout: 'layouts/adminLayout'  // Use the admin layout for this route
+    });
+  }else {
+    res.redirect('/login');
+  }
+
 });
 
 // Trainings Page
@@ -463,75 +690,82 @@ app.get('/trainings', (req, res) => {
 });
 // *** --------------------------------- BEGIN ADD Routes --------------------------------***
 app.post('/add-admin', (req, res) => {
-  // Extract values from the request body
-  const contact_id = req.body.contactId;  // The selected contact ID from the dropdown
-  const username = req.body.username || ''; // Username input
-  const password = req.body.password || ''; // Password input
+  if (authorized) { 
+    // Extract values from the request body
+    const contact_id = req.body.add_entity_name;  // The selected contact ID from the dropdown
+    const username = req.body.username || ''; // Username input
+    const password = req.body.password || ''; // Password input
 
-  // Validation (optional, but you might want to validate these fields)
-  if (!contact_id || !username || !password) {
-    return res.status(400).send('Missing required fields');
+    // Validation (optional, but you might want to validate these fields)
+    if (!contact_id || !username || !password) {
+      return res.status(400).send('Missing required fields');
+    }
+
+    // Insert into the admins table
+    knex('admins')
+      .insert({
+        contact_id: contact_id, // The contact_id selected from the dropdown
+        username: username,
+        password: password // You might want to hash the password before saving it
+      })
+      .then(() => {
+        // Redirect to the admins page after successful insertion
+        res.redirect('/admins');
+      })
+      .catch(error => {
+        console.error('Error adding admin:', error);
+        res.status(500).send('Internal Server Error');
+      });
+  }else {
+    res.redirect('/login');
   }
-
-  // Insert into the admins table
-  knex('admins')
-    .insert({
-      contact_id: contact_id, // The contact_id selected from the dropdown
-      username: username,
-      password: password // You might want to hash the password before saving it
-    })
-    .then(() => {
-      // Redirect to the admins page after successful insertion
-      res.redirect('/admins');
-    })
-    .catch(error => {
-      console.error('Error adding admin:', error);
-      res.status(500).send('Internal Server Error');
-    });
+  
 });
-
 
 
 app.post('/add-team_member', (req, res) => {
-  // Extract form values from req.body
-  const first_name = req.body.firstName || ''; // Default to empty string if not provided
-  const last_name = req.body.lastName || ''; // Default to empty string if not provided
-  const email = req.body.email || ''; // Checkbox returns true or undefined
-  const phone = req.body.phone || null;
-  const source = req.body.source || '';
-  const sewing_level = parseInt(req.body.sewingLevel, 10) || null; // Convert level to Int
-  const hours_willing = parseInt(req.body.hoursWilling, 10) || null; // Convert to integer
+  if (authorized) { 
+    // Extract form values from req.body
+    const first_name = req.body.firstName || ''; // Default to empty string if not provided
+    const last_name = req.body.lastName || ''; // Default to empty string if not provided
+    const email = req.body.email || ''; // Checkbox returns true or undefined
+    const phone = req.body.phone || null;
+    const source = req.body.source || '';
+    const sewing_level = parseInt(req.body.sewingLevel, 10) || null; // Convert level to Int
+    const hours_willing = parseInt(req.body.hoursWilling, 10) || null; // Convert to integer
 
-  // Insert the contact information into the contact_info table
-  knex('contact_info')
-      .insert({
-          first_name: toTitleCase(first_name),   // Ensure first_name is uppercase
-          last_name: toTitleCase(last_name),
-          phone: phone,
-          email: email
-      })
-      .returning('contact_id') // Return the contact_id of the newly inserted row
-      .then(contactIds => {
-        const contact_id = contactIds[0].contact_id; // Correct: Extract the contact_id from the object
-          // Now insert into the team_members table using the generated contact_id
-          return knex('team_members')
-              .insert({
-                  contact_id: contact_id, // Use the generated contact_id here
-                  source_id: source,
-                  sewing_level: sewing_level,
-                  hours_willing: hours_willing
-              });
-      })
-      .then(() => {
-          res.redirect('/team_members'); // Redirect to the main page after successful insertion
-      })
-      .catch(error => {
-          console.error('Error adding team member:', error);
-          res.status(500).send('Internal Server Error');
-      });
+    // Insert the contact information into the contact_info table
+    knex('contact_info')
+        .insert({
+            first_name: toTitleCase(first_name),   // Ensure first_name is uppercase
+            last_name: toTitleCase(last_name),
+            phone: phone,
+            email: email
+        })
+        .returning('contact_id') // Return the contact_id of the newly inserted row
+        .then(contactIds => {
+          const contact_id = contactIds[0].contact_id; // Correct: Extract the contact_id from the object
+            // Now insert into the team_members table using the generated contact_id
+            return knex('team_members')
+                .insert({
+                    contact_id: contact_id, // Use the generated contact_id here
+                    source_id: source,
+                    sewing_level: sewing_level,
+                    hours_willing: hours_willing
+                });
+        })
+        .then(() => {
+            res.redirect('/team_members'); // Redirect to the main page after successful insertion
+        })
+        .catch(error => {
+            console.error('Error adding team member:', error);
+            res.status(500).send('Internal Server Error');
+        });
+  }else {
+    res.redirect('/login');
+  }
+  
 });
-
-
 
 // *** --------------------------------- END ADD Routes --------------------------------***
 
@@ -539,6 +773,7 @@ app.post('/add-team_member', (req, res) => {
 // *** --------------------------------- Begin DELETE Routes --------------------------------***
 
 app.post('/delete-admin/:id', async (req, res) => {
+  if (authorized) { 
   const id = req.params.id;
   knex('admins')
     .where('contact_id', id)
@@ -550,11 +785,15 @@ app.post('/delete-admin/:id', async (req, res) => {
       console.error('Error deleting Admin:', error);
       res.status(500).send('Internal Server Error');
     });
+  }else {
+    res.redirect('/login');
+  }
 });
 
 app.post('/delete-team_member/:id', async (req, res) => {
   const id = req.params.id;
-  knex('team_members')
+  if (authorized) { 
+    knex('team_members')
     .where('contact_id', id)
     .del() // Deletes the record with the specified ID
     .then(() => {
@@ -563,13 +802,17 @@ app.post('/delete-team_member/:id', async (req, res) => {
     .catch(error => {
       console.error('Error deleting Team Member:', error);
       res.status(500).send('Internal Server Error');
-    });
+    });  
+  }else {
+    res.redirect('/login');
+  }
 });
 
 
 app.post('/delete-event/:id', async (req, res) => {
   const id = req.params.id;
-  knex('requested_events')
+  if (authorized) { 
+    knex('requested_events')
     .where('event_id', id)
     .del() // Deletes the record with the specified ID
     .then(() => {
@@ -580,6 +823,10 @@ app.post('/delete-event/:id', async (req, res) => {
       console.error('Error deleting Event:', error);
       res.status(500).send('Internal Server Error');
     });
+  }else {
+    res.redirect('/login');
+  }
+  
 });
 // *** --------------------------------- End DELETE Routes --------------------------------***
 

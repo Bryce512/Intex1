@@ -32,10 +32,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const closeModal = function () {
     if (modal1){
       modal1.classList.remove('visible');
+    } else if (pageType === 'editEvent'){
+      window.location.href = '/events';
+    }else {
+      modal.classList.remove('visible');
+      overlay.classList.remove('visible');
+      deleteButton.style.display = 'none'; // Hide the delete button when closing modal
     }
-    modal.classList.remove('visible');
-    overlay.classList.remove('visible');
-    deleteButton.style.display = 'none'; // Hide the delete button when closing modal
+
   };
 
   // Open modal function
@@ -259,6 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // *** SEARCH BAR
 // Search function triggered by input in the search box
 async function liveSearch(query) {
+  console.log("executing search query: " + query)
   if (!query) {
     // If there's no query, reset the table to show all rows
     const allRows = document.querySelectorAll('#mainTable .editable-row');
@@ -287,9 +292,12 @@ async function liveSearch(query) {
       }
     } else if (entity == 'events') {
       const firstName = row.getAttribute('data-first-name').toLowerCase(); // Get first name
+      const lastName = row.getAttribute('data-last-name').toLowerCase();
+      const organization = row.getAttribute('data-organization').toLowerCase();
+      const date = row.getAttribute('data-date');
 
       // Check if the query matches the first or last name
-      if (firstName.includes(queryLower) || lastName.includes(queryLower)) {
+      if (firstName.includes(queryLower) || lastName.includes(queryLower) || organization.includes(queryLower)) {
         row.style.display = '';  // Show matching row
       } else {
         row.style.display = 'none';  // Hide non-matching row
