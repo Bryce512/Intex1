@@ -67,3 +67,180 @@
     }
   }
 </style>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Calendar Events</title>
+    <!-- Include jQuery from CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Simple styles for calendar */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+        td {
+            height: 80px;
+        }
+        .event {
+            background-color: #ffeb3b;
+            margin: 5px;
+            padding: 3px;
+            border-radius: 3px;
+        }
+        h1 {
+            text-align: center; /* Centers the text horizontally */
+            margin: 20px 0; /* Adds some space around the header */
+        }
+    </style>
+</head>
+<body>
+  <h1>Calendar for <span id="calendar-month"></span></h1>
+
+    <div id="calendar-container">
+        <!-- Calendar will be dynamically inserted here -->
+    </div>
+
+    <script>
+    const apiKey = 'AIzaSyBWuZSpV2VtERnoYp9_UY29cbUwbi3dFz0';  // Replace with your actual API key
+    const calendarId = 'loganspencer203@gmail.com';  // Replace with your calendar ID
+    const currentDate = new Date();
+
+    // Get current month and year
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June", 
+        "July", "August", "September", "October", "November", "December"
+    ];
+    const currentMonth = monthNames[currentDate.getMonth()]; // Get the month name
+
+    // Update the title with the current month
+    $('#calendar-month').text(currentMonth);
+
+    function loadCalendarEvents() {
+        // Get current month and year
+        const month = currentDate.getMonth(); // 0-based (January is 0)
+        const year = currentDate.getFullYear();
+
+        $(document).ready(function() {
+    
+
+    // Load the calendar events
+    loadCalendarEvents();
+});
+
+        // Calculate the first and last day of the current month
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+
+        const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${firstDay.toISOString()}&timeMax=${lastDay.toISOString()}&singleEvents=true&orderBy=startTime`;
+
+        // Fetch approved events from your database
+        $.get('/api/approved-events', function(databaseEvents) {
+            // Make the request to Google Calendar API
+            $.get(url, function(response) {
+                const googleEvents = response.items;
+                // Merge database events and Google Calendar events
+                const allEvents = mergeEvents(databaseEvents, googleEvents);
+                renderCalendar(allEvents, month, year);
+            }).fail(function(error) {
+                console.log("Error fetching Google events: ", error);
+                $('#calendar-container').append('<p>Error fetching events.</p>');
+            });
+        }).fail(function(error) {
+            console.log("Error fetching database events: ", error);
+            $('#calendar-container').append('<p>Error fetching approved events.</p>');
+        });
+    }
+
+    function mergeEvents(databaseEvents, googleEvents) {
+        // Convert database events to a similar format to Google events
+        const formattedDatabaseEvents = databaseEvents.map(event => ({
+            start: {
+                dateTime: event.estimated_date,  // Assuming your database stores start_date
+                date: event.estimated_date  // This should be in ISO format
+            },
+            summary: event.organization  // Assuming you store the organization's name in 'organization_name'
+        }));
+
+        // Merge Google Calendar events and database events
+        return googleEvents.concat(formattedDatabaseEvents);
+    }
+
+    function renderCalendar(events, month, year) {
+        // Create a table for the current month
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0: Sunday, 6: Saturday
+
+        // Create the table for the calendar
+        let calendarHtml = '<table><thead><tr>';
+        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        daysOfWeek.forEach(day => calendarHtml += `<th>${day}</th>`);
+        calendarHtml += '</tr></thead><tbody><tr>';
+
+        // Fill in the leading empty days before the first day of the month
+        for (let i = 0; i < firstDayOfMonth; i++) {
+            calendarHtml += '<td></td>';
+        }
+
+        // Fill the days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            // Check if we need to start a new row
+            if ((firstDayOfMonth + day - 1) % 7 === 0 && day !== 1) {
+                calendarHtml += '</tr><tr>';
+            }
+
+            // Create the cell for this day
+            const eventHtml = getEventsForDay(events, day);
+            calendarHtml += `<td><strong>${day}</strong>${eventHtml}</td>`;
+        }
+
+        // Fill in the remaining empty cells after the last day
+        const remainingCells = 7 - ((firstDayOfMonth + daysInMonth - 1) % 7 + 1);
+        for (let i = 0; i < remainingCells && remainingCells < 7; i++) {
+            calendarHtml += '<td></td>';
+        }
+
+        calendarHtml += '</tr></tbody></table>';
+
+        // Append the calendar HTML to the page
+        $('#calendar-container').html(calendarHtml);
+    }
+
+    function getEventsForDay(events, day) {
+        const eventsForDay = events.filter(event => {
+            const eventDate = new Date(event.start.dateTime || event.start.date);
+            return eventDate.getDate() === day;
+        });
+
+        if (eventsForDay.length === 0) {
+            return '';
+        }
+
+        let eventHtml = '<div class="events-list">';
+        eventsForDay.forEach(event => {
+            const start = event.start.dateTime || event.start.date;
+            const title = event.summary || 'No Title';
+            eventHtml += `<div class="event">${title}</div>`;
+        });
+        eventHtml += '</div>';
+
+        return eventHtml;
+    }
+
+    // Run the function when the page loads
+    $(document).ready(function() {
+        loadCalendarEvents();
+    });
+</script>
+
+</body>
+</html>
