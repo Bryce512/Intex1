@@ -564,8 +564,20 @@ app.post('/delete-event/:id', async (req, res) => {
       res.status(500).send('Internal Server Error');
     });
 });
+
 // *** --------------------------------- End DELETE Routes --------------------------------***
 
+
+// Begin Calendar Routes 
+app.get('/api/approved-events', async (req, res) => {
+  try {
+      const result = await knex('requested_events').where('status', 'approved');
+      res.json(result); // Send the events as JSON
+  } catch (error) {
+      console.error('Error fetching events:', error);
+      res.status(500).json({ error: 'Failed to fetch approved events' });
+  }
+});
 
 
 // *** --------------------------------- PUBLIC Routes --------------------------------***
@@ -921,6 +933,10 @@ app.post('/joinTeam', (req, res) => {
       });
   });
 });
+
+
+
+
 
 
 // port number, (parameters) => what you want it to do.
