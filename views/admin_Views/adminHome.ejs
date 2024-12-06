@@ -101,9 +101,41 @@
             text-align: center; /* Centers the text horizontally */
             margin: 20px 0; /* Adds some space around the header */
         }
+        /* Modal-specific styling */
+        #eventModal {
+            animation: fadeIn 0.3s ease-out;
+        }
+        #modalBackground {
+            animation: fadeInBackground 0.3s ease-out;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -60%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        @keyframes fadeInBackground {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
     </style>
+
+    
 </head>
 <body>
+  <!-- Modal Container -->
+<div id="eventModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 500px; background: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1000;">
+  <div style="padding: 20px;">
+      <span id="closeModal" style="position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 18px; font-weight: bold;">&times;</span>
+      <div id="modalContent">
+          <!-- Event details will be dynamically inserted here -->
+      </div>
+  </div>
+</div>
+<!-- Modal Background -->
+<div id="modalBackground" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999;"></div>
+
   <h3 style="display: flex; justify-content: center;"><span id="calendar-month"></span></h3>
 
     <div id="calendar-container">
@@ -153,11 +185,11 @@
                 renderCalendar(allEvents, month, year);
             }).fail(function(error) {
                 console.log("Error fetching Google events: ", error);
-                $('#calendar-container').append('<p>Error fetching events.</p>');
+                // $('#calendar-container').append('<p>Error fetching events.</p>');
             });
         }).fail(function(error) {
             console.log("Error fetching database events: ", error);
-            $('#calendar-container').append('<p>Error fetching approved events.</p>');
+            // $('#calendar-container').append('<p>Error fetching approved events.</p>');
         });
     }
 
@@ -240,6 +272,59 @@
     $(document).ready(function() {
         loadCalendarEvents();
     });
+
+    function showEventDetails(eventId) {
+    // Fetch event details from the API
+    $.get(`/api/event-details/${eventId}`, function(details) {
+        // Populate the modal with event details
+        const detailsHtml = `
+            <h2>${details.organization || 'Event Details'}</h2>
+            <p><strong>Date:</strong> ${new Date(details.estimated_date).toLocaleDateString()}</p>
+            <p><strong>Organization:</strong> ${details.organization}</p>
+            <p><strong>Organization:</strong> ${details.first_name}</p>
+            <p><strong>Organization:</strong> ${details.last_name}</p>
+            <p><strong>Organization:</strong> ${details.phone}</p>
+            <p><strong>Organization:</strong> ${details.street_address}</p>
+            <p><strong>Organization:</strong> ${details.location}</p>
+            <p><strong>Organization:</strong> ${details.estimated_start_time}</p>
+            <p><strong>Organization:</strong> ${details.estimated_duration}</p>
+            <p><strong>Organization:</strong> ${details.type_description}</p>
+            <p><strong>Organization:</strong> ${details.size_description}</p>
+            <p><strong>Organization:</strong> ${details.estimated_num_adults}</p>
+            <p><strong>Organization:</strong> ${details.estimated_num_youth}</p>
+            <p><strong>Organization:</strong> ${details.estimated_num_children}</p>
+            <p><strong>Organization:</strong> ${details.num_machines}</p>
+            <p><strong>Organization:</strong> ${details.share_story}</p>
+            <p><strong>Organization:</strong> ${details.story_minutes}</p>
+            <p><strong>Organization:</strong> ${details.num_tables}</p>
+            <p><strong>Organization:</strong> ${details.shape_description}</p>
+            <p><strong>Organization:</strong> ${details.organization}</p>
+            <p><strong>Organization:</strong> ${details.additional_notes}</p>`;
+
+
+
+        $('#modalContent').html(detailsHtml);
+        $('#eventModal').show(); // Show the modal
+        $('#modalBackground').show(); // Show the modal background
+    }).fail(function(error) {
+        console.log('Error fetching event details:', error);
+        alert('Failed to fetch event details. Please try again.');
+    });
+}
+$(document).ready(function() {
+    // Close the modal when the close button is clicked
+    $('#closeModal').click(function() {
+        $('#eventModal').hide();
+        $('#modalBackground').hide();
+    });
+
+    // Close the modal when the background is clicked
+    $('#modalBackground').click(function() {
+        $('#eventModal').hide();
+        $('#modalBackground').hide();
+    });
+});
+
 </script>
 
 </body>
