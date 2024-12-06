@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const navLinks = document.querySelectorAll('.eventBtnContainer a');
   navLinks.forEach(link => {
     const linkHref = link.getAttribute('href'); // The href of the link
-    if (currentUrl ===('http://localhost:3000' + linkHref || currentUrl ===('tsp.brycewhitworth.com' + linkHref) )) {
+    if ((currentUrl ===('http://localhost:3000' + linkHref)) || (currentUrl ===('https://tsp.brycewhitworth.com' + linkHref))) {
       link.classList.add('active');  // Add active class if URL matches
     } else {
       link.classList.remove('active');  // Remove active class if URL doesn't match

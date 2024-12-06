@@ -109,6 +109,9 @@ nav .collection {
   color: var(--dark-grey);  /* Optionally, change the text color for better contrast */
 }
 
+.howYouCanHelp_link {
+  color: var(--dark-grey) !important;
+}
 
 
 
