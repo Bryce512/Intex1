@@ -48,49 +48,49 @@ document.addEventListener('DOMContentLoaded', function() {
     overlay.classList.add('visible');
   };
 
-  const closeAdminModal = function () {
-    modal.classList.remove('visible');
-    modal1.classList.remove('visible');
-    overlay.classList.remove('visible');
-    deleteButton.style.display = 'none'; // Hide the delete button when closing modal
-  }
+    const closeAdminModal = function () {
+      modal.classList.remove('visible');
+      modal1.classList.remove('visible');
+      overlay.classList.remove('visible');
+      deleteButton.style.display = 'none'; // Hide the delete button when closing modal
+    }
 
   
-  // Close the modal when the cancel button is clicked
-  if (closeModalBtn) {
-    closeModalBtn.addEventListener('click', closeModal);
-  }
+    // Close the modal when the cancel button is clicked
+    if (closeModalBtn) {
+      closeModalBtn.addEventListener('click', closeModal);
+    }
 
-  if(closeAdminModalBtn) {
-    closeAdminModalBtn.addEventListener('click', closeAdminModal);
-  }
+    if(closeAdminModalBtn) {
+      closeAdminModalBtn.addEventListener('click', closeAdminModal);
+    }
 
-  // Close modal when clicking the overlay
-  if (overlay) {
-    overlay.addEventListener('click', closeModal);
-    overlay.addEventListener('click', closeAdminModal);
+    // Close modal when clicking the overlay
+    if (overlay) {
+      overlay.addEventListener('click', closeModal);
+      overlay.addEventListener('click', closeAdminModal);
 
-  }
+    }
 
 
-  // Open the modal when the Add button is clicked (reset the form)
-  if (addButton) {
-    addButton.addEventListener('click', function() {
-      if (pageType == "admin") {
-        openAddAdminModal()
-      } else if (pageType == "team_member") {
-        window.location.href = '/joinTeam';
-      } else if (pageType == "event") {
-        window.location.href = '/event'
-      }
-      else {
-        addModal(); // Reset fields before opening the modal
-        openModal(); // Open the modal
-      }
-    });
-  }
+    // Open the modal when the Add button is clicked (reset the form)
+    if (addButton) {
+      addButton.addEventListener('click', function() {
+        if (pageType == "admin") {
+          openAddAdminModal()
+        } else if (pageType == "team_member") {
+          window.location.href = '/joinTeam';
+        } else if (pageType == "event") {
+          window.location.href = '/event'
+        }
+        else {
+          addModal(); // Reset fields before opening the modal
+          openModal(); // Open the modal
+        }
+      });
+    }
 
-// Open Add Admin Modal
+    // Open Add Admin Modal
     const openAddAdminModal = () => {
       // Show modal
       modal1.classList.add('visible');
@@ -98,8 +98,8 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
 
-  // Reset the modal form fields to default (for "Add" functionality)
-  const addModal = function () {
+    // Reset the modal form fields to default (for "Add" functionality)
+    const addModal = function () {
     // Select modal elements
     const titleElement = document.getElementById('modalTitle');  // Make sure the ID matches
     const form = document.querySelector('form');
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let formAction = '';
 
     
-if (pageType === "event") {
+    if (pageType === "event") {
         // Populate modal with data
         document.getElementById('entity-first-name').value = '';
         document.getElementById('entity-last-name').value = '';
